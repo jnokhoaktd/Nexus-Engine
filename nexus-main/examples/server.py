@@ -446,6 +446,15 @@ app = FastAPI(
     description="Answer arbitrary questions about a state with language-routed encoder models.",
     lifespan=lifespan,
 )
+# --- Nexus: trang web 1 cham, cung nguon voi API nen khong can CORS ---
+@app.get("/nexus", include_in_schema=False)
+def _nexus_page():
+    import pathlib
+    from fastapi.responses import HTMLResponse
+    f = pathlib.Path(__file__).resolve().parents[2] / "Nexus-1-cham.html"
+    if not f.exists():
+        return HTMLResponse("Khong tim thay file Nexus-1-cham.html", status_code=404)
+    return HTMLResponse(f.read_text(encoding="utf-8"))
 
 
 def _wants_html(request: Request) -> bool:
