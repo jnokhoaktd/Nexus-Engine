@@ -1,0 +1,10 @@
+﻿1756: if (i >= n) fail(n ? "Unexpected end of JSON; expected a value" : "Empty; expected a JSON value");
+1923: const hint = h("span", {id: "cxh-" + opts.id, text: "Tab indents \u00b7 Esc, then Tab to leave"});
+2612: : !st.ok ? "invalid JSON" : typeof v === "string" ? "text" : Array.isArray(v) ? "list" : "object";
+2614: $("#qSub").textContent = qn != null ? plural(qn, "question") : qs.ok ? "not an object" : "invalid JSON";
+2854: let s = "preview", hint = S.qValue ? "Run the request to answer " + count(S.qValue, "question") : "";
+3047: const intro = h("p", {class: "pv-intro"}, "Nothing has run yet. Press ", h("kbd", {text: MOD + "+\u21b5"}),
+3057: const what = q.type === "noul" ? "true / false"
+3064: return h("div", {class: "alist"}, listHead("Possible answers"), rows);
+3446: f"{_icon('link')}Copy link</button>"
+3707: return [f"Invalid JSON: {exc.msg} at line {exc.lineno}, column {exc.colno}"]

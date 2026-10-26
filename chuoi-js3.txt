@@ -1,0 +1,9 @@
+﻿1737: const plural = (n, w) => n + " " + w + (n === 1 ? "" : "s");
+2490: const count = new Set(recs.map((r) => r.key)).size, over = recs[LIMITS.questions];
+2600: function counters(st, qs) {
+2783: modelSel.append(h("option", {value: m}, m + " (unknown)"));
+2790: if (!Array.from(presetSel.options).some((o) => o.value === name)) presetSel.append(h("option", {value: name}, label));
+3058: : q.type === "choice" ? (isMap(c) ? plural(Object.keys(c).length, "option")
+3059: : Array.isArray(c) && c.length ? plural(c.length, "option") : "no options yet")
+3060: : q.type === "score" ? (Array.isArray(c) ? plural(c.length, "level") : "no levels yet") : "\u2014";
+3079: const count = {};

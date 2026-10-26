@@ -1,0 +1,46 @@
+﻿501: "models": {k: list(v) for k, v in (getattr(laya, "DEFAULT_MODELS", {}) or {}).items()},
+1102: "fields": "<path d='M2.5 4.5h3M7.5 4.5h6M2.5 8h3M7.5 8h6M2.5 11.5h3M7.5 11.5h6'/>",
+1103: "form": "<rect x='2.5' y='2.5' width='11' height='4.5' rx='1'/>"
+1126: for href, label in (("/models", "Models"), ("/health", "Health"), ("/docs", "API docs"))
+2076: stateMode: "fields", qMode: "form", fields: [], qs: [], base: null, last: null, running: false,
+2077: problems: [], body: null, qValue: null, view: "answers", notes: {state: null, questions: null},
+2268: const names = q.extra.map(([k], j) => [j ? ", " : "", h("code", {text: k})]);
+2429: if (S.stateMode === "fields") {
+2528: if (S.qMode === "form") {
+2581: if (S.view === "code") renderCode();
+2611: $("#stateSub").textContent = S.stateMode === "fields" ? plural(filledFields().length, "field")
+2613: const qn = S.qMode === "form" ? S.qs.length : qs.ok && isMap(qs.value) ? Object.keys(qs.value).length : null;
+2762: S.stateMode = sn.stateMode !== "json" && !st.error && !fieldsBlocker(st.ast) ? "fields" : "json";
+2763: S.qMode = sn.qMode !== "json" && !qp.error && !formBlocker(qp.ast) ? "form" : "json";
+2764: if (S.stateMode === "fields") S.fields = st.ast.entries.map((en) => ({k: en.k, v: en.v.v}));
+2766: if (S.qMode === "form") S.qs = qp.ast.entries.map(qFromAst);
+2777: return {stateMode: pref.stateMode || "fields", qMode: pref.qMode || "json",   /* the last editors picked */
+2867: else if (S.view !== "answers") announce("The run failed: " + hint + ".");
+2931: h("div", {class: "al-head"}, h("span", {text: "Key & instructions"}), h("span", {text: right}));
+2935: return parts.map((part, j) => (j % 2 ? h("code", {text: part}) : part));
+2957: expandBtn.hidden = S.view !== "answers" || !list.querySelector("details");
+3030: h("span", null, h("code", {text: "answer_confidence"}), h("b", {text: calibrated.toFixed(4)}), "calibrated"));
+3034: h("code", {text: "confidence"}), h("b", {text: ans.confidence.toFixed(4)}),
+3048: " to answer these questions about the state.");
+3099: if (S.qMode === "form") {
+3200: viewAnswers.hidden = v !== "answers";
+3202: viewCode.hidden = v !== "code";
+3203: expandBtn.hidden = v !== "answers" || !viewAnswers.querySelector("details.ans");
+3205: if (v === "code") renderCode();
+3403: setView(ui.view === "json" || ui.view === "code" ? ui.view : "answers");
+3441: _crumb("Playground", "h1")
+3453: "state", "State editor", (("fields", "fields", "Fields"), ("json", "braces", "JSON"))))
+3455: "questions", "Questions editor", (("form", "form", "Form"), ("json", "braces", "JSON"))))
+3459: for v, label in (("answers", "Answers"), ("json", "JSON"), ("code", "Code"))
+3578: repo, rev = (payload["models"].get(name) or [None, None])[:2]
+3596: "Models",
+3642: "Health",
+3770: answers = res.get("answers") or {}
+----
+3047:   const intro = h("p", {class: "pv-intro"}, "Nothing has run yet. Press ", h("kbd", {text: MOD + "+\u21b5"}),
+3048:     " to answer these questions about the state.");
+3049:   viewAnswers.replaceChildren(intro, list);
+3050: }
+2854:   let s = "preview", hint = S.qValue ? "Run the request to answer " + count(S.qValue, "question") : "";
+2855:   if (S.running) [s, hint] = ["running", "Waiting for the server\u2026"];
+2856:   else if (L && !same) [s, hint] = ["stale", "The request changed since this run"];

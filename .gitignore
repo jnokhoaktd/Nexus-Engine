@@ -1,0 +1,42 @@
+﻿# 🚀 Nexus Engine - Trợ Lý Phân Tích Phản Hồi Khách Hàng Tiếng Việt (No-Code)
+
+**Nexus Engine** là mô hình NLP chạy cục bộ (Local & Open-Source Apache-2.0), được thiết kế để giúp các hộ kinh doanh nhỏ và SME tự động phân loại đánh giá của khách hàng (Sentiment, Loại khiếu nại, Ý định hoàn trả) mà không cần lập trình.
+
+---
+
+## 🗺️ Sơ Đồ Tổng Quan Dự Án (Nexus Mindmap)
+
+```mermaid
+mindmap
+  root((Nexus Engine))
+    Sản Phẩm Core
+      Chạy Cục Bộ Local
+      Mã Nguồn Mở Apache-2.0
+      Tích Hợp FastAPI Server
+    Đối Tượng Sử Dụng
+      Chủ Shop Shopee / TikTok
+      Hộ Kinh Doanh F&B / Thời Trang
+      Doanh Nghiệp Vừa & Nhỏ (SME)
+    Tính Năng Phân Tích
+      Phân Loại Lỗi complaint_type
+        Kích thước sizing_fit
+        Chất lượng quality
+        Vận chuyển shipping
+        Hướng dẫn instructions
+        Giá cả price_value
+      Mức Độ Hài Lòng sentiment
+      Ý Định Trả Hàng wants_return
+    Lộ Trình Phát Triển R&D
+      Pha 1: Zero-Shot Backtest (Đạt 46.0%)
+      Pha 2: Fine-Tune Dataset Tiếng Việt (1.000 - 2.000 mẫu)
+      Pha 3: Đạt Mục Tiêu Độ Chính Xác (75% - 85%)
+
+Set-Location D:\nghien-cuu-ck
+
+# 1. Tạo file .gitignore để bỏ qua môi trường ảo và các file tạm
+@'
+.venv/
+__pycache__/
+*.pyc
+*.bak
+.DS_Store

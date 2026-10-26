@@ -1,0 +1,60 @@
+﻿1 | dong 1129 | chu trong the | Laya
+2 | dong 1248 | chu trong the | raw answer
+3 | dong 1265 | chu trong the | uncertain
+4 | dong 1295 | chu trong the | answer_confidence
+5 | dong 1295 | chu trong the | calibrated
+6 | dong 1299 | chu trong the | confidence
+7 | dong 1889 | chu trong the | = off && errAt
+8 | dong 1895 | chu trong the | = at && errAt
+9 | dong 1988 | chu trong the | 0) while (li
+10 | dong 1989 | chu trong the | 0 && off(li - 1)
+11 | dong 2734 | chu trong the | b.left && a.left
+12 | dong 2734 | chu trong the | b.top && a.top
+13 | dong 2849 | chu trong the | (ms
+14 | dong 3224 | chu trong the | = 1100 && lo
+15 | dong 3425 | chu trong the | Format
+16 | dong 3443 | chu trong the | Billing email (example)
+17 | dong 3444 | chu trong the | edited
+18 | dong 3471 | chu trong the | Auto-route by language
+19 | dong 3480 | chu trong the | Revert
+20 | dong 3481 | chu trong the | Run request
+21 | dong 3482 | chu trong the | Ctrl+&#8629;
+22 | dong 3485 | chu trong the | Response
+23 | dong 3486 | chu trong the | Preview
+24 | dong 3506 | chu trong the | JavaScript is off, so this is the plain form: edit the JSON and the server renders the answers.
+25 | dong 3508 | chu trong the | State
+26 | dong 3509 | chu trong the | Questions
+27 | dong 3510 | chu trong the | Model
+28 | dong 3512 | chu trong the | Language hint
+29 | dong 3583 | chu trong the | default
+30 | dong 3587 | chu trong the | Picked when
+31 | dong 3590 | chu trong the | Open in playground
+32 | dong 3591 | chu trong the | Copy curl
+33 | dong 3597 | chu trong the | Models
+34 | dong 3599 | chu trong the | Leave
+35 | dong 3599 | chu trong the | model
+36 | dong 3604 | chu trong the | Open the playground
+37 | dong 3605 | chu trong the | API docs
+38 | dong 3643 | chu trong the | Health
+39 | dong 3644 | chu trong the | Router state and the settings this process was started with.
+40 | dong 3649 | chu trong the | Configuration
+41 | dong 3651 | chu trong the | --device
+42 | dong 3651 | chu trong the | --no-preload
+43 | dong 3651 | chu trong the | --max-loaded
+44 | dong 3652 | chu trong the | LAYA_DEVICE
+45 | dong 3652 | chu trong the | LAYA_PRELOAD
+46 | dong 3652 | chu trong the | LAYA_MAX_LOADED
+47 | dong 3653 | chu trong the | Endpoints
+48 | dong 3654 | chu trong the | /models
+49 | dong 3654 | chu trong the | and
+50 | dong 3654 | chu trong the | /health
+51 | dong 3655 | chu trong the | Accept: application/json
+52 | dong 3657 | chu trong the | Refresh
+53 | dong 3721 | chu trong the | Error
+54 | dong 3783 | chu trong the | Answers
+55 | dong 3783 | chu trong the | OK
+56 | dong 3786 | chu trong the | Collapse all
+57 | dong 3787 | chu trong the | Edit in playground
+58 | dong 3789 | chu trong the | Key &amp; instructions
+59 | dong 3790 | chu trong the | Answer &amp; calibrated confidence
+60 | dong 444 | thuoc tinh | Laya Routing API

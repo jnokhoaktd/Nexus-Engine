@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus - Báo Cáo Phản Hồi Khách Hàng</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 25px; background: #f8fafc; color: #1e293b; }
+        .card { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h1 { color: #0f172a; margin-top: 0; font-size: 24px; }
+        p { color: #64748b; font-size: 14px; margin-bottom: 20px; }
+        textarea { width: 100%; height: 120px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        button { background: #2563eb; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 15px; }
+        button:hover { background: #1d4ed8; }
+        .nav-link { display: inline-block; margin-top: 20px; color: #64748b; text-decoration: none; font-size: 13px; }
+        .nav-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Nexus - Trợ Lý Hiểu Khách Hàng (No-Code)</h1>
+        <p>Dán danh sách đánh giá/bình luận của khách hàng vào đây để nhận báo cáo phân tích tự động.</p>
+        <textarea id="inputText" placeholder="Ví dụ:&#10;Sản phẩm giao nhanh, đóng gói đẹp!&#10;Áo bị rách chỉ ở nách, chất vải mỏng quá."></textarea>
+        <br>
+        <button onclick="alert('Đã nhận dữ liệu! Đang kết nối mô hình Nexus...')">Phân Tích Ngay</button>
+        <br>
+        <a class="nav-link" href="/playground" target="_blank">⚙ Mở Trang Kỹ Thuật (Playground R&D)</a>
+    </div>
+</body>
+</html>
