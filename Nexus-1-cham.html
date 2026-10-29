@@ -314,27 +314,27 @@ var ISSUES = {
   no_issue: "Không phàn nàn"
 };
 
-function  { return document.getElementById(id); }
+function $(id) { return document.getElementById(id); }
 
 function switchTab(e, tabId) {
-  ['tabOverview', 'tabSku', 'tabGap', 'tabDetail'].forEach(t => .style.display = 'none');
-  .style.display = 'block';
+  ['tabOverview', 'tabSku', 'tabGap', 'tabDetail'].forEach(t => $(t).style.display = 'none');
+  $(tabId).style.display = 'block';
   document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
   e.currentTarget.classList.add('active');
 }
 
 async function handleFile(file) {
   if (!file) return;
-  fileStatus.textContent = "⏳ Đang đọc dữ liệu từ file " + file.name + "...";
+  $("fileStatus").textContent = "⏳ Đang đọc dữ liệu từ file " + file.name + "...";
   state.table = null;
   
   try {
     var ext = file.name.split('.').pop().toLowerCase();
     if (ext === 'docx') {
       var r = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
-      pasteInput.value = r.value || "";
+      $("pasteInput").value = r.value || "";
     } else if (ext === 'txt') {
-      pasteInput.value = await file.text();
+      $("pasteInput").value = await file.text();
     } else {
       var wb = (ext === 'csv') ? XLSX.read(await file.text(), { type: 'string' }) : XLSX.read(await file.arrayBuffer(), { type: 'array' });
       var ws = wb.Sheets[wb.SheetNames[0]];
@@ -344,7 +344,7 @@ async function handleFile(file) {
       var header = data[0].map((h, i) => String(h || ("Cột " + (i + 1))));
       state.table = data.slice(1);
       
-      var selTxt = colText, selSku = colSku;
+      var selTxt = $("colText"), selSku = $("colSku");
       selTxt.innerHTML = ""; 
       selSku.innerHTML = "<option value='-1'>-- Không chọn (Mặc định) --</option>";
       
@@ -359,36 +359,36 @@ async function handleFile(file) {
         if (/sku|mã|sản phẩm|product/i.test(lh)) selSku.value = i;
       });
       
-      columnSelects.style.display = "grid";
-      pasteInput.value = "";
+      $("columnSelects").style.display = "grid";
+      $("pasteInput").value = "";
     }
-    fileStatus.textContent = "✅ Đã đọc xong file " + file.name + " (" + (state.table ? state.table.length : 0) + " dòng). Bấm 'Chạy Phân tích BI' bên dưới.";
+    $("fileStatus").textContent = "✅ Đã đọc xong file " + file.name + " (" + (state.table ? state.table.length : 0) + " dòng). Bấm 'Chạy Phân tích BI' bên dưới.";
   } catch (e) {
-    fileStatus.textContent = "❌ Lỗi đọc file: " + e.message;
+    $("fileStatus").textContent = "❌ Lỗi đọc file: " + e.message;
   }
   updateReadyState();
 }
 
 function updateReadyState() {
   var count = getParsedLines().length;
-  btnRun.disabled = count === 0;
+  $("btnRun").disabled = count === 0;
   if (count > 0 && !state.table) {
-    fileStatus.textContent = "✅ Đã nhận " + count + " dòng văn bản. Bấm 'Chạy Phân tích BI' để bắt đầu.";
+    $("fileStatus").textContent = "✅ Đã nhận " + count + " dòng văn bản. Bấm 'Chạy Phân tích BI' để bắt đầu.";
   }
 }
 
 function getParsedLines() {
   var lines = [], skus = [];
   if (state.table) {
-    var cTxt = parseInt(colText.value, 10) || 0;
-    var cSku = parseInt(colSku.value, 10);
+    var cTxt = parseInt($("colText").value, 10) || 0;
+    var cSku = parseInt($("colSku").value, 10);
     state.table.forEach(r => {
       var txt = String(r[cTxt] || "").trim();
       var sku = (cSku >= 0 && r[cSku] != null) ? String(r[cSku]).trim() : "Tất cả sản phẩm";
       if (txt.length >= 2) { lines.push(txt); skus.push(sku || "Tất cả sản phẩm"); }
     });
   } else {
-    pasteInput.value.split(/\r?\n/).forEach(l => {
+    $("pasteInput").value.split(/\r?\n/).forEach(l => {
       var txt = l.trim();
       if (txt.length >= 2) { lines.push(txt); skus.push("Tất cả sản phẩm"); }
     });
@@ -444,13 +444,13 @@ function renderDashboard(results) {
   });
 
   var csat = total > 0 ? (((pos * 5 + neu * 3 + neg * 1) / (total * 5)) * 5).toFixed(1) : "0.0";
-  kpiTotal.textContent = total;
-  kpiCsat.textContent = csat + " / 5.0";
-  kpiPos.textContent = (pos / total * 100).toFixed(1) + "%";
-  kpiReturn.textContent = (returns / total * 100).toFixed(1) + "%";
+  $("kpiTotal").textContent = total;
+  $("kpiCsat").textContent = csat + " / 5.0";
+  $("kpiPos").textContent = (pos / total * 100).toFixed(1) + "%";
+  $("kpiReturn").textContent = (returns / total * 100).toFixed(1) + "%";
 
   if (sentimentChartInst) sentimentChartInst.destroy();
-  var ctx1 = sentimentChart.getContext('2d');
+  var ctx1 = $("sentimentChart").getContext('2d');
   sentimentChartInst = new Chart(ctx1, {
     type: 'doughnut',
     data: {
@@ -470,7 +470,7 @@ function renderDashboard(results) {
   });
 
   if (issueChartInst) issueChartInst.destroy();
-  var ctx2 = issueChart.getContext('2d');
+  var ctx2 = $("issueChart").getContext('2d');
   issueChartInst = new Chart(ctx2, {
     type: 'bar',
     data: {
@@ -490,7 +490,7 @@ function renderDashboard(results) {
     }
   });
 
-  var skuTbody = skuTable.querySelector("tbody");
+  var skuTbody = $("skuTable").querySelector("tbody");
   skuTbody.innerHTML = "";
   Object.keys(skuMap).forEach(sku => {
     var d = skuMap[sku];
@@ -498,42 +498,42 @@ function renderDashboard(results) {
     var negPct = (d.neg / d.total * 100).toFixed(1);
     var statusBadge = negPct > 20 ? '<span class="badge badge-neg">⚠️ Cảnh báo Trả hàng cao</span>' : (posPct >= 70 ? '<span class="badge badge-pos">⭐ Sản phẩm Ngôi sao</span>' : '<span class="badge badge-warn">Ổn định</span>');
 
-    skuTbody.innerHTML += 
+    skuTbody.innerHTML += `
       <tr>
-        <td><b></b></td>
-        <td><b></b> đánh giá</td>
-        <td><b style="color:var(--pos-color);">%</b></td>
-        <td><b style="color:var(--neg-color);">%</b></td>
-        <td></td>
+        <td><b>${sku}</b></td>
+        <td><b>${d.total}</b> đánh giá</td>
+        <td><b style="color:var(--pos-color);">${posPct}%</b></td>
+        <td><b style="color:var(--neg-color);">${negPct}%</b></td>
+        <td>${statusBadge}</td>
       </tr>
-    ;
+    `;
   });
 
-  var gapBox = marketGapBox;
-  gapBox.innerHTML = 
+  var gapBox = $("marketGapBox");
+  gapBox.innerHTML = `
     <div class="insight-card">
       <h4>📌 Phân tích Chiến lược & Hành động Đề xuất cho Shop:</h4>
       <ul>
-        <li><b>Vấn đề Kích cỡ & Form dáng:</b> Chiếm <b>%</b> tổng phàn nàn. Đề xuất: Đăng video hướng dẫn đo bảng size thực tế lên trang sản phẩm để giảm 30% tỷ lệ trả hàng.</li>
-        <li><b>Rủi ro Đổi trả / Hoàn tiền:</b> Đạt mức <b>%</b>. Cần bổ sung Tem kiểm định QC và thẻ thư cảm ơn kèm mã QR hỗ trợ đổi trả 1-1 trước khi khiếu nại Shopee.</li>
+        <li><b>Vấn đề Kích cỡ & Form dáng:</b> Chiếm <b>${((issueCounts.sizing_fit || 0) / total * 100).toFixed(1)}%</b> tổng phàn nàn. Đề xuất: Đăng video hướng dẫn đo bảng size thực tế lên trang sản phẩm để giảm 30% tỷ lệ trả hàng.</li>
+        <li><b>Rủi ro Đổi trả / Hoàn tiền:</b> Đạt mức <b>${(returns / total * 100).toFixed(1)}%</b>. Cần bổ sung Tem kiểm định QC và thẻ thư cảm ơn kèm mã QR hỗ trợ đổi trả 1-1 trước khi khiếu nại Shopee.</li>
         <li><b>Đối thủ & Dịch vụ:</b> Ghi nhận khách phàn nàn về tốc độ đóng gói và lỗi thiếu phụ kiện. Nếu shop bạn bổ sung quà tặng kèm và đóng hàng chống sốc 3 lớp, bạn sẽ chiếm ưu thế vượt trội so với các shop cùng ngành.</li>
       </ul>
     </div>
-  ;
+  `;
 
   filterDetails();
 
-  outputSection.style.display = "block";
-  outputSection.scrollIntoView({ behavior: 'smooth' });
+  $("outputSection").style.display = "block";
+  $("outputSection").scrollIntoView({ behavior: 'smooth' });
 }
 
 function filterDetails() {
   if (!state.results || !state.results.length) return;
-  var sFilter = filterSentiment.value;
-  var iFilter = filterIssue.value;
-  var kw = searchKeyword.value.toLowerCase().trim();
+  var sFilter = $("filterSentiment").value;
+  var iFilter = $("filterIssue").value;
+  var kw = $("searchKeyword").value.toLowerCase().trim();
 
-  var detailTbody = detailTable.querySelector("tbody");
+  var detailTbody = $("detailTable").querySelector("tbody");
   detailTbody.innerHTML = "";
 
   state.results.forEach(r => {
@@ -543,28 +543,28 @@ function filterDetails() {
 
     var badgeClass = r.cam === 'pos' ? 'badge-pos' : (r.cam === 'neg' ? 'badge-neg' : 'badge-warn');
     var camText = r.cam === 'pos' ? 'Hài lòng' : (r.cam === 'neg' ? 'Tiêu cực' : 'Bình thường');
-    detailTbody.innerHTML += 
+    detailTbody.innerHTML += `
       <tr>
-        <td><b></b></td>
-        <td><span class="badge "></span></td>
-        <td><b></b></td>
-        <td></td>
+        <td><b>${r.sku}</b></td>
+        <td><span class="badge ${badgeClass}">${camText}</span></td>
+        <td><b>${ISSUES[r.issue] || r.issue}</b></td>
+        <td>${r.text}</td>
       </tr>
-    ;
+    `;
   });
 }
 
-var dz = dropZone;
+var dz = $("dropZone");
 ["dragenter", "dragover"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("over"); }));
 ["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("over"); }));
 dz.addEventListener("drop", e => { var f = e.dataTransfer.files[0]; if (f) handleFile(f); });
 
-fileInput.addEventListener("change", e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
-pasteInput.addEventListener("input", updateReadyState);
-colText.addEventListener("change", updateReadyState);
-colSku.addEventListener("change", updateReadyState);
+$("fileInput").addEventListener("change", e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+$("pasteInput").addEventListener("input", updateReadyState);
+$("colText").addEventListener("change", updateReadyState);
+$("colSku").addEventListener("change", updateReadyState);
 
-btnRun.onclick = () => {
+$("btnRun").onclick = () => {
   var lines = getParsedLines(), skus = state.skus;
   var results = lines.map((line, idx) => analyzeRuleBased(line, skus[idx]));
   renderDashboard(results);
