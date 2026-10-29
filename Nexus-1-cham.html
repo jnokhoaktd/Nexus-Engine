@@ -6,7 +6,10 @@
 <title>Nexus Engine – E-Commerce Intelligence Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 :root {
   --bg-main: #f8fafc;
@@ -17,85 +20,94 @@
   --brand: #0d9488;
   --brand-hover: #0f766e;
   --brand-light: #f0fdf4;
-  --accent: #4f46e5;
+  --accent: #6366f1;
   --pos-color: #10b981;
   --pos-bg: #ecfdf5;
   --neg-color: #f43f5e;
   --neg-bg: #fff1f2;
   --warn-color: #f59e0b;
   --warn-bg: #fffbeb;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg-main); color: var(--text-main); font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; line-height: 1.5; font-size: 14px; -webkit-font-smoothing: antialiased; }
+body { background: var(--bg-main); color: var(--text-main); font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; line-height: 1.5; font-size: 14px; -webkit-font-smoothing: antialiased; }
 
-.app-header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+.app-header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
 .logo-group { display: flex; align-items: center; gap: 12px; }
-.logo-badge { background: var(--brand); color: #fff; font-weight: 700; padding: 6px 12px; border-radius: 8px; font-size: 16px; letter-spacing: -0.5px; }
-.logo-title { font-size: 18px; font-weight: 700; color: var(--text-main); }
-.logo-sub { font-size: 12px; color: var(--text-muted); }
+.logo-badge { background: linear-gradient(135deg, var(--brand), #0284c7); color: #fff; font-weight: 800; padding: 6px 14px; border-radius: 10px; font-size: 16px; letter-spacing: -0.5px; box-shadow: 0 2px 8px rgba(13,148,136,0.3); }
+.logo-title { font-size: 18px; font-weight: 800; color: var(--text-main); letter-spacing: -0.3px; }
+.logo-sub { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-.status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: var(--pos-bg); color: var(--pos-color); font-size: 12px; font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.2); }
+.status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: var(--pos-bg); color: var(--pos-color); font-size: 12px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2); }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pos-color); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
 
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+.container { max-width: 1280px; margin: 24px auto; padding: 0 24px; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s; }
+.card:hover { box-shadow: var(--shadow-md); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.card-title { font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
 
-.container { max-width: 1280px; margin: 28px auto; padding: 0 24px; }
-.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
-.card-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.upload-wrapper { position: relative; }
+.drop-zone { border: 2px dashed var(--brand); border-radius: 14px; padding: 32px 20px; text-align: center; background: var(--brand-light); cursor: pointer; transition: all 0.2s ease; display: block; width: 100%; user-select: none; }
+.drop-zone:hover, .drop-zone.over { background: #ccfbf1; border-color: var(--brand-hover); transform: translateY(-1px); }
+.drop-icon { font-size: 36px; margin-bottom: 8px; color: var(--brand); }
+.drop-text { font-size: 15px; font-weight: 700; color: var(--text-main); }
+.drop-hint { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
 
-.drop-zone { border: 2px dashed var(--brand); border-radius: 14px; padding: 36px 20px; text-align: center; background: var(--brand-light); cursor: pointer; transition: all 0.2s ease; }
-.drop-zone:hover, .drop-zone.over { background: #e6fffa; border-color: var(--brand-hover); }
-.drop-icon { font-size: 32px; margin-bottom: 8px; color: var(--brand); }
-.drop-text { font-size: 15px; font-weight: 600; color: var(--text-main); }
-.drop-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
 
-.grid-cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid-cols-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+input[type=text], select, textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 13px; color: var(--text-main); background: #fff; transition: all 0.15s; }
+input[type=text]:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15); }
+textarea { min-height: 80px; resize: vertical; margin-top: 10px; }
 
-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; }
-input[type=text], select, textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 13px; color: var(--text-main); background: #fff; transition: border-color 0.15s; }
-input[type=text]:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1); }
-textarea { min-height: 80px; resize: vertical; margin-top: 8px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--brand), #0f766e); color: #fff; font-weight: 700; padding: 11px 22px; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s; font-size: 13.5px; box-shadow: 0 2px 4px rgba(13,148,136,0.2); }
+.btn:hover { background: var(--brand-hover); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(13,148,136,0.3); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-sec { background: #fff; color: var(--text-main); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.btn-sec:hover { background: var(--bg-main); border-color: #cbd5e1; }
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--brand); color: #fff; font-weight: 600; padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer; transition: background 0.15s; font-size: 14px; }
-.btn:hover { background: var(--brand-hover); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-sec { background: #fff; color: var(--text-main); border: 1px solid var(--border); }
-.btn-sec:hover { background: var(--bg-main); }
-
-.nav-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-.tab-item { padding: 10px 18px; font-weight: 600; font-size: 13px; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
+.nav-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--border); margin-bottom: 24px; }
+.tab-item { padding: 12px 20px; font-weight: 700; font-size: 13.5px; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; margin-bottom: -2px; }
 .tab-item:hover { color: var(--brand); }
-.tab-item.active { color: var(--brand); border-bottom-color: var(--brand); }
+.tab-item.active { color: var(--brand); border-bottom-color: var(--brand); background: var(--bg-card); border-radius: 8px 8px 0 0; }
 
-.kpi-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; box-shadow: var(--shadow-sm); }
-.kpi-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.kpi-value { font-size: 28px; font-weight: 700; color: var(--text-main); margin-top: 6px; }
-.kpi-sub { font-size: 12px; margin-top: 4px; font-weight: 500; }
+.kpi-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--border); }
+.kpi-card.kpi-brand::before { background: var(--brand); }
+.kpi-card.kpi-pos::before { background: var(--pos-color); }
+.kpi-card.kpi-neg::before { background: var(--neg-color); }
+.kpi-card.kpi-accent::before { background: var(--accent); }
+
+.kpi-label { font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+.kpi-value { font-size: 30px; font-weight: 800; color: var(--text-main); margin-top: 6px; letter-spacing: -0.5px; }
+.kpi-sub { font-size: 12px; margin-top: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
 .kpi-sub.pos { color: var(--pos-color); }
 .kpi-sub.neg { color: var(--neg-color); }
 
-.bar-row { margin-bottom: 12px; }
-.bar-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-.bar-track { background: var(--border); height: 10px; border-radius: 9999px; overflow: hidden; }
-.bar-fill { height: 100%; background: var(--brand); border-radius: 9999px; transition: width 0.4s ease; }
+.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 9999px; font-size: 11.5px; font-weight: 700; }
+.badge-pos { background: var(--pos-bg); color: var(--pos-color); border: 1px solid rgba(16, 185, 129, 0.25); }
+.badge-neg { background: var(--neg-bg); color: var(--neg-color); border: 1px solid rgba(244, 63, 94, 0.25); }
+.badge-warn { background: var(--warn-bg); color: var(--warn-color); border: 1px solid rgba(245, 158, 11, 0.25); }
 
-.table-wrapper { overflow-x: auto; }
+.table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
 table.data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-table.data-table th { background: var(--bg-main); color: var(--text-muted); font-weight: 600; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+table.data-table th { background: #f1f5f9; color: var(--text-muted); font-weight: 700; padding: 12px 16px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
 table.data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-main); }
-table.data-table tr:hover { background: var(--bg-main); }
+table.data-table tr:last-child td { border-bottom: none; }
+table.data-table tr:hover { background: #f8fafc; }
 
-.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
-.badge-pos { background: var(--pos-bg); color: var(--pos-color); border: 1px solid rgba(16, 185, 129, 0.2); }
-.badge-neg { background: var(--neg-bg); color: var(--neg-color); border: 1px solid rgba(244, 63, 94, 0.2); }
-.badge-warn { background: var(--warn-bg); color: var(--warn-color); border: 1px solid rgba(245, 158, 11, 0.2); }
+.insight-card { background: linear-gradient(135deg, #f0fdf4, #e0f2fe); border: 1px solid #99f6e4; border-radius: 14px; padding: 20px; color: #0f766e; margin-bottom: 16px; }
+.insight-card h4 { font-size: 15px; font-weight: 800; color: #115e59; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.insight-card ul { padding-left: 20px; margin-top: 8px; }
+.insight-card li { margin-bottom: 6px; line-height: 1.6; }
 
-.insight-box { background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 12px; padding: 16px; margin-top: 16px; color: #3730a3; font-size: 13px; }
-.insight-box b { color: #1e1b4b; }
+.chart-container { position: relative; height: 280px; width: 100%; }
 </style>
 </head>
 <body>
@@ -105,99 +117,118 @@ table.data-table tr:hover { background: var(--bg-main); }
     <div class="logo-badge">NEXUS</div>
     <div>
       <div class="logo-title">E-Commerce Intelligence Dashboard</div>
-      <div class="logo-sub">Hệ thống Tình báo Phản hồi & Phân tích Cạnh tranh</div>
+      <div class="logo-sub">Hệ thống Tình báo Phản hồi & Phân tích Cạnh tranh SaaS</div>
     </div>
   </div>
   <div class="status-pill" id="serverStatus">
     <span class="status-dot"></span>
-    <span id="statusText">Đang sẵn sàng (FastAPI Local)</span>
+    <span id="statusText">FastAPI Server Local Sẵn sàng</span>
   </div>
 </header>
 
 <div class="container">
   
   <div class="card">
-    <div class="card-title">1. Nhập Dữ liệu Đánh giá / Comment</div>
-    <div class="drop-zone" id="dropZone">
-      <div class="drop-icon">📁</div>
-      <div class="drop-text">Kéo thả file CSV, Excel (.xlsx), Word hoặc TXT vào đây</div>
-      <div class="drop-hint">Hoặc nhấp để chọn file từ máy tính của bạn</div>
+    <div class="card-header">
+      <div class="card-title">📌 1. Tải Dữ liệu Đánh giá / Comment Sản phẩm</div>
+      <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Hỗ trợ .csv, .xlsx, .docx, .txt (Tối đa 2.000 dòng)</span>
     </div>
-    <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.docx,.txt" hidden>
     
-    <textarea id="pasteInput" placeholder="Hoặc dán trực tiếp danh sách bình luận (mỗi dòng 1 bình luận)..."></textarea>
+    <div class="upload-wrapper">
+      <label for="fileInput" class="drop-zone" id="dropZone">
+        <div class="drop-icon">📂</div>
+        <div class="drop-text">Bấm vào đây để chọn file hoặc Kéo thả file dữ liệu vào đây</div>
+        <div class="drop-hint">Chấp nhận file Excel Shopee / TikTok Shop / Lazada hoặc file văn bản</div>
+      </label>
+      <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.docx,.txt" style="display: none;">
+    </div>
+    
+    <textarea id="pasteInput" placeholder="Hoặc dán trực tiếp danh sách nhận xét ở đây (mỗi dòng 1 nhận xét)..."></textarea>
 
-    <div id="columnSelects" class="grid-cols-2" style="margin-top: 16px; display: none;">
+    <div id="columnSelects" class="grid-2" style="margin-top: 16px; display: none;">
       <div>
-        <label>Cột Nội dung phản hồi (*):</label>
+        <label for="colText">Cột Nội dung đánh giá (*):</label>
         <select id="colText"></select>
       </div>
       <div>
-        <label>Cột Mã SKU / Tên Sản phẩm (Tùy chọn):</label>
+        <label for="colSku">Cột Mã SKU / Tên Sản phẩm (Tùy chọn):</label>
         <select id="colSku"></select>
       </div>
     </div>
     
-    <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
-      <label style="margin: 0; cursor: pointer;">
-        <input type="checkbox" id="demoMode" checked> Sử dụng Chế độ Demo nhanh
+    <div style="margin-top: 18px; display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 12px 16px; border-radius: 12px;">
+      <label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <input type="checkbox" id="demoMode" checked style="width: auto;"> ⚡ <b>Chế độ Demo Tốc độ cao</b> (Phân tích từ khóa thông minh)
       </label>
-      <button class="btn" id="btnRun" disabled>🚀 Chạy Phân tích BI</button>
+      <button class="btn" id="btnRun" disabled>🚀 Chạy Phân tích BI Trọn gói</button>
     </div>
-    <div id="fileStatus" style="font-size: 12px; color: var(--text-muted); margin-top: 8px;"></div>
+    <div id="fileStatus" style="font-size: 12.5px; color: var(--brand); font-weight: 700; margin-top: 10px;"></div>
   </div>
 
   <div id="outputSection" style="display: none;">
     
     <div class="nav-tabs">
-      <div class="tab-item active" onclick="switchTab('tabOverview')">📊 Tổng quan CSAT</div>
-      <div class="tab-item" onclick="switchTab('tabSku')">📦 Báo cáo SKU & Sản phẩm</div>
-      <div class="tab-item" onclick="switchTab('tabGap')">💡 Phân tích Đối thủ & Market Gap</div>
-      <div class="tab-item" onclick="switchTab('tabDetail')">💬 Chi tiết Phản hồi</div>
+      <div class="tab-item active" onclick="switchTab(event, 'tabOverview')">📊 Tổng quan CSAT & Sentiment</div>
+      <div class="tab-item" onclick="switchTab(event, 'tabSku')">📦 Phân tích SKU & Top Sản phẩm</div>
+      <div class="tab-item" onclick="switchTab(event, 'tabGap')">💡 Đối thủ & Market Gap</div>
+      <div class="tab-item" onclick="switchTab(event, 'tabDetail')">💬 Trích xuất & Lọc Phản hồi</div>
     </div>
 
     <div id="tabOverview">
-      <div class="grid-cols-4" style="margin-bottom: 24px;">
-        <div class="kpi-card">
+      <div class="grid-4" style="margin-bottom: 24px;">
+        <div class="kpi-card kpi-brand">
           <div class="kpi-label">Tổng số Đánh giá</div>
           <div class="kpi-value" id="kpiTotal">0</div>
-          <div class="kpi-sub" style="color: var(--text-muted);">Mẫu phản hồi đã xử lý</div>
+          <div class="kpi-sub" style="color: var(--text-muted);">Mẫu bình luận được quét</div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card kpi-accent">
           <div class="kpi-label">Chỉ số CSAT Score</div>
-          <div class="kpi-value" id="kpiCsat" style="color: var(--brand);">0.0 / 5.0</div>
-          <div class="kpi-sub pos" id="kpiCsatSub">Đánh giá chung</div>
+          <div class="kpi-value" id="kpiCsat" style="color: var(--accent);">0.0 / 5.0</div>
+          <div class="kpi-sub pos" id="kpiCsatSub">Điểm hài lòng trung bình</div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card kpi-pos">
           <div class="kpi-label">Tỷ lệ Hài lòng (%)</div>
           <div class="kpi-value" id="kpiPos" style="color: var(--pos-color);">0%</div>
-          <div class="kpi-sub pos">Phản hồi tích cực</div>
+          <div class="kpi-sub pos">Phản hồi 4-5 sao</div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card kpi-neg">
           <div class="kpi-label">Tỷ lệ Đòi Trả Hàng</div>
           <div class="kpi-value" id="kpiReturn" style="color: var(--neg-color);">0%</div>
-          <div class="kpi-sub neg">Rủi ro hoàn tiền</div>
+          <div class="kpi-sub neg">Yêu cầu hoàn tiền / đổi trả</div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">Phân bổ Nhóm Vấn đề & Phàn nàn Chính (%)</div>
-        <div id="issueChartBox"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">📈 Phân bổ Cảm xúc (Sentiment Share)</div>
+          <div class="chart-container">
+            <canvas id="sentimentChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚠️ Phân bổ Nhóm Vấn đề / Phàn nàn (%)</div>
+          <div class="chart-container">
+            <canvas id="issueChart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
 
     <div id="tabSku" style="display: none;">
       <div class="card">
-        <div class="card-title">Bảng Xếp hạng & Chất lượng theo SKU</div>
+        <div class="card-header">
+          <div class="card-title">📦 Xếp hạng Chất lượng theo Mã SKU Sản phẩm</div>
+          <span style="font-size: 12px; color: var(--text-muted);">Tự động phân loại SKU Ngôi sao & SKU Cảnh báo</span>
+        </div>
         <div class="table-wrapper">
           <table class="data-table" id="skuTable">
             <thead>
               <tr>
                 <th>Mã SKU / Sản phẩm</th>
-                <th>Lượng Đánh giá</th>
-                <th>Hài lòng (%)</th>
-                <th>Tiêu cực (%)</th>
-                <th>Phân loại Sản phẩm</th>
+                <th>Tổng đánh giá</th>
+                <th>Tỷ lệ Hài lòng</th>
+                <th>Tỷ lệ Tiêu cực</th>
+                <th>Xếp hạng & Cảnh báo</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -208,25 +239,53 @@ table.data-table tr:hover { background: var(--bg-main); }
 
     <div id="tabGap" style="display: none;">
       <div class="card">
-        <div class="card-title">Dự báo Khoảng trống Thị trường & Đề xuất Kinh doanh</div>
+        <div class="card-title">💡 Báo cáo Tình báo Kinh doanh & Khoảng trống Thị trường (Market Gap)</div>
         <div id="marketGapBox"></div>
       </div>
     </div>
 
     <div id="tabDetail" style="display: none;">
       <div class="card">
-        <div class="card-title">
-          <span>Danh sách Phản hồi Chi tiết</span>
-          <button class="btn btn-sec" onclick="window.print()" style="padding: 6px 12px; font-size: 12px;">🖨️ In Báo cáo PDF</button>
+        <div class="card-header">
+          <div class="card-title">💬 Trích xuất Phản hồi Chi tiết & Lọc Tìm kiếm</div>
+          <button class="btn btn-sec" onclick="window.print()" style="padding: 6px 14px; font-size: 12px;">🖨️ In Báo cáo PDF</button>
         </div>
+
+        <div class="grid-3" style="margin-bottom: 16px;">
+          <div>
+            <label for="filterSentiment">Lọc theo Cảm xúc:</label>
+            <select id="filterSentiment" onchange="filterDetails()">
+              <option value="ALL">Tất cả cảm xúc</option>
+              <option value="pos">Hài lòng (Positive)</option>
+              <option value="neg">Tiêu cực (Negative)</option>
+              <option value="neu">Bình thường (Neutral)</option>
+            </select>
+          </div>
+          <div>
+            <label for="filterIssue">Lọc theo Nhóm vấn đề:</label>
+            <select id="filterIssue" onchange="filterDetails()">
+              <option value="ALL">Tất cả nhóm vấn đề</option>
+              <option value="quality">Chất lượng sản phẩm</option>
+              <option value="sizing_fit">Kích cỡ / Size</option>
+              <option value="shipping">Giao hàng & Đóng gói</option>
+              <option value="price_value">Giá cả / Đáng tiền</option>
+              <option value="instructions">Hướng dẫn & Hỗ trợ</option>
+            </select>
+          </div>
+          <div>
+            <label for="searchKeyword">Tìm từ khóa:</label>
+            <input type="text" id="searchKeyword" placeholder="Nhập từ khóa (ví dụ: mỏng, rộng, vỡ)..." oninput="filterDetails()">
+          </div>
+        </div>
+
         <div class="table-wrapper">
           <table class="data-table" id="detailTable">
             <thead>
               <tr>
-                <th>SKU</th>
-                <th>Cảm xúc</th>
-                <th>Nhóm vấn đề</th>
-                <th>Nội dung đánh giá</th>
+                <th style="width: 15%;">SKU</th>
+                <th style="width: 15%;">Cảm xúc</th>
+                <th style="width: 20%;">Nhóm vấn đề</th>
+                <th style="width: 50%;">Nội dung phản hồi</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -239,33 +298,36 @@ table.data-table tr:hover { background: var(--bg-main); }
 
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script>
 "use strict";
 
 var state = { table: null, lines: [], skus: [], results: [] };
+var sentimentChartInst = null;
+var issueChartInst = null;
+
 var ISSUES = {
   quality: "Chất lượng sản phẩm",
   sizing_fit: "Kích cỡ / Size",
   shipping: "Giao hàng & Đóng gói",
   price_value: "Giá cả / Đáng tiền",
-  instructions: "Hướng dẫn & Dịch vụ",
+  instructions: "Hướng dẫn & Hỗ trợ",
   no_issue: "Không phàn nàn"
 };
 
 function  { return document.getElementById(id); }
 
-function switchTab(tabId) {
+function switchTab(e, tabId) {
   ['tabOverview', 'tabSku', 'tabGap', 'tabDetail'].forEach(t => .style.display = 'none');
   .style.display = 'block';
   document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-  event.target.classList.add('active');
+  e.currentTarget.classList.add('active');
 }
 
 async function handleFile(file) {
-  fileStatus.textContent = "Đang đọc file: " + file.name;
+  if (!file) return;
+  fileStatus.textContent = "⏳ Đang đọc dữ liệu từ file " + file.name + "...";
   state.table = null;
+  
   try {
     var ext = file.name.split('.').pop().toLowerCase();
     if (ext === 'docx') {
@@ -277,25 +339,32 @@ async function handleFile(file) {
       var wb = (ext === 'csv') ? XLSX.read(await file.text(), { type: 'string' }) : XLSX.read(await file.arrayBuffer(), { type: 'array' });
       var ws = wb.Sheets[wb.SheetNames[0]];
       var data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
-      if (!data.length) throw new Error("File rỗng");
+      if (!data.length) throw new Error("File rỗng.");
       
       var header = data[0].map((h, i) => String(h || ("Cột " + (i + 1))));
       state.table = data.slice(1);
       
       var selTxt = colText, selSku = colSku;
-      selTxt.innerHTML = ""; selSku.innerHTML = "<option value='-1'>-- Không chọn (Mặc định) --</option>";
+      selTxt.innerHTML = ""; 
+      selSku.innerHTML = "<option value='-1'>-- Không chọn (Mặc định) --</option>";
       
       header.forEach((h, i) => {
         selTxt.appendChild(new Option(h, i));
         selSku.appendChild(new Option(h, i));
       });
       
+      header.forEach((h, i) => {
+        var lh = h.toLowerCase();
+        if (/bình luận|nội dung|comment|review|phản hồi|đánh giá/i.test(lh)) selTxt.value = i;
+        if (/sku|mã|sản phẩm|product/i.test(lh)) selSku.value = i;
+      });
+      
       columnSelects.style.display = "grid";
       pasteInput.value = "";
     }
-    fileStatus.textContent = "Đã đọc thành công " + (state.table ? state.table.length : 0) + " dòng.";
+    fileStatus.textContent = "✅ Đã đọc xong file " + file.name + " (" + (state.table ? state.table.length : 0) + " dòng). Bấm 'Chạy Phân tích BI' bên dưới.";
   } catch (e) {
-    fileStatus.textContent = "Lỗi đọc file: " + e.message;
+    fileStatus.textContent = "❌ Lỗi đọc file: " + e.message;
   }
   updateReadyState();
 }
@@ -303,7 +372,9 @@ async function handleFile(file) {
 function updateReadyState() {
   var count = getParsedLines().length;
   btnRun.disabled = count === 0;
-  if (count > 0) fileStatus.textContent = "Sẵn sàng phân tích " + count + " dòng dữ liệu.";
+  if (count > 0 && !state.table) {
+    fileStatus.textContent = "✅ Đã nhận " + count + " dòng văn bản. Bấm 'Chạy Phân tích BI' để bắt đầu.";
+  }
 }
 
 function getParsedLines() {
@@ -329,15 +400,15 @@ function getParsedLines() {
 
 function analyzeRuleBased(text, sku) {
   var t = text.toLowerCase();
-  var isNeg = /tệ|dở|kém|chậm|hỏng|vỡ|lừa|thất vọng|không như|trả hàng|hoàn tiền|rách|mỏng|lỗi|chật|rộng/.test(t);
-  var isPos = /tốt|đẹp|ưng|hài lòng|nhanh|chất lượng|thích|tuyệt|ok|xịn|đáng tiền|vừa/.test(t);
+  var isNeg = /tệ|dở|kém|chậm|hỏng|vỡ|lừa|thất vọng|không như|trả hàng|hoàn tiền|rách|mỏng|lỗi|chật|rộng|bung|hôi|rè|tụt/.test(t);
+  var isPos = /tốt|đẹp|ưng|hài lòng|nhanh|chất lượng|thích|tuyệt|ok|xịn|đáng tiền|vừa|êm|chuẩn|sắc nét/.test(t);
   
   var issue = "no_issue";
   if (isNeg) {
-    if (/giao|ship|vận chuyển|đóng gói/.test(t)) issue = "shipping";
-    else if (/size|rộng|chật|kích cỡ/.test(t)) issue = "sizing_fit";
+    if (/giao|ship|vận chuyển|đóng gói|hộp|chậm/.test(t)) issue = "shipping";
+    else if (/size|rộng|chật|kích cỡ|form|ngắn|dài/.test(t)) issue = "sizing_fit";
     else if (/giá|đắt|đáng tiền/.test(t)) issue = "price_value";
-    else if (/hướng dẫn|lắp|cách dùng/.test(t)) issue = "instructions";
+    else if (/hướng dẫn|lắp|cách dùng|kết nối|tiếng việt/.test(t)) issue = "instructions";
     else issue = "quality";
   }
   
@@ -345,11 +416,12 @@ function analyzeRuleBased(text, sku) {
     text: text, sku: sku,
     cam: isNeg ? 'neg' : (isPos ? 'pos' : 'neu'),
     issue: issue,
-    isReturn: /trả hàng|hoàn tiền|đổi trả/.test(t)
+    isReturn: /trả hàng|hoàn tiền|đổi trả|trả lại/.test(t)
   };
 }
 
 function renderDashboard(results) {
+  state.results = results;
   var total = results.length;
   var pos = 0, neg = 0, neu = 0, returns = 0;
   var issueCounts = { quality: 0, sizing_fit: 0, shipping: 0, price_value: 0, instructions: 0 };
@@ -371,88 +443,126 @@ function renderDashboard(results) {
     if (r.cam === 'neg') skuMap[r.sku].neg++;
   });
 
-  // CSAT Score Calculation
   var csat = total > 0 ? (((pos * 5 + neu * 3 + neg * 1) / (total * 5)) * 5).toFixed(1) : "0.0";
   kpiTotal.textContent = total;
   kpiCsat.textContent = csat + " / 5.0";
   kpiPos.textContent = (pos / total * 100).toFixed(1) + "%";
   kpiReturn.textContent = (returns / total * 100).toFixed(1) + "%";
 
-  // Render Issue Chart
-  var chartHtml = "";
-  Object.keys(issueCounts).forEach(k => {
-    var count = issueCounts[k];
-    var pct = total > 0 ? (count / total * 100).toFixed(1) : 0;
-    chartHtml += 
-      <div class="bar-row">
-        <div class="bar-header">
-          <span></span>
-          <span>% ()</span>
-        </div>
-        <div class="bar-track">
-          <div class="bar-fill" style="width: %;"></div>
-        </div>
-      </div>
-    ;
+  if (sentimentChartInst) sentimentChartInst.destroy();
+  var ctx1 = sentimentChart.getContext('2d');
+  sentimentChartInst = new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+      labels: ['Hài lòng (Positive)', 'Tiêu cực (Negative)', 'Bình thường (Neutral)'],
+      datasets: [{
+        data: [pos, neg, neu],
+        backgroundColor: ['#10b981', '#f43f5e', '#cbd5e1'],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } }
+    }
   });
-  issueChartBox.innerHTML = chartHtml;
 
-  // Render SKU Table
+  if (issueChartInst) issueChartInst.destroy();
+  var ctx2 = issueChart.getContext('2d');
+  issueChartInst = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(issueCounts).map(k => ISSUES[k]),
+      datasets: [{
+        label: 'Số lượng phàn nàn',
+        data: Object.values(issueCounts),
+        backgroundColor: '#0d9488',
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+
   var skuTbody = skuTable.querySelector("tbody");
   skuTbody.innerHTML = "";
   Object.keys(skuMap).forEach(sku => {
     var d = skuMap[sku];
     var posPct = (d.pos / d.total * 100).toFixed(1);
     var negPct = (d.neg / d.total * 100).toFixed(1);
-    var statusBadge = negPct > 20 ? '<span class="badge badge-neg">Cảnh báo Trả hàng</span>' : (posPct >= 70 ? '<span class="badge badge-pos">Sản phẩm Ngôi sao</span>' : '<span class="badge badge-warn">Ổn định</span>');
+    var statusBadge = negPct > 20 ? '<span class="badge badge-neg">⚠️ Cảnh báo Trả hàng cao</span>' : (posPct >= 70 ? '<span class="badge badge-pos">⭐ Sản phẩm Ngôi sao</span>' : '<span class="badge badge-warn">Ổn định</span>');
 
     skuTbody.innerHTML += 
       <tr>
         <td><b></b></td>
-        <td></td>
-        <td>%</td>
-        <td>%</td>
+        <td><b></b> đánh giá</td>
+        <td><b style="color:var(--pos-color);">%</b></td>
+        <td><b style="color:var(--neg-color);">%</b></td>
         <td></td>
       </tr>
     ;
   });
 
-  // Render Market Gap Insights
   var gapBox = marketGapBox;
   gapBox.innerHTML = 
-    <div class="insight-box">
-      <b>💡 Đề xuất Tình báo Kinh doanh cho Chủ Shop:</b><br>
-      • Phát hiện <b>%</b> khách hàng gặp vấn đề về Size. Bạn nên cập nhật lại Bảng Size chuẩn trên trang sản phẩm.<br>
-      • Tỷ lệ khách hỏi trả hàng đạt <b>%</b>. Cần bổ sung quy trình hướng dẫn sử dụng và kiểm tra đóng gói trước khi giao.
+    <div class="insight-card">
+      <h4>📌 Phân tích Chiến lược & Hành động Đề xuất cho Shop:</h4>
+      <ul>
+        <li><b>Vấn đề Kích cỡ & Form dáng:</b> Chiếm <b>%</b> tổng phàn nàn. Đề xuất: Đăng video hướng dẫn đo bảng size thực tế lên trang sản phẩm để giảm 30% tỷ lệ trả hàng.</li>
+        <li><b>Rủi ro Đổi trả / Hoàn tiền:</b> Đạt mức <b>%</b>. Cần bổ sung Tem kiểm định QC và thẻ thư cảm ơn kèm mã QR hỗ trợ đổi trả 1-1 trước khi khiếu nại Shopee.</li>
+        <li><b>Đối thủ & Dịch vụ:</b> Ghi nhận khách phàn nàn về tốc độ đóng gói và lỗi thiếu phụ kiện. Nếu shop bạn bổ sung quà tặng kèm và đóng hàng chống sốc 3 lớp, bạn sẽ chiếm ưu thế vượt trội so với các shop cùng ngành.</li>
+      </ul>
     </div>
   ;
 
-  // Render Detail Table
+  filterDetails();
+
+  outputSection.style.display = "block";
+  outputSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+function filterDetails() {
+  if (!state.results || !state.results.length) return;
+  var sFilter = filterSentiment.value;
+  var iFilter = filterIssue.value;
+  var kw = searchKeyword.value.toLowerCase().trim();
+
   var detailTbody = detailTable.querySelector("tbody");
   detailTbody.innerHTML = "";
-  results.forEach(r => {
+
+  state.results.forEach(r => {
+    if (sFilter !== 'ALL' && r.cam !== sFilter) return;
+    if (iFilter !== 'ALL' && r.issue !== iFilter) return;
+    if (kw.length > 0 && r.text.toLowerCase().indexOf(kw) === -1) return;
+
     var badgeClass = r.cam === 'pos' ? 'badge-pos' : (r.cam === 'neg' ? 'badge-neg' : 'badge-warn');
     var camText = r.cam === 'pos' ? 'Hài lòng' : (r.cam === 'neg' ? 'Tiêu cực' : 'Bình thường');
     detailTbody.innerHTML += 
       <tr>
         <td><b></b></td>
         <td><span class="badge "></span></td>
-        <td></td>
+        <td><b></b></td>
         <td></td>
       </tr>
     ;
   });
-
-  outputSection.style.display = "block";
-  outputSection.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Event Listeners
-dropZone.onclick = () => fileInput.click();
-fileInput.onchange = (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); };
-pasteInput.oninput = updateReadyState;
-colText.onchange = updateReadyState;
-colSku.onchange = updateReadyState;
+var dz = dropZone;
+["dragenter", "dragover"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("over"); }));
+dz.addEventListener("drop", e => { var f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+
+fileInput.addEventListener("change", e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+pasteInput.addEventListener("input", updateReadyState);
+colText.addEventListener("change", updateReadyState);
+colSku.addEventListener("change", updateReadyState);
 
 btnRun.onclick = () => {
   var lines = getParsedLines(), skus = state.skus;
