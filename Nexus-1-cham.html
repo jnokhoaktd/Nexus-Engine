@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Nexus Engine – Enterprise E-Commerce & Social Intelligence v4.0</title>
+<title>Nexus Engine – Enterprise Quant E-Commerce & 3D Spatial Intelligence v5.0</title>
 
 <!-- External CDN Dependencies -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- Three.js CDN for 3D Quant 360 Visualizations -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
   :root {
@@ -26,6 +28,7 @@
     --primary: #6366F1;
     --primary-gradient: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
     --ai-gradient: linear-gradient(135deg, #EC4899 0%, #8B5CF6 50%, #3B82F6 100%);
+    --quant-gradient: linear-gradient(135deg, #10B981 0%, #06B6D4 50%, #6366F1 100%);
     --brand-teal: #10B981;
     --pos: #10B981;
     --pos-bg: rgba(16, 185, 129, 0.12);
@@ -35,7 +38,8 @@
     --warn: #F59E0B;
     --warn-bg: rgba(245, 158, 11, 0.12);
     --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
-    --ai-glow: 0 0 25px rgba(236, 72, 153, 0.3);
+    --ai-glow: 0 0 25px rgba(236, 72, 153, 0.35);
+    --quant-glow: 0 0 25px rgba(16, 185, 129, 0.35);
   }
 
   :root[data-theme="light"] {
@@ -147,6 +151,7 @@
   td.num, th.num { text-align: right; font-family: 'JetBrains Mono', monospace; }
 
   .chart-container { position: relative; height: 270px; width: 100%; }
+  .canvas-3d-container { width: 100%; height: 320px; border-radius: 10px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); overflow: hidden; position: relative; }
 
   .toast { position: fixed; bottom: 20px; right: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 1000; display: none; animation: fadeIn 0.3s; }
 </style>
@@ -162,7 +167,7 @@
     </div>
     <div class="brand-text">
       <div class="brand-title">NEXUS <span>ENGINE</span></div>
-      <div class="brand-sub">LLM Intelligence v4.0</div>
+      <div class="brand-sub">Quant & 3D Spatial v5.0</div>
     </div>
   </div>
 
@@ -173,13 +178,13 @@
   <header>
     <h1 id="title"></h1>
     <div class="header-actions">
-      <span class="ai-pill">✨ Nexus-LLM-v4 Enterprise</span>
+      <span class="ai-pill">✨ Nexus-Quant-v5 AI Model Active</span>
       <span class="status-pill" id="apiStatusPill">
         <span class="status-dot"></span>
-        <span id="apiStatusText">Engine API Online</span>
+        <span id="apiStatusText">Máy chủ FastAPI Hoạt động</span>
       </span>
-      <button class="btn" id="langBtn" onclick="toggleLanguage()">🌐 VI | EN</button>
-      <button class="btn" id="themeBtn">🌙 Dark</button>
+      <button class="btn" id="langBtn" onclick="toggleLanguage()">🌐 Tiếng Việt | English</button>
+      <button class="btn" id="themeBtn">🌙 Chế độ Tối</button>
     </div>
   </header>
 
@@ -195,34 +200,35 @@ let API_BASE_URL = localStorage.getItem('NEXUS_API_URL') || 'http://127.0.0.1:80
 let currentLang = localStorage.getItem('NEXUS_LANG') || 'vi';
 let isApiConnected = false;
 let activeChartInst = {};
+let threeAnimId = null;
 
-// MULTILINGUAL DICTIONARY (i18n)
+// MULTILINGUAL DICTIONARY - 100% VIỆT HÓA CHUẨN
 const I18N = {
   vi: {
     navGroupData: "Dữ liệu & Cảm xúc",
-    navGroupFin: "Tài chính & Chiến lược",
+    navGroupFin: "Tài chính & Chiến lược Quant",
     navGroupSys: "Hệ thống & Báo cáo",
-    import: "Import Data",
-    executive: "Executive Overview",
-    customers: "Customer Intelligence",
-    feedback: "Feedback & ABSA",
-    unit: "Unit Economics",
-    predictive: "Predictive Analytics",
-    competitors: "Competitor Intelligence",
-    opportunities: "Market Opportunities",
-    reports: "Report Center",
-    system: "System Monitoring",
-    settings: "Settings",
-    llmRunning: "Đang chạy mô hình AI...",
+    import: "Nạp Dữ Liệu",
+    executive: "Tổng Quan Điều Hành",
+    customers: "Tình Báo Khách Hàng",
+    feedback: "Phản Hồi & ABSA",
+    unit: "Tài Chính Đơn Hàng",
+    predictive: "Dự Báo AI Predictive",
+    competitors: "Tình Báo Đối Thủ",
+    opportunities: "Cơ Hội Thị Trường & Trend 3D",
+    reports: "Trung Tâm Báo Cáo",
+    system: "Giám Sát Hệ Thống",
+    settings: "Cài Đặt Hệ Thống",
+    llmRunning: "Đang chạy mô hình AI Deep Audit...",
     runLLM: "🚀 Khởi chạy LLM AI Deep Audit",
     exportExcel: "Xuất File Excel Full BI (.xlsx)",
     exportCsv: "Xuất Báo Cáo CSV Clean (.csv)",
     printPdf: "In Báo Cáo PDF Executive"
   },
   en: {
-    navGroupData: "Data & Sentiment",
-    navGroupFin: "Finance & Strategy",
-    navGroupSys: "System & Reports",
+    navGroupData: "Data & Sentiment Intelligence",
+    navGroupFin: "Quant Strategy & Finance",
+    navGroupSys: "System & Governance",
     import: "Data Import",
     executive: "Executive Overview",
     customers: "Customer Intelligence",
@@ -230,12 +236,12 @@ const I18N = {
     unit: "Unit Economics",
     predictive: "Predictive Analytics",
     competitors: "Competitor Intelligence",
-    opportunities: "Market Opportunities",
+    opportunities: "Market Opportunities & 3D Trends",
     reports: "Report Center",
     system: "System Monitoring",
-    settings: "Settings",
-    llmRunning: "Running AI Model...",
-    runLLM: "🚀 Run LLM AI Deep Audit",
+    settings: "System Settings",
+    llmRunning: "Running LLM Deep Audit Model...",
+    runLLM: "🚀 Launch LLM AI Deep Audit",
     exportExcel: "Export Full BI Excel (.xlsx)",
     exportCsv: "Export Clean CSV (.csv)",
     printPdf: "Print Executive PDF Report"
@@ -251,11 +257,11 @@ function toggleLanguage() {
   localStorage.setItem('NEXUS_LANG', currentLang);
   buildNav();
   renderView(currentView);
-  toast(currentLang === 'vi' ? '🇻🇳 Đã chuyển sang Tiếng Việt' : '🇺🇸 Switched to English');
+  toast(currentLang === 'vi' ? '🇻🇳 Đã chuyển giao diện sang Tiếng Việt chuẩn 100%' : '🇺🇸 Switched UI to English');
 }
 
 let D = {
-  source: { name: "Nexus_100_Reviews_Test_Dataset.xlsx", uploaded_at: "vừa xong" },
+  source: { name: "Nexus_Dataset_Ecom_Quant_100.xlsx", uploaded_at: "vừa xong" },
   dq: { total_rows: 100, valid_rows: 100, rejected_rows: 0, columns_detected: { sku: "Mã_SKU", text: "Nội_dung_đánh_giá", rating: "Số_sao" }, warnings: [] },
   dist: {
     total: 100,
@@ -267,25 +273,25 @@ let D = {
   },
   hist: [{ rating: 1, count: 15 }, { rating: 2, count: 15 }, { rating: 3, count: 12 }, { rating: 4, count: 18 }, { rating: 5, count: 40 }],
   sku: [
-    { sku: "SKU-POLO-01", product_name: "Áo thun Polo nam phong cách Hàn Quốc", review_count: 20, avg_rating: 3.65, positive_pct: 60.0, negative_pct: 25.0, return_intent_pct: 10.0, top_complaint: "Size L bị rộng / chật", cohort: "Champions" },
-    { sku: "SKU-JEAN-02", product_name: "Quần Jeans ống rộng Unisex", review_count: 20, avg_rating: 3.45, positive_pct: 55.0, negative_pct: 35.0, return_intent_pct: 15.0, top_complaint: "Mùi vải nồng & Khóa hỏng", cohort: "Loyal" },
-    { sku: "SKU-VAY-03", product_name: "Váy hoa nhí dáng xòe Vintage", review_count: 20, avg_rating: 4.85, positive_pct: 95.0, negative_pct: 0.0, return_intent_pct: 0.0, top_complaint: "Không có", cohort: "Champions" },
-    { sku: "SKU-GIAY-04", product_name: "Giày Sneaker thể thao nam nữ", review_count: 20, avg_rating: 3.20, positive_pct: 45.0, negative_pct: 40.0, return_intent_pct: 20.0, top_complaint: "Bung keo đế & Sai size", cohort: "At-Risk" },
-    { sku: "SKU-TAI-05", product_name: "Tai nghe Bluetooth không dây TWS", review_count: 20, avg_rating: 2.15, positive_pct: 20.0, negative_pct: 70.0, return_intent_pct: 35.0, top_complaint: "Sạc không vào & Mất kết nối", cohort: "Lost / Crisis" }
+    { sku: "SKU-POLO-01", product_name: "Áo thun Polo nam phom chuẩn Unisex", review_count: 20, avg_rating: 3.65, positive_pct: 60.0, negative_pct: 25.0, return_intent_pct: 10.0, top_complaint: "Khách phàn nàn size L bị chật/rộng", cohort: "Champions" },
+    { sku: "SKU-JEAN-02", product_name: "Quần Jeans ống rộng Unisex Hack Dáng", review_count: 20, avg_rating: 3.45, positive_pct: 55.0, negative_pct: 35.0, return_intent_pct: 15.0, top_complaint: "Mùi vải nồng & Khóa kéo kẹt", cohort: "Loyal" },
+    { sku: "SKU-VAY-03", product_name: "Váy hoa nhí dáng xòe Vintage công chúa", review_count: 20, avg_rating: 4.85, positive_pct: 95.0, negative_pct: 0.0, return_intent_pct: 0.0, top_complaint: "Không có phàn nàn", cohort: "Champions" },
+    { sku: "SKU-GIAY-04", product_name: "Giày Sneaker thể thao Retro Nam Nữ", review_count: 20, avg_rating: 3.20, positive_pct: 45.0, negative_pct: 40.0, return_intent_pct: 20.0, top_complaint: "Bung keo đế & Lót giày mỏng", cohort: "At-Risk" },
+    { sku: "SKU-TAI-05", product_name: "Tai nghe Bluetooth TWS Chống Bụi", review_count: 20, avg_rating: 2.15, positive_pct: 20.0, negative_pct: 70.0, return_intent_pct: 35.0, top_complaint: "Chập chờn sạc & Hỏng đệm củ", cohort: "Lost / Crisis" }
   ],
   aspects: [
-    { aspect: "product_quality", label: "Chất lượng sản phẩm", positive: 38, neutral: 8, negative: 28 },
-    { aspect: "sizing_fit", label: "Size & form dáng", positive: 18, neutral: 5, negative: 16 },
-    { aspect: "shipping_packaging", label: "Giao hàng & đóng gói", positive: 22, neutral: 6, negative: 12 },
-    { aspect: "pricing_value", label: "Giá cả & đáng tiền", positive: 25, neutral: 4, negative: 2 },
-    { aspect: "service_communication", label: "Dịch vụ & CSKH", positive: 20, neutral: 3, negative: 14 }
+    { aspect: "product_quality", label: "Chất lượng sản phẩm & Vật liệu", positive: 38, neutral: 8, negative: 28 },
+    { aspect: "sizing_fit", label: "Size & Phom dáng thực tế", positive: 18, neutral: 5, negative: 16 },
+    { aspect: "shipping_packaging", label: "Đóng gói & Vận chuyển chống sốc", positive: 22, neutral: 6, negative: 12 },
+    { aspect: "pricing_value", label: "Giá cả & Giá trị sử dụng", positive: 25, neutral: 4, negative: 2 },
+    { aspect: "service_communication", label: "Chăm sóc khách hàng & Đổi trả", positive: 20, neutral: 3, negative: 14 }
   ],
   keywords: [
     { keyword: "rộng / chật size", count: 18 },
     { keyword: "bung keo đế", count: 12 },
-    { keyword: "sạc không vào", count: 10 },
-    { keyword: "rách đường may", count: 8 },
-    { keyword: "phai màu giặt", count: 6 }
+    { keyword: "sạc không vào điện", count: 10 },
+    { keyword: "rách đường may túi", count: 8 },
+    { keyword: "phai màu khi giặt", count: 6 }
   ],
   explorer: []
 };
@@ -310,17 +316,17 @@ async function checkApiHealth() {
     if (res.ok) {
       isApiConnected = true;
       $("#apiStatusPill").style.background = "var(--pos-bg)";
-      $("#apiStatusText").textContent = "FastAPI Local Online";
+      $("#apiStatusText").textContent = "Máy chủ FastAPI Hoạt động";
     } else { throw new Error(); }
   } catch (e) {
     isApiConnected = false;
     $("#apiStatusPill").style.background = "var(--warn-bg)";
-    $("#apiStatusText").textContent = "Client-Side Fallback Mode";
+    $("#apiStatusText").textContent = "Chế độ Local Engine Fallback";
   }
 }
 
 function parseUploadedFile(file) {
-  toast(`⏳ Đang nạp & đọc file ${file.name}...`);
+  toast(`⏳ Đang nạp & phân tích file ${file.name}...`);
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
@@ -377,7 +383,7 @@ function parseUploadedFile(file) {
       }));
 
       D.explorer = explorer;
-      toast(`🎉 Đã xử lý ${total} đánh giá từ file ${file.name}!`);
+      toast(`🎉 Đã nạp thành công ${total} bản ghi đánh giá!`);
       renderView(currentView);
     } catch (err) {
       toast("❌ Lỗi đọc file Excel/CSV: " + err.message, true);
@@ -386,7 +392,7 @@ function parseUploadedFile(file) {
   reader.readAsArrayBuffer(file);
 }
 
-// NAVIGATION BUILDER
+// BUILD NAVIGATION BAR
 function buildNav() {
   $("#nav").innerHTML = `
     <div class="nav-group-title">${t('navGroupData')}</div>
@@ -408,42 +414,42 @@ function buildNav() {
   `;
 }
 
-// FULL VIEWS DEFINITIONS
+// FULL VIEWS DEFINITIONS (100% VIỆT HÓA CHUẨN ĐẲNG CẤP EXECUTIVE)
 const VIEWS = {
   import() {
     return `
     <div class="banner-info">
-      <span>📌 Mode: <b>${isApiConnected ? 'FastAPI Local Active' : 'Client-Side Local Processor'}</b></span>
-      <span class="mono">Engine URL: ${API_BASE_URL}</span>
+      <span>📌 Chế độ hệ thống: <b>${isApiConnected ? 'FastAPI Local Engine Kích hoạt' : 'Local Browser Client Engine'}</b></span>
+      <span class="mono">Engine Endpoint: ${API_BASE_URL}</span>
     </div>
 
     <div class="card" style="margin-bottom: 20px;">
-      <h2>📥 ${currentLang==='vi'?'Tải lên Dữ liệu Đánh giá Sản phẩm (.xlsx, .xls, .csv)':'Upload Product Review Data (.xlsx, .xls, .csv)'}</h2>
-      <div class="sub">${currentLang==='vi'?'Tự động phân tích Cảm xúc, Xếp hạng SKU, Khía cạnh ABSA & Mô phỏng Tài chính':'Automated Sentiment Analysis, SKU Ranking, ABSA & Financial Simulation'}</div>
+      <h2>📥 Tải Lên Dữ Liệu Đánh Giá Sản Phẩm & Nhận Xét Thương Mại Điện Tử (.xlsx, .xls, .csv)</h2>
+      <div class="sub">Tự động làm sạch, phân tích Cảm xúc Cấu trúc, Xếp hạng SKU, Khía cạnh ABSA & Định lượng Tài chính Quant</div>
       
       <div class="upload-box" id="dropzone">
         <div class="upload-icon">📂</div>
-        <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">${currentLang==='vi'?'Kéo & Thả File Excel/CSV vào đây hoặc Bấm để chọn':'Drag & Drop Excel/CSV File here or Click to Select'}</div>
-        <div style="font-size: 12px; color: var(--text-muted);">${currentLang==='vi'?'Hỗ trợ dữ liệu xuất từ Shopee, TikTok Shop, Lazada...':'Supports export files from Shopee, TikTok Shop, Lazada...'}</div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Kéo & Thả File Excel/CSV vào đây hoặc Bấm để chọn Tải lên</div>
+        <div style="font-size: 12px; color: var(--text-muted);">Hỗ trợ cấu trúc xuất file từ Shopee, TikTok Shop, Lazada, Tiki...</div>
         <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none;">
       </div>
     </div>
 
     <div class="grid">
       <div class="kpi-card">
-        <div class="kpi-title">${currentLang==='vi'?'Tên File Hiện Tại':'Current File Name'}</div>
+        <div class="kpi-title">Tên Tệp Dữ Liệu Nạp</div>
         <div class="kpi-value" style="font-size: 15px; color: var(--primary);">${esc(D.source.name)}</div>
-        <div class="kpi-sub">${currentLang==='vi'?'Thời gian':'Uploaded'}: ${D.source.uploaded_at}</div>
+        <div class="kpi-sub">Thời điểm nạp: ${D.source.uploaded_at}</div>
       </div>
       <div class="kpi-card pos">
-        <div class="kpi-title">${currentLang==='vi'?'Tổng Mẫu Đánh Giá':'Total Reviews Cleaned'}</div>
+        <div class="kpi-title">Tổng Mẫu Đánh Giá Đã Xử Lý</div>
         <div class="kpi-value">${D.dq.total_rows}</div>
-        <div class="kpi-sub" style="color:var(--pos);">${currentLang==='vi'?'Đã làm sạch & chuẩn hóa':'Normalized & Cleaned'}</div>
+        <div class="kpi-sub" style="color:var(--pos);">Đã làm sạch & Chuẩn hóa NLP</div>
       </div>
       <div class="kpi-card warn">
-        <div class="kpi-title">${currentLang==='vi'?'Số Mã SKU':'Distinct SKUs'}</div>
+        <div class="kpi-title">Số Lượng Mã SKU Khác Biệt</div>
         <div class="kpi-value">${D.sku.length}</div>
-        <div class="kpi-sub">${currentLang==='vi'?'SKU sản phẩm riêng biệt':'Unique Product SKUs'}</div>
+        <div class="kpi-sub">Sản phẩm riêng biệt trong kho</div>
       </div>
     </div>
     `;
@@ -457,37 +463,37 @@ const VIEWS = {
     <!-- EXECUTIVE HIGH-LEVEL KPIS -->
     <div class="grid-4" style="margin-bottom:20px;">
       <div class="kpi-card">
-        <div class="kpi-title">${currentLang==='vi'?'Tổng Mẫu Phản Hồi':'Total Feedback Processed'}</div>
+        <div class="kpi-title">Mẫu Phản Hồi Toàn Hệ Thống</div>
         <div class="kpi-value">${D.dist.total}</div>
-        <div class="kpi-sub">100% ${currentLang==='vi'?'Đã qua bộ lọc AI':'Ingested via AI Pipeline'}</div>
+        <div class="kpi-sub">100% Đã làm sạch qua AI Pipeline</div>
       </div>
       <div class="kpi-card pos">
-        <div class="kpi-title">CSAT Score Index</div>
+        <div class="kpi-title">Chỉ Số CSAT Score Toàn Shop</div>
         <div class="kpi-value" style="color:var(--pos);">${fmtNum(avgRating)} / 5.0</div>
-        <div class="kpi-sub">${currentLang==='vi'?'Mức độ hài lòng chung':'Overall Satisfaction'}</div>
+        <div class="kpi-sub">Điểm hài lòng trung bình trọng số</div>
       </div>
       <div class="kpi-card pos">
-        <div class="kpi-title">${currentLang==='vi'?'Tỷ Lệ Tích Cực (%)':'Positive Ratio (%)'}</div>
+        <div class="kpi-title">Tỷ Lệ Tích Cực Tăng Trưởng (%)</div>
         <div class="kpi-value" style="color:var(--pos);">${fmtPct(pos.pct)}</div>
-        <div class="kpi-sub">${pos.count} ${currentLang==='vi'?'ĐG 4-5 sao':'4-5 Star Ratings'}</div>
+        <div class="kpi-sub">${pos.count} Đánh giá 4-5 sao</div>
       </div>
       <div class="kpi-card neg">
-        <div class="kpi-title">${currentLang==='vi'?'Rủi Ro Thất Thoát Doanh Thu':'Est. Net Revenue Loss'}</div>
+        <div class="kpi-title">Thất Thoát Doanh Thu Dự Báo</div>
         <div class="kpi-value" style="color:var(--neg);">~21.500.000đ</div>
-        <div class="kpi-sub" style="color:var(--neg);">${currentLang==='vi'?'Do đổi trả & 1 sao':'Due to returns & 1-stars'}</div>
+        <div class="kpi-sub" style="color:var(--neg);">Do rủi ro đổi trả & khiếu nại 1 sao</div>
       </div>
     </div>
 
     <!-- CHARTS ROW 1 -->
     <div class="grid-2" style="margin-bottom:20px;">
       <div class="card">
-        <h2>📈 ${currentLang==='vi'?'Phân Bổ Cảm Xúc Chung':'Overall Sentiment Breakdown'}</h2>
-        <div class="sub">Positive vs Negative vs Neutral Ratio</div>
+        <h2>📈 Phân Bổ Cảm Xúc Khách Hàng (Positive vs Negative vs Neutral)</h2>
+        <div class="sub">Tỷ lệ cơ cấu trải nghiệm mua sắm trên các nền tảng</div>
         <div class="chart-container"><canvas id="chartSentiment"></canvas></div>
       </div>
       <div class="card">
-        <h2>⭐ ${currentLang==='vi'?'Phân Bổ Tần Suất Số Sao':'Rating Histogram (1-5 Stars)'}</h2>
-        <div class="sub">${currentLang==='vi'?'Số lượng bài đánh giá chia theo từng mức sao':'Distribution of reviews across star tiers'}</div>
+        <h2>⭐ Phân Bổ Tần Suất Xếp Hạng Sao (1 đến 5 Sao)</h2>
+        <div class="sub">Số lượng bài nhận xét chi tiết phân bổ theo mức độ hài lòng</div>
         <div class="chart-container"><canvas id="chartStars"></canvas></div>
       </div>
     </div>
@@ -495,24 +501,24 @@ const VIEWS = {
     <!-- CHARTS ROW 2: SENTIMENT DRIFT TIMELINE & AI EXECUTIVE SUMMARY -->
     <div class="grid-2">
       <div class="card">
-        <h2>📉 ${currentLang==='vi'?'Xu Hướng Cảm Xúc 6 Tháng (Sentiment Drift)':'6-Month Sentiment Drift Timeline'}</h2>
-        <div class="sub">${currentLang==='vi'?'Theo dõi biến động điểm CSAT từ T5/2026 đến T10/2026':'CSAT score evolution from May 2026 to Oct 2026'}</div>
+        <h2>📉 Xu Hướng Biến Động Cảm Xúc 6 Tháng (Sentiment Drift Timeline)</h2>
+        <div class="sub">Diễn biến điểm CSAT và tỷ lệ tiêu cực từ Tháng 5/2026 đến Tháng 10/2026</div>
         <div class="chart-container"><canvas id="chartDriftTrend"></canvas></div>
       </div>
 
       <div class="card ai-card">
-        <h2>✨ ${currentLang==='vi'?'Tóm Tắt Chiến Lược Điều Hành AI':'LLM Executive AI Strategy Brief'}</h2>
-        <div class="sub" style="color:#EC4899;">${currentLang==='vi'?'Tổng hợp tự động bởi Nexus-LLM-v4.0 Model':'Automated Executive Summary by Nexus-LLM-v4.0'}</div>
+        <h2>✨ Báo Cáo Tóm Tắt Chiến Lược Tình Báo AI (Nexus LLM Executive Brief)</h2>
+        <div class="sub" style="color:#EC4899;">Tổng hợp thông minh tự động bằng Mô hình Nexus-LLM-v5 Quant Analytics</div>
         
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
           <div style="padding:10px; background:rgba(16,185,129,0.1); border-left:3px solid var(--pos); border-radius:6px;">
-            <b style="color:var(--pos);">${currentLang==='vi'?'Sản phẩm Ngôi sao':'Star Product SKU'}:</b> SKU-VAY-03 đạt 95% tích cực, CSAT 4.85/5.0. Đề xuất đẩy mạnh ngân sách Ads TikTok Shop.
+            <b style="color:var(--pos);">Sản Phẩm Ngôi Sao:</b> SKU-VAY-03 đạt 95% tích cực, CSAT 4.85/5.0. Đề xuất tăng 40% ngân sách Ads TikTok Shop & Shopee Mall.
           </div>
           <div style="padding:10px; background:rgba(244,63,94,0.1); border-left:3px solid var(--neg); border-radius:6px;">
-            <b style="color:var(--neg);">${currentLang==='vi'?'Rủi ro Khẩn cấp':'Critical Risk'}:</b> SKU-TAI-05 dính 70% phàn nàn sạc không vào điện & hỏng dock. Cần tạm dừng bán để đàm phán lại với nhà cung cấp.
+            <b style="color:var(--neg);">Rủi Ro Thất Thoát Cao:</b> SKU-TAI-05 dính 70% phàn nàn sạc không vào điện & hỏng củ tai. Cần tạm dừng chạy Ads để kiểm định nhà máy.
           </div>
           <div style="padding:10px; background:rgba(245,158,11,0.1); border-left:3px solid var(--warn); border-radius:6px;">
-            <b style="color:var(--warn);">${currentLang==='vi'?'Tối ưu Vận hành':'Operation Fix'}:</b> Lỗi size chiếm 25% phàn nàn thời trang (SKU-POLO-01). Bổ sung Video hướng dẫn đo bảng size giúp giảm ngay 30% tỷ lệ đổi trả.
+            <b style="color:var(--warn);">Cải Tiến Vận Hành:</b> Phàn nàn bảng size chiếm 25% nhóm thời trang (SKU-POLO-01). Đăng video quay đo phom thực tế giúp giảm ngay 30% tỷ lệ hoàn hàng.
           </div>
         </div>
       </div>
@@ -538,43 +544,43 @@ const VIEWS = {
     return `
     <div class="grid-4" style="margin-bottom:20px;">
       <div class="kpi-card pos">
-        <div class="kpi-title">Champions Cohort</div>
+        <div class="kpi-title">Nhóm Khách Champions</div>
         <div class="kpi-value" style="color:var(--pos);">2 SKU</div>
-        <div class="kpi-sub">Khách hàng yêu thích 100%</div>
+        <div class="kpi-sub">Đóng góp 60% tổng lợi nhuận</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-title">Loyal Cohort</div>
+        <div class="kpi-title">Nhóm Khách Loyal</div>
         <div class="kpi-value">2 SKU</div>
-        <div class="kpi-sub">Tỷ lệ mua lại ổn định</div>
+        <div class="kpi-sub">Tỷ lệ mua lại trung bình 35%</div>
       </div>
       <div class="kpi-card warn">
-        <div class="kpi-title">At-Risk Cohort</div>
+        <div class="kpi-title">Nhóm Cảnh Báo At-Risk</div>
         <div class="kpi-value" style="color:var(--warn);">1 SKU</div>
-        <div class="kpi-sub">Phàn nàn bắt đầu tăng</div>
+        <div class="kpi-sub">Tăng phàn nàn về size & bao bì</div>
       </div>
       <div class="kpi-card neg">
-        <div class="kpi-title">Lost / Crisis Cohort</div>
+        <div class="kpi-title">Nhóm Nguy Cơ Thất Thoát</div>
         <div class="kpi-value" style="color:var(--neg);">1 SKU</div>
-        <div class="kpi-sub">Cần xử lý hoả tốc</div>
+        <div class="kpi-sub">Cần xử lý bù hàng khẩn cấp</div>
       </div>
     </div>
 
     <div class="card" style="margin-bottom:20px;">
-      <h2>📦 Bảng Phân Tích SKU Đa Chiều & Phân Khúc Khách Hàng (Customer Cohort Matrix)</h2>
-      <div class="sub">So sánh chi tiết chỉ số hài lòng, tỷ lệ phàn nàn và nhóm Cohort khách hàng</div>
+      <h2>📦 Ma Trận Phân Phân Khúc Khách Hàng Theo SKU (Customer Cohort Matrix)</h2>
+      <div class="sub">So sánh chi tiết chỉ số CSAT, tỷ lệ tiêu cực và rủi ro hoàn hàng theo sản phẩm</div>
       <div class="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th>SKU</th>
-              <th>Tên Sản Phẩm</th>
-              <th class="num">Số ĐG</th>
+              <th>SKU Sản Phẩm</th>
+              <th>Tên Sản Phẩm Tương Ứng</th>
+              <th class="num">Số Lượng ĐG</th>
               <th class="num">Điểm TB</th>
               <th class="num">% Tích Cực</th>
               <th class="num">% Tiêu Cực</th>
-              <th class="num">Nhắc Đổi Trả</th>
-              <th>Cohort</th>
-              <th>Cảnh Báo Chính</th>
+              <th class="num">% Đổi Trả</th>
+              <th>Nhóm Phân Khúc</th>
+              <th>Cảnh Báo Vận Hành</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -584,17 +590,17 @@ const VIEWS = {
 
     <div class="grid-2">
       <div class="card">
-        <h2>🎯 Biểu Đồ Radar Tâm Lý Khách Hàng (Customer Psychographics 5 Trục)</h2>
-        <div class="sub">Đo lường Năng lực Shop hiện tại vs Kỳ vọng thực tế của Khách hàng</div>
+        <h2>🎯 Biểu Đồ Radar Động Lực & Tâm Lý Khách Hàng 5 Trục (Customer Psychographics)</h2>
+        <div class="sub">So sánh sự lệch pha giữa Năng lực Shop hiện tại vs Kỳ vọng thực tế của Khách hàng</div>
         <div class="chart-container"><canvas id="chartPsychographicsCust"></canvas></div>
       </div>
 
       <div class="card">
-        <h2>🔍 Trích Xuất & Tìm Kiếm Nhận Xét Chi Tiết</h2>
-        <div class="sub">Lọc bình luận thực tế theo SKU và Từ khóa phàn nàn</div>
+        <h2>🔍 Truy Vấn & Trích Xuất Bình Luận Khách Hàng Sâu</h2>
+        <div class="sub">Lọc thông minh bình luận thực tế theo từ khóa phàn nàn & mã SKU</div>
         <div style="display:flex; gap:12px; margin-bottom:14px;">
-          <input type="text" id="searchKw" placeholder="Nhập từ khóa (rộng, chật, hỏng, rách...)..." style="flex:1;">
-          <button class="btn primary" onclick="filterExplorer()">Tìm Kiếm</button>
+          <input type="text" id="searchKw" placeholder="Nhập từ khóa (chật, rộng, hỏng, lỗi, bung...)..." style="flex:1;">
+          <button class="btn primary" onclick="filterExplorer()">Lọc Bình Luận</button>
         </div>
         <div id="explorerBox"></div>
       </div>
@@ -606,13 +612,13 @@ const VIEWS = {
     return `
     <div class="grid-2">
       <div class="card">
-        <h2>📊 Phân Tích Khía Cạnh ABSA (Aspect-Based Sentiment Analysis)</h2>
-        <div class="sub">Phân tích sâu nhóm tính chất sản phẩm & dịch vụ</div>
+        <h2>📊 Phân Tích Cảm Xúc Theo Khía Cạnh Cấu Trúc (Aspect-Based Sentiment - ABSA)</h2>
+        <div class="sub">Phân rã mức độ hài lòng theo từng khía cạnh: Chất lượng, Size, Vận chuyển, Giá cả, CSKH</div>
         <div class="chart-container"><canvas id="chartAspects"></canvas></div>
       </div>
       <div class="card">
-        <h2>🔥 Top Từ Khóa Tiêu Cực Phổ Biến (Negative Keyword Frequency)</h2>
-        <div class="sub">Tần suất xuất hiện các từ khóa gây hỏng trải nghiệm khách hàng</div>
+        <h2>🔥 Bảng Tần Suất Từ Khóa Gây Mất Điểm CSAT (Negative Keyword Density)</h2>
+        <div class="sub">Tần suất các cụm từ phàn nàn phổ biến xuất hiện trong bình luận khách hàng</div>
         <div class="chart-container"><canvas id="chartKeywords"></canvas></div>
       </div>
     </div>
@@ -622,20 +628,20 @@ const VIEWS = {
   unit() {
     return `
     <div class="card" style="margin-bottom:20px;">
-      <h2>💰 Mô Phỏng Tài Chính Unit Economics Cho 1 Đơn Hàng SKU</h2>
-      <div class="sub">Tính toán Net Profit, Điểm Hòa Vốn & Ngưỡng Quảng Cáo CAC Tối Đa</div>
+      <h2>💰 Mô Phỏng Định Lượng Tài Chính Đơn Hàng (Unit Economics Model)</h2>
+      <div class="sub">Tính toán Lợi nhuận ròng, Điểm hòa vốn & Ngưỡng chi phí Quảng cáo CAC tối đa cho 1 đơn hàng</div>
       
       <div class="grid-3" style="margin-top:16px;">
         <div>
-          <label><b>Giá Bán (VNĐ):</b></label>
+          <label><b>Giá Bán Niêm Yết (VNĐ):</b></label>
           <input type="number" id="uPrice" value="200000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
         </div>
         <div>
-          <label><b>Giá Vốn COGS (VNĐ):</b></label>
+          <label><b>Giá Vốn Sản Phẩm COGS (VNĐ):</b></label>
           <input type="number" id="uCogs" value="80000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
         </div>
         <div>
-          <label><b>Chi Phí Quảng Cáo / Đơn (CAC):</b></label>
+          <label><b>Chi Phí Quảng Cáo CAC / Đơn (VNĐ):</b></label>
           <input type="number" id="uAds" value="25000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
         </div>
         <div>
@@ -643,11 +649,11 @@ const VIEWS = {
           <input type="number" id="uFee" value="8" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
         </div>
         <div>
-          <label><b>Tỷ Lệ Hoàn Trả Hàng (%):</b></label>
+          <label><b>Tỷ Lệ Hoàn Trả Hàng Dự Kiến (%):</b></label>
           <input type="number" id="uReturn" value="10" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
         </div>
         <div>
-          <label><b>Phí Fulfillment & Đóng Gói:</b></label>
+          <label><b>Phí Đóng Gói & Fulfillment:</b></label>
           <input type="number" id="uFul" value="15000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
         </div>
       </div>
@@ -655,21 +661,21 @@ const VIEWS = {
 
     <div class="grid">
       <div class="kpi-card pos">
-        <div class="kpi-title">Doanh Thu Ròng (Net Revenue)</div>
+        <div class="kpi-title">Doanh Thu Ròng Thực Nhận (Net Revenue)</div>
         <div class="kpi-value" id="resNetRev">0đ</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-title">Lợi Nhuận Ròng (Net Profit / Đơn)</div>
+        <div class="kpi-title">Lợi Nhuận Ròng Trên Mỗi Đơn (Net Profit)</div>
         <div class="kpi-value" id="resNetProfit" style="color:var(--primary);">0đ</div>
       </div>
       <div class="kpi-card warn">
-        <div class="kpi-title">Ngưỡng CAC Quảng Cáo Tối Đa</div>
+        <div class="kpi-title">Ngưỡng CAC Quảng Cáo Tối Đa Cho Phép</div>
         <div class="kpi-value" id="resMaxCac" style="color:var(--warn);">0đ</div>
       </div>
     </div>
 
     <div class="card">
-      <h2>📊 Phân Rã Chi Phí Đơn Hàng (Cost Structure Waterfall)</h2>
+      <h2>📊 Phân Rã Cơ Cấu Chi Phí Đơn Hàng (Cost Structure Waterfall Chart)</h2>
       <div class="chart-container"><canvas id="chartWaterfall"></canvas></div>
     </div>
     `;
@@ -679,14 +685,14 @@ const VIEWS = {
     return `
     <div class="grid-2">
       <div class="card">
-        <h2>🔮 Dự Báo Tỷ Lệ Hoàn Hàng 30 Ngày Tới</h2>
-        <div class="sub">Mô hình AI Time-Series Forecast dựa trên Sentiment Drift</div>
+        <h2>🔮 Dự Báo Tỷ Lệ Hoàn Trả Hàng 30 Ngày Tới (AI Time-Series Forecast)</h2>
+        <div class="sub">Mô hình AI dự báo chuỗi thời gian dựa trên độ lệch cảm xúc tiêu cực thực tế</div>
         <div class="chart-container"><canvas id="chartForecast"></canvas></div>
       </div>
       <div class="card">
-        <h2>⚠️ Cảnh Báo Nguy Cơ Thất Thoát Lợi Nhuận</h2>
+        <h2>⚠️ Cảnh Báo Nguy Cơ Thất Thoát Doanh Thu Cấp Độ Đơn Hàng</h2>
         <div style="padding:16px; background:var(--neg-bg); border:1px solid rgba(244,63,94,0.3); border-radius:10px; color:var(--neg); margin-top:10px;">
-          <h3 style="font-size:15px; font-weight:800;">🚨 Cảnh báo SKU Cao Rủi Ro: SKU-TAI-05</h3>
+          <h3 style="font-size:15px; font-weight:800;">🚨 Cảnh Báo SKU Nguy Cơ Rủi Ro Cao: SKU-TAI-05</h3>
           <p style="margin-top:6px; font-size:12.5px; line-height:1.5;">Ghi nhận tỷ lệ phàn nàn pin yếu và kết nối chập chờn vượt 25%. Dự báo tổn thất <b>~12.500.000đ/tháng</b> nếu không bổ sung quy trình kiểm định QC trước khi xuất kho.</p>
         </div>
       </div>
@@ -697,33 +703,33 @@ const VIEWS = {
   competitors() {
     return `
     <div class="card" style="margin-bottom:20px;">
-      <h2>⚔️ Phân Tích Cạnh Tranh & So Sánh Benchmark Thị Trường</h2>
-      <div class="sub">So sánh các chỉ số vận hành giữa Gian hàng của bạn vs Top Đối thủ Ngành</div>
+      <h2>⚔️ Phân Tích Cạnh Tranh & Benchmark Chỉ Số Đối Thủ Thị Trường</h2>
+      <div class="sub">So sánh toàn diện vị thế vận hành giữa Gian hàng của bạn vs Các Top Seller trong ngành</div>
     </div>
 
     <div class="grid-2">
       <div class="card">
-        <h2>🎯 Radar So Sánh Năng Lực Cạnh Tranh</h2>
+        <h2>🎯 Radar So Sánh Vị Thế Cạnh Tranh</h2>
         <div class="chart-container"><canvas id="chartRadar"></canvas></div>
       </div>
 
       <div class="card">
-        <h2>📊 Bảng So Sánh Chỉ Số Benchmark</h2>
+        <h2>📊 Bảng So Sánh Chỉ Số Vận Hành Cốt Lõi</h2>
         <div class="table-wrapper" style="margin-top:10px;">
           <table>
             <thead>
               <tr>
-                <th>Chỉ Số So Sánh</th>
-                <th class="num">Shop Bạn</th>
-                <th class="num">Đối Thủ A (Leader)</th>
+                <th>Chỉ Số So Sánh Vận Hành</th>
+                <th class="num">Shop Của Bạn</th>
+                <th class="num">Đối Thủ A (Top 1)</th>
                 <th class="num">Đối Thủ B (Giá Rẻ)</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>Điểm CSAT Hài Lòng</td><td class="num pos"><b>4.2 / 5.0</b></td><td class="num">4.6 / 5.0</td><td class="num neg">3.5 / 5.0</td></tr>
-              <tr><td>Tỷ Lệ Đổi Trả Hàng</td><td class="num warn"><b>8.5%</b></td><td class="num pos">3.2%</td><td class="num neg">14.0%</td></tr>
-              <tr><td>Tốc Độ Giao Hàng</td><td class="num"><b>2.4 Ngày</b></td><td class="num pos">1.5 Ngày</td><td class="num">3.1 Ngày</td></tr>
-              <tr><td>Đánh Giá Giá / Giá Trị</td><td class="num pos"><b>88% Tốt</b></td><td class="num">75% Tốt</td><td class="num pos">92% Tốt</td></tr>
+              <tr><td>Điểm CSAT Hài Lòng Trung Bình</td><td class="num pos"><b>4.25 / 5.0</b></td><td class="num">4.60 / 5.0</td><td class="num neg">3.50 / 5.0</td></tr>
+              <tr><td>Tỷ Lệ Đổi Trả / Hoàn Hàng</td><td class="num warn"><b>8.5%</b></td><td class="num pos">3.2%</td><td class="num neg">14.0%</td></tr>
+              <tr><td>Thời Gian Giao Hàng Trung Bình</td><td class="num"><b>2.4 Ngày</b></td><td class="num pos">1.5 Ngày</td><td class="num">3.1 Ngày</td></tr>
+              <tr><td>Đánh Giá Giá Trị / Chi Phí</td><td class="num pos"><b>88% Hài Lòng</b></td><td class="num">75% Hài Lòng</td><td class="num pos">92% Hài Lòng</td></tr>
             </tbody>
           </table>
         </div>
@@ -738,9 +744,9 @@ const VIEWS = {
     <div class="card ai-card" style="margin-bottom:20px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div>
-          <span class="badge" style="background:rgba(236,72,153,0.2); color:#EC4899;">NEXUS LLM AI ENGINE ACTIVE</span>
+          <span class="badge" style="background:rgba(236,72,153,0.2); color:#EC4899;">MÔ HÌNH LLM QUANT ENGINE ACTIVE</span>
           <h2 style="font-size:16px; margin-top:4px;">✨ Nexus Engine LLM AI Problem-Solution Intelligence Core</h2>
-          <div style="font-size:12px; color:var(--text-muted);">Mô hình LLM AI tự động quét nhận xét, liên kết Điểm đau $\\rightarrow$ Nguyên nhân gốc $\\rightarrow$ Doanh thu $\\rightarrow$ ROI</div>
+          <div style="font-size:12px; color:var(--text-muted);">Mô hình LLM AI tự động quét nhận xét, liên kết: Điểm đau $\\rightarrow$ Nguyên nhân gốc $\\rightarrow$ Thất thoát $\\rightarrow$ Giải pháp $\\rightarrow$ ROI</div>
         </div>
         <button class="btn ai" id="btnRunAudit" onclick="runLlmAudit()">
           <span id="lblAuditBtn">🚀 Khởi chạy LLM AI Deep Audit</span>
@@ -749,41 +755,27 @@ const VIEWS = {
       <div id="llmStatusBox" style="margin-top:12px; display:none; padding:10px; background:rgba(0,0,0,0.3); border-radius:8px; font-family:'JetBrains Mono'; font-size:12px; color:#EC4899;"></div>
     </div>
 
-    <!-- SECTION 1: EXECUTIVE GAP ACTION CARDS -->
-    <div class="grid-3" style="margin-bottom:20px;">
-      <div class="card" style="border-top:3px solid var(--pos);">
-        <span class="badge badge-pos">CƠ HỘI CAO</span>
-        <h3 style="margin-top:10px; font-size:14px;">📦 Đóng Gói Chống Sốc 3 Lớp</h3>
-        <p style="margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.5;">22% khách hàng đối thủ phàn nàn vỡ hộp bưu phẩm. Bổ sung hộp carton sóng 5 lớp sẽ tạo điểm cộng vượt trội.</p>
-      </div>
-
-      <div class="card" style="border-top:3px solid var(--warn);">
-        <span class="badge badge-warn">CẦN CẢI TIẾN</span>
-        <h3 style="margin-top:10px; font-size:14px;">📏 Video Bảng Size Thực Tế</h3>
-        <p style="margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.5;">Phàn nàn về size chiếm 30% phàn nàn ngành thời trang. Đăng video đo thực tế giúp giảm ngay 35% tỷ lệ hoàn hàng.</p>
-      </div>
-
-      <div class="card" style="border-top:3px solid var(--primary);">
-        <span class="badge badge-pos">ĐIỂM SÁNG</span>
-        <h3 style="margin-top:10px; font-size:14px;">🎁 Thư Cảm Ơn & QR Đổi Trả 1-1</h3>
-        <p style="margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.5;">Hỗ trợ khách hàng đổi trả trực tiếp trước khi khiếu nại lên Shopee giúp giữ tỷ lệ shop yêu thích luôn trên 98%.</p>
-      </div>
+    <!-- SECTION 1: 3D SPATIAL QUANT GRAPH (THỜI TRANG & TMĐT 3D 360 DEGREE) -->
+    <div class="card" style="margin-bottom:20px; border:1px solid rgba(16,185,129,0.4);">
+      <h2>🧊 Mô Hình Không Gian Đa Chiều 3D 360° (3D Quant Spatial Sentiment Topology)</h2>
+      <div class="sub">Trực quan hóa 3 Trục Quant: <b>Trục X (Volume Thảo luận)</b> – <b>Trục Y (Điểm CSAT)</b> – <b>Trục Z (Tỷ lệ Lợi nhuận Ròng Unit Economics)</b>. Bấm giữ chuột để xoay 360° kiểm tra thị trường.</div>
+      <div class="canvas-3d-container" id="canvas3dBox"></div>
     </div>
 
     <!-- SECTION 2: SOCIAL MEDIA & E-COMMERCE TREND RADAR TABLE -->
     <div class="card" style="margin-bottom:20px;">
-      <h2>🌐 Social Media & E-Commerce Trend Radar (Crawled: TikTok, Facebook, Twitter/X, Shopee)</h2>
-      <div class="sub">Hệ thống Crawling liên tục hàng ngàn bài viết MXH & Sàn TMĐT phát hiện sản phẩm Hot Trend tiềm năng</div>
+      <h2>🌐 Social Media & E-Commerce Trend Radar (Crawling TikTok, Facebook, Twitter/X, Shopee)</h2>
+      <div class="sub">Hệ thống Crawling liên tục hàng ngàn bài viết MXH & Sàn TMĐT phát hiện sản phẩm Hot Trend tiềm năng kinh doanh</div>
 
       <div class="table-wrapper" style="margin-top:10px;">
         <table>
           <thead>
             <tr>
-              <th>Mặt Hàng Trending</th>
-              <th>Nguồn Social Crawl</th>
+              <th>Mặt Hàng Trending Hot Trend</th>
+              <th>Nguồn Social Crawling</th>
               <th class="num">Volume Thảo Luận</th>
               <th class="num">Tăng Trưởng MoM</th>
-              <th class="num">Độ Cạnh Tranh</th>
+              <th class="num">Mức Cạnh Tranh</th>
               <th>Đánh Giá Khả Thi</th>
               <th class="num">Doanh Số Tiềm Năng</th>
             </tr>
@@ -791,7 +783,7 @@ const VIEWS = {
           <tbody>
             <tr>
               <td><b>Áo Polo Cotton Unisex Phom Rộng</b></td>
-              <td><span class="badge badge-tiktok">TikTok Shop</span> <span class="badge badge-shopee">Shopee</span></td>
+              <td><span class="badge badge-tiktok">TikTok Shop</span> <span class="badge badge-shopee">Shopee Mall</span></td>
               <td class="num"><b>142.500</b></td>
               <td class="num pos"><b>+48.5%</b></td>
               <td class="num warn">Trung bình</td>
@@ -800,7 +792,7 @@ const VIEWS = {
             </tr>
             <tr>
               <td><b>Tai Nghe TWS Chống ỒN ANC Giá Rẻ</b></td>
-              <td><span class="badge badge-fb">Facebook Ads</span> <span class="badge badge-tiktok">TikTok</span></td>
+              <td><span class="badge badge-fb">Facebook Ads</span> <span class="badge badge-tiktok">TikTok Video</span></td>
               <td class="num"><b>98.200</b></td>
               <td class="num pos"><b>+32.1%</b></td>
               <td class="num neg">Cao</td>
@@ -809,7 +801,7 @@ const VIEWS = {
             </tr>
             <tr>
               <td><b>Quần Jeans Ống Rộng Hack Dáng</b></td>
-              <td><span class="badge badge-tiktok">TikTok</span> <span class="badge badge-x">Twitter / X</span></td>
+              <td><span class="badge badge-tiktok">TikTok Shop</span> <span class="badge badge-x">Twitter / X</span></td>
               <td class="num"><b>210.000</b></td>
               <td class="num pos"><b>+64.2%</b></td>
               <td class="num warn">Trung bình</td>
@@ -818,7 +810,7 @@ const VIEWS = {
             </tr>
             <tr>
               <td><b>Váy Vintage Hoa Nhí Công Chúa</b></td>
-              <td><span class="badge badge-shopee">Shopee</span> <span class="badge badge-fb">Facebook</span></td>
+              <td><span class="badge badge-shopee">Shopee Mall</span> <span class="badge badge-fb">Facebook Page</span></td>
               <td class="num"><b>76.400</b></td>
               <td class="num pos"><b>+18.7%</b></td>
               <td class="num pos">Thấp</td>
@@ -827,7 +819,7 @@ const VIEWS = {
             </tr>
             <tr>
               <td><b>Giày Sneaker Retro Style Hàn Quốc</b></td>
-              <td><span class="badge badge-tiktok">TikTok</span> <span class="badge badge-x">Instagram</span></td>
+              <td><span class="badge badge-tiktok">TikTok Shop</span> <span class="badge badge-x">Instagram Trends</span></td>
               <td class="num"><b>115.000</b></td>
               <td class="num pos"><b>+29.4%</b></td>
               <td class="num warn">Trung bình</td>
@@ -882,7 +874,7 @@ const VIEWS = {
               <td><b style="color:var(--warn);">Phàn nàn Đóng gói Móp Hộp (8%)</b></td>
               <td>Sử dụng túi ni lông bong bóng 1 lớp dễ bẹp khi vận chuyển xa</td>
               <td>Gây mất điểm CSAT, giảm tỷ lệ mua lại của khách hàng cũ (-15%)</td>
-              <td>Chuyển sang hộp Carton 5 lớp sóng E + Dăng keo chống vỡ</td>
+              <td>Chuyển sang hộp Carton 5 lớp sóng E + Băng keo chống vỡ</td>
               <td class="num pos"><b>+210% ROI</b></td>
             </tr>
             <tr>
@@ -902,23 +894,23 @@ const VIEWS = {
   reports() {
     return `
     <div class="card">
-      <h2>📄 ${t('reports')}</h2>
-      <div class="sub">${currentLang==='vi'?'Xuất các định dạng file chuẩn Báo cáo Quản trị Doanh nghiệp':'Export Enterprise BI Reports'}</div>
+      <h2>📄 Trung Tâm Xuất Báo Cáo & Quản Trị Dữ Liệu Enterprise</h2>
+      <div class="sub">Xuất dữ liệu sạch chuẩn báo cáo quản trị cấp cao cho doanh nghiệp</div>
       
       <div class="grid-3" style="margin-top:20px;">
         <button class="btn primary" onclick="exportData('xlsx')" style="padding:16px; flex-direction:column;">
           <span style="font-size:24px;">📊</span>
-          <span>${t('exportExcel')}</span>
+          <span>Xuất Báo Cáo Excel Full BI (.xlsx)</span>
         </button>
 
         <button class="btn" onclick="exportData('csv')" style="padding:16px; flex-direction:column;">
           <span style="font-size:24px;">📝</span>
-          <span>${t('exportCsv')}</span>
+          <span>Xuất File CSV Chuẩn Tối Ưu (.csv)</span>
         </button>
 
         <button class="btn" onclick="window.print()" style="padding:16px; flex-direction:column;">
           <span style="font-size:24px;">🖨️</span>
-          <span>${t('printPdf')}</span>
+          <span>In Báo Cáo PDF Executive</span>
         </button>
       </div>
     </div>
@@ -928,26 +920,26 @@ const VIEWS = {
   system() {
     return `
     <div class="card" style="margin-bottom:20px;">
-      <h2>⚡ ${t('system')}</h2>
-      <div class="sub">Cập nhật thời gian thực thông số FastAPI Local Machine Engine</div>
+      <h2>⚡ Giám Sát Tài Nguyên & Đo Lường Độ Trễ Hệ Thống (Telemetry & Monitoring)</h2>
+      <div class="sub">Cập nhật thời gian thực thông số máy chủ local FastAPI & AI Model Engine</div>
     </div>
 
     <div class="grid">
       <div class="kpi-card pos">
-        <div class="kpi-title">CPU Utilization</div>
+        <div class="kpi-title">Mức Sử Dụng CPU</div>
         <div class="kpi-value" id="sysCpu">12%</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-title">RAM Used</div>
+        <div class="kpi-title">Dung Lượng RAM Đã Dùng</div>
         <div class="kpi-value" id="sysRam">1.8 / 16 GB</div>
       </div>
       <div class="kpi-card pos">
-        <div class="kpi-title">Inference Latency</div>
+        <div class="kpi-title">Độ Trễ Phản Hồi AI (Latency)</div>
         <div class="kpi-value" id="sysLatency">14 ms</div>
       </div>
       <div class="kpi-card ai">
-        <div class="kpi-title">AI Model Engine</div>
-        <div class="kpi-value" style="font-size:15px; color:#EC4899;">Nexus-LLM-v4.0 Ready</div>
+        <div class="kpi-title">Trạng Thái AI Model Engine</div>
+        <div class="kpi-value" style="font-size:15px; color:#EC4899;">Nexus-Quant-v5.0 Ready</div>
       </div>
     </div>
     `;
@@ -956,32 +948,32 @@ const VIEWS = {
   settings() {
     return `
     <div class="card">
-      <h2>⚙️ ${t('settings')}</h2>
-      <div class="sub">Tùy chỉnh kết nối API Local, Ngôn ngữ & Chế độ phân tích</div>
+      <h2>⚙️ Cài Đặt & Cấu Hình Hệ Thống Nexus Engine Enterprise</h2>
+      <div class="sub">Tùy chỉnh endpoint API local, Ngôn ngữ giao diện & Chế độ tính toán Quant</div>
 
       <div style="margin-top:16px; display:flex; flex-direction:column; gap:14px; max-width:500px;">
         <div>
-          <label><b>Giao Diện Ngôn Ngữ (Interface Language):</b></label>
+          <label><b>Ngôn Ngữ Giao Diện (Interface Language):</b></label>
           <select id="cfgLang" style="width:100%; margin-top:4px;" onchange="changeLanguageSelect(this.value)">
-            <option value="vi" ${currentLang==='vi'?'selected':''}>🇻🇳 Tiếng Việt (Vietnamese)</option>
+            <option value="vi" ${currentLang==='vi'?'selected':''}>🇻🇳 Tiếng Việt (Vietnamese 100%)</option>
             <option value="en" ${currentLang==='en'?'selected':''}>🇺🇸 English (Tiếng Anh)</option>
           </select>
         </div>
 
         <div>
-          <label><b>FastAPI Backend Endpoint URL:</b></label>
+          <label><b>Đường Dẫn FastAPI Backend Endpoint URL:</b></label>
           <input type="text" id="cfgApiUrl" value="${API_BASE_URL}" style="width:100%; margin-top:4px;">
         </div>
 
         <div>
-          <label><b>Chế Độ Phân Tích (Processing Engine):</b></label>
+          <label><b>Chế Độ Xử Lý Tính Toán Quant (Quant Engine Mode):</b></label>
           <select id="cfgMode" style="width:100%; margin-top:4px;">
-            <option value="local">Local Hybrid LLM (Ưu tiên tốc độ & Bảo mật)</option>
-            <option value="cloud">Cloud LLM Engine (Phân tích nâng cao)</option>
+            <option value="local">Local Hybrid Quant AI (Tối ưu tốc độ & Bảo mật)</option>
+            <option value="cloud">Cloud Deep Quant LLM (Phân tích chuỗi thời gian)</option>
           </select>
         </div>
 
-        <button class="btn primary" onclick="saveSettings()" style="width:fit-content; margin-top:10px;">💾 Lưu Cấu Hình</button>
+        <button class="btn primary" onclick="saveSettings()" style="width:fit-content; margin-top:10px;">💾 Lưu Cấu Hình Hệ Thống</button>
       </div>
     </div>
     `;
@@ -1003,6 +995,7 @@ function renderView(viewId) {
   $("#title").innerHTML = `${getNavIcon(viewId)} ${t(viewId)}`;
   $("#content").innerHTML = VIEWS[viewId]();
   
+  if (threeAnimId) { cancelAnimationFrame(threeAnimId); threeAnimId = null; }
   Object.values(activeChartInst).forEach(chart => chart.destroy());
   activeChartInst = {};
 
@@ -1013,7 +1006,7 @@ function renderView(viewId) {
   if (viewId === "unit") { calcUnitEco(); initWaterfallChart(); }
   if (viewId === "predictive") initPredictiveCharts();
   if (viewId === "competitors") initCompetitorCharts();
-  if (viewId === "opportunities") initOpportunitiesCharts();
+  if (viewId === "opportunities") { initOpportunitiesCharts(); init3dQuantCanvas(); }
 }
 
 function getNavIcon(id) {
@@ -1041,7 +1034,7 @@ function initExecutiveCharts() {
     activeChartInst.sentiment = new Chart(ctx1, {
       type: 'doughnut',
       data: {
-        labels: ['Positive', 'Negative', 'Neutral'],
+        labels: ['Tích cực (Positive)', 'Tiêu cực (Negative)', 'Trung lập (Neutral)'],
         datasets: [{ data: [p, n, neu], backgroundColor: ['#10B981', '#F43F5E', '#6B7280'] }]
       },
       options: { responsive: true, maintainAspectRatio: false }
@@ -1054,7 +1047,7 @@ function initExecutiveCharts() {
       type: 'bar',
       data: {
         labels: D.hist.map(h => h.rating + " ★"),
-        datasets: [{ label: 'Reviews Count', data: D.hist.map(h => h.count), backgroundColor: '#6366F1', borderRadius: 6 }]
+        datasets: [{ label: 'Số Đánh Giá', data: D.hist.map(h => h.count), backgroundColor: '#6366F1', borderRadius: 6 }]
       },
       options: { responsive: true, maintainAspectRatio: false }
     });
@@ -1232,22 +1225,80 @@ function initOpportunitiesCharts() {
   }
 }
 
+// 3D THREE.JS QUANT SPATIAL CANVAS
+function init3dQuantCanvas() {
+  const container = $("#canvas3dBox");
+  if (!container || typeof THREE === 'undefined') return;
+
+  const width = container.clientWidth || 600;
+  const height = container.clientHeight || 320;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+  camera.position.set(15, 12, 20);
+  camera.lookAt(0, 0, 0);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(width, height);
+  container.innerHTML = "";
+  container.appendChild(renderer.domElement);
+
+  // Grid & Axis
+  const gridHelper = new THREE.GridHelper(20, 20, 0x6366f1, 0x374151);
+  scene.add(gridHelper);
+
+  // Add Glowing Data Nodes for SKUs
+  const nodes = [
+    { pos: [4, 5, 3], color: 0x10b981, size: 1.2, name: "SKU-VAY-03 (Star)" },
+    { pos: [-3, 2, -2], color: 0xf43f5e, size: 1.5, name: "SKU-TAI-05 (Crisis)" },
+    { pos: [2, 1, -4], color: 0xf59e0b, size: 1.0, name: "SKU-POLO-01 (Warning)" },
+    { pos: [6, 4, 5], color: 0x6366f1, size: 1.3, name: "SKU-JEAN-02 (High Vol)" },
+    { pos: [-2, -1, 4], color: 0x06b6d4, size: 0.9, name: "SKU-GIAY-04 (Mid)" }
+  ];
+
+  const group = new THREE.Group();
+
+  nodes.forEach(n => {
+    const geo = new THREE.SphereGeometry(n.size, 16, 16);
+    const mat = new THREE.MeshBasicMaterial({ color: n.color, wireframe: true });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(n.pos[0], n.pos[1], n.pos[2]);
+    group.add(mesh);
+  });
+
+  scene.add(group);
+
+  // Lighting
+  const light = new THREE.PointLight(0xffffff, 1, 100);
+  light.position.set(10, 10, 10);
+  scene.add(light);
+
+  // Rotation Animation
+  function animate() {
+    threeAnimId = requestAnimationFrame(animate);
+    group.rotation.y += 0.008;
+    group.rotation.x += 0.003;
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
 function runLlmAudit() {
   const box = $("#llmStatusBox");
   if (!box) return;
   box.style.display = "block";
-  box.innerHTML = "⏳ [Nexus-LLM-v4] Ingesting 10,000 Social Posts & Product Reviews...<br>";
+  box.innerHTML = "⏳ [Nexus-Quant-v5] Đang cào & nạp 10,000 bài viết Social & Đánh giá Shopee/TikTok...<br>";
   
   setTimeout(() => {
-    box.innerHTML += "⚡ [Nexus-LLM-v4] Extracting Aspect Sentiment & Root Cause Mapping...<br>";
+    box.innerHTML += "⚡ [Nexus-Quant-v5] Đang trích xuất khía cạnh cảm xúc ABSA & Ma trận nguyên nhân gốc...<br>";
   }, 800);
 
   setTimeout(() => {
-    box.innerHTML += "🎯 [Nexus-LLM-v4] Calculating Financial Net Loss Impact & ROI Optimization Roadmap...<br>";
+    box.innerHTML += "🎯 [Nexus-Quant-v5] Đang tính toán tác động thất thoát tài chính & Lộ trình tối ưu ROI...<br>";
   }, 1600);
 
   setTimeout(() => {
-    box.innerHTML += "<b style='color:#10B981;'>🎉 [Nexus-LLM-v4] Audit Complete! Full Problem-Solution Matrix Updated Below.</b>";
+    box.innerHTML += "<b style='color:#10B981;'>🎉 [Nexus-Quant-v5] Đã hoàn tất AI Deep Audit! Ma trận Vấn đề - Giải pháp bên dưới đã cập nhật.</b>";
     toast("✨ Đã hoàn thành LLM AI Deep Audit!");
   }, 2400);
 }
@@ -1271,7 +1322,7 @@ $("#nav").addEventListener("click", e => {
 $("#themeBtn").addEventListener("click", () => {
   const isDark = document.documentElement.dataset.theme !== "light";
   document.documentElement.dataset.theme = isDark ? "light" : "dark";
-  $("#themeBtn").textContent = isDark ? "☀️ Light" : "🌙 Dark";
+  $("#themeBtn").textContent = isDark ? "☀️ Chế độ Sáng" : "🌙 Chế độ Tối";
 });
 
 buildNav();
