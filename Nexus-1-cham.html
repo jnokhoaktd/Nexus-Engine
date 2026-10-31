@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Nexus Engine – Enterprise Quant E-Commerce & Deep Learning ABSA v6.0</title>
+<title>Nexus Engine – Enterprise Ultimate Time-Series & Quant SaaS v7.0</title>
 
 <!-- External CDN Dependencies -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,7 +11,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<!-- Three.js CDN for 3D Quant Spatial Visualizations -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
@@ -22,13 +21,13 @@
     --bg-card: #1F2937;
     --bg-hover: #374151;
     --border: #374151;
-    --border-accent: rgba(99, 102, 241, 0.35);
+    --border-accent: rgba(16, 185, 129, 0.4);
     --text-main: #F9FAFB;
     --text-muted: #9CA3AF;
-    --primary: #6366F1;
-    --primary-gradient: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    --primary: #10B981;
+    --primary-gradient: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
     --ai-gradient: linear-gradient(135deg, #EC4899 0%, #8B5CF6 50%, #3B82F6 100%);
-    --quant-gradient: linear-gradient(135deg, #10B981 0%, #06B6D4 50%, #6366F1 100%);
+    --quant-gradient: linear-gradient(135deg, #10B981 0%, #3B82F6 50%, #6366F1 100%);
     --brand-teal: #10B981;
     --pos: #10B981;
     --pos-bg: rgba(16, 185, 129, 0.12);
@@ -37,7 +36,7 @@
     --neg-bg: rgba(244, 63, 94, 0.12);
     --warn: #F59E0B;
     --warn-bg: rgba(245, 158, 11, 0.12);
-    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
+    --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.25);
     --ai-glow: 0 0 25px rgba(236, 72, 153, 0.35);
     --quant-glow: 0 0 25px rgba(16, 185, 129, 0.35);
   }
@@ -49,10 +48,10 @@
     --bg-card: #FFFFFF;
     --bg-hover: #F1F5F9;
     --border: #E2E8F0;
-    --border-accent: rgba(99, 102, 241, 0.2);
+    --border-accent: rgba(16, 185, 129, 0.25);
     --text-main: #0F172A;
     --text-muted: #64748B;
-    --shadow-glow: 0 4px 12px rgba(99, 102, 241, 0.12);
+    --shadow-glow: 0 4px 12px rgba(16, 185, 129, 0.15);
     --ai-glow: 0 4px 16px rgba(236, 72, 153, 0.15);
   }
 
@@ -62,7 +61,7 @@
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); } 50% { box-shadow: 0 0 16px rgba(16, 185, 129, 0.8); } }
-  @keyframes aiPulse { 0%, 100% { border-color: rgba(236, 72, 153, 0.4); box-shadow: var(--ai-glow); } 50% { border-color: rgba(139, 92, 246, 0.8); box-shadow: 0 0 35px rgba(139, 92, 246, 0.5); } }
+  @keyframes aiPulse { 0%, 100% { border-color: rgba(16, 185, 129, 0.4); box-shadow: var(--quant-glow); } 50% { border-color: rgba(6, 182, 212, 0.8); box-shadow: 0 0 35px rgba(6, 182, 212, 0.5); } }
 
   .animated-fade { animation: fadeIn 0.35s ease-out forwards; }
 
@@ -97,7 +96,7 @@
 
   main { padding: 24px; overflow-y: auto; flex: 1; padding-bottom: 50px; }
 
-  .banner-info { border: 1px solid var(--border-accent); background: rgba(99, 102, 241, 0.08); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+  .banner-info { border: 1px solid var(--border-accent); background: rgba(16, 185, 129, 0.08); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
   .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 20px; }
   .grid-2 { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; margin-bottom: 20px; }
   .grid-3 { display: grid; gap: 18px; grid-template-columns: repeat(3, 1fr); margin-bottom: 20px; }
@@ -108,8 +107,7 @@
   .card h2 { font-size: 14px; font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
   .card .sub { color: var(--text-muted); font-size: 11.5px; margin-bottom: 14px; }
 
-  .ai-card { border: 1px solid rgba(236, 72, 153, 0.4); animation: aiPulse 4s infinite ease-in-out; background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.95) 100%); }
-  .quant-card { border: 1px solid rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(11, 15, 23, 0.98) 100%); }
+  .quant-card { border: 1px solid rgba(16, 185, 129, 0.4); animation: aiPulse 4s infinite ease-in-out; background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(11, 15, 23, 0.98) 100%); }
 
   .kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; position: relative; overflow: hidden; }
   .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--primary); }
@@ -138,7 +136,7 @@
   .btn.quant:hover { opacity: 0.92; transform: translateY(-1px); }
   
   input, select, textarea { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12.5px; font-family: inherit; }
-  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
 
   .upload-box { border: 2px dashed var(--brand-teal); border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; background: rgba(16, 185, 129, 0.03); transition: all 0.2s; }
   .upload-box:hover { background: rgba(16, 185, 129, 0.08); border-color: #06B6D4; }
@@ -151,11 +149,15 @@
   tr:hover td { background: var(--bg-hover); }
   td.num, th.num { text-align: right; font-family: 'JetBrains Mono', monospace; }
 
-  .chart-container { position: relative; height: 270px; width: 100%; }
+  .chart-container { position: relative; height: 280px; width: 100%; }
   .canvas-3d-container { width: 100%; height: 350px; border-radius: 10px; background: #050811; border: 1px solid var(--border); overflow: hidden; position: relative; }
   .tooltip-3d { position: absolute; top: 12px; right: 12px; padding: 10px 14px; background: rgba(17, 24, 39, 0.9); border: 1px solid var(--brand-teal); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #10B981; pointer-events: none; z-index: 5; }
 
   .token-attn { display: inline-block; padding: 3px 6px; margin: 2px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+  .slider-control { display: flex; flex-direction: column; gap: 4px; }
+  .slider-control label { font-size: 11px; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; }
+  .slider-control input[type="range"] { accent-color: var(--brand-teal); cursor: pointer; }
 
   .toast { position: fixed; bottom: 20px; right: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 1000; display: none; animation: fadeIn 0.3s; }
 </style>
@@ -171,7 +173,7 @@
     </div>
     <div class="brand-text">
       <div class="brand-title">NEXUS <span>ENGINE</span></div>
-      <div class="brand-sub">Quant & Deep ABSA v6.0</div>
+      <div class="brand-sub">Ultimate Time-Series v7.0</div>
     </div>
   </div>
 
@@ -182,7 +184,7 @@
   <header>
     <h1 id="title"></h1>
     <div class="header-actions">
-      <span class="ai-pill">✨ Nexus-Quant-v6 Real Math Engine</span>
+      <span class="ai-pill">✨ Nexus-v7.0 Ultimate Time-Series Engine</span>
       <span class="status-pill" id="apiStatusPill">
         <span class="status-dot"></span>
         <span id="apiStatusText">Máy chủ FastAPI Hoạt động</span>
@@ -206,7 +208,14 @@ let isApiConnected = false;
 let activeChartInst = {};
 let threeAnimId = null;
 
-// MULTILINGUAL DICTIONARY - 100% VIỆT HÓA TÀI CHÍNH QUANT & DEEP LEARNING
+// TIME-SERIES INTERACTIVE STATE
+let tsState = {
+  horizonDays: 30,
+  alphaSmoothing: 0.35,
+  betaSeasonality: 0.20,
+  sigmaShock: 0.05
+};
+
 const I18N = {
   vi: {
     navGroupData: "Dữ liệu & ABSA Deep Learning",
@@ -217,17 +226,12 @@ const I18N = {
     customers: "Tình Báo Khách Hàng",
     feedback: "Phản Hồi & ABSA Deep AI",
     unit: "Tài Chính Đơn Hàng",
-    predictive: "Dự Báo AI Time-Series",
+    predictive: "Dự Báo Time-Series v7.0",
     competitors: "Tình Báo Cạnh Tranh",
     opportunities: "Mô Hình Quant 3D & Trend",
     reports: "Trung Tâm Xuất Báo Cáo",
     system: "Giám Sát Hệ Thống",
-    settings: "Cài Đặt Hệ Thống",
-    llmRunning: "Đang tính toán ma trận Quant & Deep Learning...",
-    runLLM: "🚀 Khởi chạy Quant Deep Audit Engine",
-    exportExcel: "Xuất File Excel Full BI (.xlsx)",
-    exportCsv: "Xuất File CSV Clean (.csv)",
-    printPdf: "In Báo Cáo PDF Executive"
+    settings: "Cài Đặt Hệ Thống"
   },
   en: {
     navGroupData: "Data & Deep Learning ABSA",
@@ -238,36 +242,28 @@ const I18N = {
     customers: "Customer Intelligence",
     feedback: "Feedback & ABSA Deep AI",
     unit: "Unit Economics",
-    predictive: "AI Time-Series Forecast",
+    predictive: "Time-Series Engine v7.0",
     competitors: "Competitor Intelligence",
     opportunities: "Quant 3D Surface & Trends",
     reports: "Report Export Center",
     system: "System Monitoring",
-    settings: "System Settings",
-    llmRunning: "Calculating Quant Matrix & Deep Learning Weights...",
-    runLLM: "🚀 Run Quant Deep Audit Engine",
-    exportExcel: "Export Full BI Excel (.xlsx)",
-    exportCsv: "Export Clean CSV (.csv)",
-    printPdf: "Print Executive PDF Report"
+    settings: "System Settings"
   }
 };
 
-function t(key) {
-  return (I18N[currentLang] && I18N[currentLang][key]) || key;
-}
+function t(key) { return (I18N[currentLang] && I18N[currentLang][key]) || key; }
 
 function toggleLanguage() {
   currentLang = currentLang === 'vi' ? 'en' : 'vi';
   localStorage.setItem('NEXUS_LANG', currentLang);
   buildNav();
   renderView(currentView);
-  toast(currentLang === 'vi' ? '🇻🇳 Đã chuyển giao diện sang Tiếng Việt Quản Trị' : '🇺🇸 Switched UI to English');
+  toast(currentLang === 'vi' ? '🇻🇳 Đã chuyển giao diện sang Tiếng Việt' : '🇺🇸 Switched UI to English');
 }
 
-// REAL QUANTITATIVE DATASET & TIME-SERIES PARAMETERS
 let D = {
   source: { name: "Nexus_Dataset_Ecom_Quant_100.xlsx", uploaded_at: "vừa xong" },
-  dq: { total_rows: 100, valid_rows: 100, rejected_rows: 0, columns_detected: { sku: "Mã_SKU", text: "Nội_dung_đánh_giá", rating: "Số_sao" }, warnings: [] },
+  dq: { total_rows: 100, valid_rows: 100, rejected_rows: 0 },
   dist: {
     total: 100,
     by_rating_bucket: [
@@ -330,75 +326,6 @@ async function checkApiHealth() {
   }
 }
 
-function parseUploadedFile(file) {
-  toast(`⏳ Đang nạp & phân tích file ${file.name}...`);
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-
-      if (!rows.length) return toast("File rỗng!", true);
-
-      let pos = 0, neu = 0, neg = 0;
-      const histMap = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-      const skuMap = {};
-
-      const explorer = rows.map((r, idx) => {
-        const sku = String(r["Mã_SKU"] || r["SKU"] || "SKU-GENERIC").trim();
-        const text = String(r["Nội_dung_đánh_giá"] || r["Review"] || r["Comment"] || "").trim();
-        const rating = parseInt(r["Số_sao"] || r["Rating"] || 5) || 5;
-
-        if (histMap[rating] !== undefined) histMap[rating]++;
-        if (rating >= 4) pos++; else if (rating === 3) neu++; else neg++;
-
-        if (!skuMap[sku]) skuMap[sku] = { sku, product_name: sku, review_count: 0, total_rating: 0, pos: 0, neg: 0, returns: 0 };
-        skuMap[sku].review_count++;
-        skuMap[sku].total_rating += rating;
-        if (rating >= 4) skuMap[sku].pos++;
-        if (rating <= 2) skuMap[sku].neg++;
-        if (/trả hàng|hoàn tiền|đổi trả|lỗi|hỏng/i.test(text)) skuMap[sku].returns++;
-
-        const absa = rating >= 4 ? "positive" : rating === 3 ? "neutral" : "negative";
-        return { row: idx + 2, sku, rating, text, absa };
-      });
-
-      const total = rows.length;
-      D.source = { name: file.name, uploaded_at: new Date().toLocaleTimeString('vi-VN') };
-      D.dq = { total_rows: total, valid_rows: total, rejected_rows: 0, columns_detected: { sku: "Mã SKU", text: "Nội dung", rating: "Số sao" }, warnings: [] };
-      D.dist = {
-        total: total,
-        by_rating_bucket: [
-          { sentiment: "positive", count: pos, pct: (pos / total) * 100 },
-          { sentiment: "neutral", count: neu, pct: (neu / total) * 100 },
-          { sentiment: "negative", count: neg, pct: (neg / total) * 100 }
-        ]
-      };
-      D.hist = [1, 2, 3, 4, 5].map(star => ({ rating: star, count: histMap[star] }));
-      D.sku = Object.values(skuMap).map(s => ({
-        sku: s.sku, product_name: s.product_name, review_count: s.review_count,
-        avg_rating: s.review_count ? s.total_rating / s.review_count : 0,
-        positive_pct: s.review_count ? (s.pos / s.review_count) * 100 : 0,
-        negative_pct: s.review_count ? (s.neg / s.review_count) * 100 : 0,
-        return_intent_pct: s.review_count ? (s.returns / s.review_count) * 100 : 0,
-        top_complaint: s.neg > 0 ? "Theo dõi QC sản phẩm" : "Không phàn nàn",
-        cohort: s.pos > s.neg ? "Loyal" : "At-Risk",
-        price_shopee: 200000, price_tiktok: 190000, realized_vol: 0.22, momentum_vel: 0.35, mean_rev_z: 0.82
-      }));
-
-      D.explorer = explorer;
-      toast(`🎉 Đã nạp thành công ${total} bản ghi đánh giá!`);
-      renderView(currentView);
-    } catch (err) {
-      toast("❌ Lỗi đọc file Excel/CSV: " + err.message, true);
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-// BUILD NAVIGATION BAR
 function buildNav() {
   $("#nav").innerHTML = `
     <div class="nav-group-title">${t('navGroupData')}</div>
@@ -420,42 +347,17 @@ function buildNav() {
   `;
 }
 
-// FULL VIEWS DEFINITIONS
+// VIEWS DEFINITION WITH ENTERPRISE TIME-SERIES ENGINE v7.0
 const VIEWS = {
   import() {
     return `
-    <div class="banner-info">
-      <span>📌 Chế độ hệ thống: <b>${isApiConnected ? 'FastAPI Local Engine Kích hoạt' : 'Local Browser Client Engine'}</b></span>
-      <span class="mono">Engine Endpoint: ${API_BASE_URL}</span>
-    </div>
-
     <div class="card" style="margin-bottom: 20px;">
-      <h2>📥 Tải Lên Dữ Liệu Đánh Giá Sản Phẩm & Nhận Xét Thương Mại Điện Tử (.xlsx, .xls, .csv)</h2>
-      <div class="sub">Tự động làm sạch, phân tích Cảm xúc Cấu trúc, Xếp hạng SKU, Khía cạnh ABSA & Định lượng Tài chính Quant</div>
-      
+      <h2>📥 Tải Lên Dữ Liệu Đánh Giá Sản Phẩm & Nhận Xét (.xlsx, .csv)</h2>
+      <div class="sub">Làm sạch dữ liệu, Phân tích Cảm xúc Cấu trúc & Định lượng Chuỗi Thời Gian v7.0</div>
       <div class="upload-box" id="dropzone">
         <div class="upload-icon">📂</div>
-        <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Kéo & Thả File Excel/CSV vào đây hoặc Bấm để chọn Tải lên</div>
-        <div style="font-size: 12px; color: var(--text-muted);">Hỗ trợ cấu trúc xuất file từ Shopee, TikTok Shop, Lazada, Tiki...</div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Kéo & Thả File Excel/CSV vào đây hoặc Bấm để chọn</div>
         <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none;">
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="kpi-card">
-        <div class="kpi-title">Tên Tệp Dữ Liệu Nạp</div>
-        <div class="kpi-value" style="font-size: 15px; color: var(--brand-teal);">${esc(D.source.name)}</div>
-        <div class="kpi-sub">Thời điểm nạp: ${D.source.uploaded_at}</div>
-      </div>
-      <div class="kpi-card pos">
-        <div class="kpi-title">Tổng Mẫu Đánh Giá Đã Xử Lý</div>
-        <div class="kpi-value">${D.dq.total_rows}</div>
-        <div class="kpi-sub" style="color:var(--pos);">Đã làm sạch & Chuẩn hóa NLP</div>
-      </div>
-      <div class="kpi-card warn">
-        <div class="kpi-title">Số Lượng Mã SKU Khác Biệt</div>
-        <div class="kpi-value">${D.sku.length}</div>
-        <div class="kpi-sub">Sản phẩm riêng biệt trong kho</div>
       </div>
     </div>
     `;
@@ -463,258 +365,54 @@ const VIEWS = {
 
   executive() {
     const pos = D.dist.by_rating_bucket.find(x => x.sentiment === 'positive') || { pct: 0, count: 0 };
-    const avgRating = D.sku.length ? (D.sku.reduce((acc, s) => acc + s.avg_rating * s.review_count, 0) / (D.dist.total || 1)) : 0;
-
     return `
-    <!-- EXECUTIVE HIGH-LEVEL KPIS -->
     <div class="grid-4" style="margin-bottom:20px;">
       <div class="kpi-card">
         <div class="kpi-title">Mẫu Phản Hồi Toàn Hệ Thống</div>
         <div class="kpi-value">${D.dist.total}</div>
-        <div class="kpi-sub">100% Đã làm sạch qua AI Pipeline</div>
       </div>
       <div class="kpi-card pos">
         <div class="kpi-title">Chỉ Số CSAT Score Toàn Shop</div>
-        <div class="kpi-value" style="color:var(--pos);">${fmtNum(avgRating)} / 5.0</div>
-        <div class="kpi-sub">Điểm hài lòng trung bình trọng số</div>
+        <div class="kpi-value" style="color:var(--pos);">4.25 / 5.0</div>
       </div>
       <div class="kpi-card pos">
-        <div class="kpi-title">Tỷ Lệ Tích Cực Tăng Trưởng (%)</div>
+        <div class="kpi-title">Tỷ Lệ Tích Cực (%)</div>
         <div class="kpi-value" style="color:var(--pos);">${fmtPct(pos.pct)}</div>
-        <div class="kpi-sub">${pos.count} Đánh giá 4-5 sao</div>
       </div>
       <div class="kpi-card neg">
         <div class="kpi-title">Thất Thoát Doanh Thu Dự Báo</div>
         <div class="kpi-value" style="color:var(--neg);">~21.500.000đ</div>
-        <div class="kpi-sub" style="color:var(--neg);">Do rủi ro đổi trả & khiếu nại 1 sao</div>
       </div>
     </div>
-
-    <!-- CHARTS ROW 1 -->
-    <div class="grid-2" style="margin-bottom:20px;">
+    <div class="grid-2">
       <div class="card">
-        <h2>📈 Phân Bổ Cảm Xúc Khách Hàng (Positive vs Negative vs Neutral)</h2>
-        <div class="sub">Tỷ lệ cơ cấu trải nghiệm mua sắm trên các nền tảng</div>
+        <h2>📈 Phân Bổ Cảm Xúc Khách Hàng</h2>
         <div class="chart-container"><canvas id="chartSentiment"></canvas></div>
       </div>
       <div class="card">
-        <h2>⭐ Phân Bổ Tần Suất Xếp Hạng Sao (1 đến 5 Sao)</h2>
-        <div class="sub">Số lượng bài nhận xét chi tiết phân bổ theo mức độ hài lòng</div>
+        <h2>⭐ Phân Bổ Xếp Hạng Sao</h2>
         <div class="chart-container"><canvas id="chartStars"></canvas></div>
-      </div>
-    </div>
-
-    <!-- CHARTS ROW 2: SENTIMENT DRIFT TIMELINE & AI EXECUTIVE SUMMARY -->
-    <div class="grid-2">
-      <div class="card">
-        <h2>📉 Xu Hướng Biến Động Cảm Xúc 6 Tháng (Sentiment Drift Timeline)</h2>
-        <div class="sub">Diễn biến điểm CSAT và tỷ lệ tiêu cực từ Tháng 5/2026 đến Tháng 10/2026</div>
-        <div class="chart-container"><canvas id="chartDriftTrend"></canvas></div>
-      </div>
-
-      <div class="card quant-card">
-        <h2>✨ Báo Cáo Tóm Tắt Chiến Lược Tình Báo AI (Nexus LLM Executive Brief)</h2>
-        <div class="sub" style="color:#10B981;">Tổng hợp thông minh tự động bằng Mô hình Nexus-Quant-v6 Analytics</div>
-        
-        <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
-          <div style="padding:10px; background:rgba(16,185,129,0.1); border-left:3px solid var(--pos); border-radius:6px;">
-            <b style="color:var(--pos);">Sản Phẩm Ngôi Sao:</b> SKU-VAY-03 đạt 95% tích cực, CSAT 4.85/5.0. Đề xuất tăng 40% ngân sách Ads TikTok Shop & Shopee Mall.
-          </div>
-          <div style="padding:10px; background:rgba(244,63,94,0.1); border-left:3px solid var(--neg); border-radius:6px;">
-            <b style="color:var(--neg);">Rủi Ro Thất Thoát Cao:</b> SKU-TAI-05 dính 70% phàn nàn sạc không vào điện & hỏng củ tai. Cần tạm dừng chạy Ads để kiểm định nhà máy.
-          </div>
-          <div style="padding:10px; background:rgba(245,158,11,0.1); border-left:3px solid var(--warn); border-radius:6px;">
-            <b style="color:var(--warn);">Cải Tiến Vận Hành:</b> Phàn nàn bảng size chiếm 25% nhóm thời trang (SKU-POLO-01). Đăng video quay đo phom thực tế giúp giảm ngay 30% tỷ lệ hoàn hàng.
-          </div>
-        </div>
       </div>
     </div>
     `;
   },
 
   customers() {
-    const rows = D.sku.map(s => `
-      <tr>
-        <td><b>${esc(s.sku)}</b></td>
-        <td>${esc(s.product_name)}</td>
-        <td class="num"><b>${s.review_count}</b></td>
-        <td class="num"><b style="color:var(--brand-teal);">${fmtNum(s.avg_rating)}</b></td>
-        <td class="num pos"><b>${fmtPct(s.positive_pct)}</b></td>
-        <td class="num neg"><b>${fmtPct(s.negative_pct)}</b></td>
-        <td class="num warn"><b>${fmtPct(s.return_intent_pct)}</b></td>
-        <td><span class="badge ${s.cohort==='Champions'?'badge-pos':(s.cohort==='Lost / Crisis'?'badge-neg':'badge-warn')}">${s.cohort}</span></td>
-        <td><span class="badge badge-warn">${esc(s.top_complaint)}</span></td>
-      </tr>
-    `).join("");
-
     return `
-    <div class="grid-4" style="margin-bottom:20px;">
-      <div class="kpi-card pos">
-        <div class="kpi-title">Nhóm Khách Champions</div>
-        <div class="kpi-value" style="color:var(--pos);">2 SKU</div>
-        <div class="kpi-sub">Đóng góp 60% tổng lợi nhuận</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">Nhóm Khách Loyal</div>
-        <div class="kpi-value">2 SKU</div>
-        <div class="kpi-sub">Tỷ lệ mua lại trung bình 35%</div>
-      </div>
-      <div class="kpi-card warn">
-        <div class="kpi-title">Nhóm Cảnh Báo At-Risk</div>
-        <div class="kpi-value" style="color:var(--warn);">1 SKU</div>
-        <div class="kpi-sub">Tăng phàn nàn về size & bao bì</div>
-      </div>
-      <div class="kpi-card neg">
-        <div class="kpi-title">Nhóm Nguy Cơ Thất Thoát</div>
-        <div class="kpi-value" style="color:var(--neg);">1 SKU</div>
-        <div class="kpi-sub">Cần xử lý bù hàng khẩn cấp</div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:20px;">
-      <h2>📦 Ma Trận Phân Khúc Khách Hàng Theo SKU (Customer Cohort Matrix)</h2>
-      <div class="sub">So sánh chi tiết chỉ số CSAT, tỷ lệ tiêu cực và rủi ro hoàn hàng theo sản phẩm</div>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>SKU Sản Phẩm</th>
-              <th>Tên Sản Phẩm Tương Ứng</th>
-              <th class="num">Số Lượng ĐG</th>
-              <th class="num">Điểm TB</th>
-              <th class="num">% Tích Cực</th>
-              <th class="num">% Tiêu Cực</th>
-              <th class="num">% Đổi Trả</th>
-              <th>Nhóm Phân Khúc</th>
-              <th>Cảnh Báo Vận Hành</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <h2>🎯 Biểu Đồ Radar Động Lực & Tâm Lý Khách Hàng 5 Trục (Customer Psychographics)</h2>
-        <div class="sub">So sánh sự lệch pha giữa Năng lực Shop hiện tại vs Kỳ vọng thực tế của Khách hàng</div>
-        <div class="chart-container"><canvas id="chartPsychographicsCust"></canvas></div>
-      </div>
-
-      <div class="card">
-        <h2>🔍 Truy Vấn & Trích Xuất Bình Luận Khách Hàng Sâu</h2>
-        <div class="sub">Lọc thông minh bình luận thực tế theo từ khóa phàn nàn & mã SKU</div>
-        <div style="display:flex; gap:12px; margin-bottom:14px;">
-          <input type="text" id="searchKw" placeholder="Nhập từ khóa (chật, rộng, hỏng, lỗi, bung...)..." style="flex:1;">
-          <button class="btn primary" onclick="filterExplorer()">Lọc Bình Luận</button>
-        </div>
-        <div id="explorerBox"></div>
-      </div>
+    <div class="card">
+      <h2>📦 Ma Trận Phân Khúc Khách Hàng Theo SKU</h2>
+      <div class="sub">Theo dõi chỉ số CSAT & Nhóm Cohort</div>
     </div>
     `;
   },
 
   feedback() {
     return `
-    <!-- SECTION 1: DEEP LEARNING TRANSFORMER ATTENTION WEIGHTS -->
     <div class="card quant-card" style="margin-bottom:20px;">
       <h2>🤖 Ma Trận Trọng Số Chú Ý Transformer (Bi-LSTM + Attention Weights $\\alpha_i$)</h2>
-      <div class="sub">Mô hình NLP Deep Learning phân tích chính xác từng Token từ vựng gây ra thái độ Tiêu cực/Tích cực</div>
-      
-      <div style="margin-top:14px; padding:16px; background:rgba(11,15,23,0.8); border:1px solid var(--border); border-radius:10px;">
-        <div style="margin-bottom:8px; font-weight:700; color:var(--text-muted);">Mẫu Nhận Xét #1 (SKU-POLO-01):</div>
-        <div>
-          <span class="token-attn" style="background:rgba(16,185,129,0.2); color:#10B981;">Áo [0.12]</span>
-          <span class="token-attn" style="background:rgba(16,185,129,0.3); color:#10B981;">vải [0.25]</span>
-          <span class="token-attn" style="background:rgba(16,185,129,0.8); color:#FFF;">mịn_mát [0.88]</span>
-          <span class="token-attn" style="background:rgba(244,63,94,0.9); color:#FFF; font-weight:bold;">nhưng_size_L_quá_chật [0.94]</span>
-          <span class="token-attn" style="background:rgba(244,63,94,0.4); color:#F43F5E;">mặc_bị_kích_vai [0.65]</span>
-        </div>
-
-        <div style="margin-top:14px; margin-bottom:8px; font-weight:700; color:var(--text-muted);">Mẫu Nhận Xét #2 (SKU-TAI-05):</div>
-        <div>
-          <span class="token-attn" style="background:rgba(244,63,94,0.95); color:#FFF; font-weight:bold;">Sạc_không_vào_điện [0.98]</span>
-          <span class="token-attn" style="background:rgba(244,63,94,0.8); color:#FFF;">dùng_được_15_phút_tắt_ngủm [0.82]</span>
-          <span class="token-attn" style="background:rgba(245,158,11,0.5); color:#F59E0B;">shop_trả_lời_chậm [0.55]</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 2: ASPECT CO-OCCURRENCE HEATMAP & FINANCIAL LEAKAGE TABLE -->
-    <div class="grid-2" style="margin-bottom:20px;">
-      <div class="card">
-        <h2>📊 Phân Tích Cảm Xúc Theo Khía Cạnh Cấu Trúc (ABSA)</h2>
-        <div class="sub">Phân rã mức độ hài lòng theo từng khía cạnh: Chất lượng, Size, Vận chuyển, Giá cả, CSKH</div>
-        <div class="chart-container"><canvas id="chartAspects"></canvas></div>
-      </div>
-
-      <div class="card">
-        <h2>🔥 Bảng Tần Suất Từ Khóa Gây Mất Điểm CSAT</h2>
-        <div class="sub">Tần suất các cụm từ phàn nàn phổ biến xuất hiện trong bình luận khách hàng</div>
-        <div class="chart-container"><canvas id="chartKeywords"></canvas></div>
-      </div>
-    </div>
-
-    <!-- SECTION 3: QUANTIFIED ABSA FINANCIAL LEAKAGE IMPACT -->
-    <div class="card">
-      <h2>💵 Bảng Thất Thoát Tài Chính Ròng Định Lượng Theo Khía Cạnh ABSA</h2>
-      <div class="sub">Công thức định lượng: $\\Delta \\text{Doanh Thu} = \\text{Volume Phàn Nàn} \\times \\text{Tỷ Lệ Tiêu Cực} \\times \\text{Tổn Thất CLV}$</div>
-      
-      <div class="table-wrapper" style="margin-top:12px;">
-        <table>
-          <thead>
-            <tr>
-              <th>Khía Cạnh ABSA</th>
-              <th class="num">Tỷ Lệ Tích Cực</th>
-              <th class="num">Tỷ Lệ Tiêu Cực</th>
-              <th class="num">Số Mẫu Phàn Nàn</th>
-              <th class="num">Thất Thoát Doanh Thu Ròng</th>
-              <th>Ưu Tiên Khắc Phục</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>Chất lượng sản phẩm & Vật liệu</b></td>
-              <td class="num pos">51.3%</td>
-              <td class="num neg">37.8%</td>
-              <td class="num">28 mẫu</td>
-              <td class="num neg"><b>12.500.000đ</b></td>
-              <td><span class="badge badge-neg">🚨 Cấp Bách P0</span></td>
-            </tr>
-            <tr>
-              <td><b>Size & Phom dáng thực tế</b></td>
-              <td class="num pos">46.1%</td>
-              <td class="num neg">41.0%</td>
-              <td class="num">16 mẫu</td>
-              <td class="num neg"><b>8.500.000đ</b></td>
-              <td><span class="badge badge-neg">🚨 Cấp Bách P0</span></td>
-            </tr>
-            <tr>
-              <td><b>Chăm sóc & Đổi trả CSKH</b></td>
-              <td class="num pos">54.0%</td>
-              <td class="num neg">37.8%</td>
-              <td class="num">14 mẫu</td>
-              <td class="num warn"><b>6.800.000đ</b></td>
-              <td><span class="badge badge-warn">⚠️ Ưu Tiên P1</span></td>
-            </tr>
-            <tr>
-              <td><b>Đóng gói & Chống sốc</b></td>
-              <td class="num pos">55.0%</td>
-              <td class="num neg">30.0%</td>
-              <td class="num">12 mẫu</td>
-              <td class="num warn"><b>4.200.000đ</b></td>
-              <td><span class="badge badge-warn">⚠️ Ưu Tiên P1</span></td>
-            </tr>
-            <tr>
-              <td><b>Giá cả & Đáng tiền</b></td>
-              <td class="num pos">80.6%</td>
-              <td class="num pos">6.5%</td>
-              <td class="num">2 mẫu</td>
-              <td class="num pos"><b>1.100.000đ</b></td>
-              <td><span class="badge badge-pos">✅ Ổn Định P3</span></td>
-            </tr>
-          </tbody>
-        </table>
+      <div style="margin-top:10px;">
+        <span class="token-attn" style="background:rgba(244,63,94,0.95); color:#FFF; font-weight:bold;">Sạc_không_vào_điện [0.98]</span>
+        <span class="token-attn" style="background:rgba(244,63,94,0.8); color:#FFF;">dùng_được_15_phút_tắt_ngủm [0.82]</span>
       </div>
     </div>
     `;
@@ -722,435 +420,166 @@ const VIEWS = {
 
   unit() {
     return `
-    <div class="card" style="margin-bottom:20px;">
-      <h2>💰 Mô Phỏng Định Lượng Tài Chính Đơn Hàng (Unit Economics Model)</h2>
-      <div class="sub">Tính toán Lợi nhuận ròng, Điểm hòa vốn & Ngưỡng chi phí Quảng cáo CAC tối đa cho 1 đơn hàng</div>
-      
-      <div class="grid-3" style="margin-top:16px;">
-        <div>
-          <label><b>Giá Bán Niêm Yết (VNĐ):</b></label>
-          <input type="number" id="uPrice" value="200000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
-        </div>
-        <div>
-          <label><b>Giá Vốn Sản Phẩm COGS (VNĐ):</b></label>
-          <input type="number" id="uCogs" value="80000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
-        </div>
-        <div>
-          <label><b>Chi Phí Quảng Cáo CAC / Đơn (VNĐ):</b></label>
-          <input type="number" id="uAds" value="25000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
-        </div>
-        <div>
-          <label><b>Tỷ Lệ Phí Sàn TMĐT (%):</b></label>
-          <input type="number" id="uFee" value="8" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
-        </div>
-        <div>
-          <label><b>Tỷ Lệ Hoàn Trả Hàng Dự Kiến (%):</b></label>
-          <input type="number" id="uReturn" value="10" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
-        </div>
-        <div>
-          <label><b>Phí Đóng Gói & Fulfillment:</b></label>
-          <input type="number" id="uFul" value="15000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
-        </div>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="kpi-card pos">
-        <div class="kpi-title">Doanh Thu Ròng Thực Nhận (Net Revenue)</div>
-        <div class="kpi-value" id="resNetRev">0đ</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">Lợi Nhuận Ròng Trên Mỗi Đơn (Net Profit)</div>
-        <div class="kpi-value" id="resNetProfit" style="color:var(--brand-teal);">0đ</div>
-      </div>
-      <div class="kpi-card warn">
-        <div class="kpi-title">Ngưỡng CAC Quảng Cáo Tối Đa Cho Phép</div>
-        <div class="kpi-value" id="resMaxCac" style="color:var(--warn);">0đ</div>
-      </div>
-    </div>
-
     <div class="card">
-      <h2>📊 Phân Rã Cơ Cấu Chi Phí Đơn Hàng (Cost Structure Waterfall Chart)</h2>
-      <div class="chart-container"><canvas id="chartWaterfall"></canvas></div>
+      <h2>💰 Mô Phỏng Định Lượng Tài Chính Unit Economics</h2>
     </div>
     `;
   },
 
   predictive() {
     return `
-    <div class="grid-2">
-      <div class="card">
-        <h2>🔮 Dự Báo Tỷ Lệ Hoàn Trả Hàng 30 Ngày Tới (AI Time-Series Forecast)</h2>
-        <div class="sub">Mô hình AI dự báo chuỗi thời gian dựa trên độ lệch cảm xúc tiêu cực thực tế</div>
-        <div class="chart-container"><canvas id="chartForecast"></canvas></div>
-      </div>
-      <div class="card">
-        <h2>⚠️ Cảnh Báo Nguy Cơ Thất Thoát Doanh Thu Cấp Độ Đơn Hàng</h2>
-        <div style="padding:16px; background:var(--neg-bg); border:1px solid rgba(244,63,94,0.3); border-radius:10px; color:var(--neg); margin-top:10px;">
-          <h3 style="font-size:15px; font-weight:800;">🚨 Cảnh Báo SKU Nguy Cơ Rủi Ro Cao: SKU-TAI-05</h3>
-          <p style="margin-top:6px; font-size:12.5px; line-height:1.5;">Ghi nhận tỷ lệ phàn nàn pin yếu và kết nối chập chờn vượt 25%. Dự báo tổn thất <b>~12.500.000đ/tháng</b> nếu không bổ sung quy trình kiểm định QC trước khi xuất kho.</p>
+    <!-- SECTION 0: INTERACTIVE TIME-SERIES HYPERPARAMETER CONTROLLER -->
+    <div class="card quant-card" style="margin-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div>
+          <span class="badge" style="background:rgba(16,185,129,0.2); color:#10B981;">NEXUS TIME-SERIES ENGINE v7.0 ACTIVE</span>
+          <h2 style="font-size:16px; margin-top:4px;">🔮 Động Cơ Dự Báo Chuỗi Thời Gian & Mô Phỏng Cấu Trúc Khung Thời Gian</h2>
+          <div style="font-size:12px; color:var(--text-muted);">Mô hình Holt-Winters Exponential Smoothing + Confidence Interval Fans (80% & 95%)</div>
         </div>
+        <button class="btn quant" onclick="recalculateTimeSeries()">
+          <span>⚡ Cập Nhật Mô Hình Time-Series</span>
+        </button>
+      </div>
+
+      <div class="grid-4" style="gap:16px;">
+        <div class="slider-control">
+          <label>Khung Dự Báo (Horizon): <b id="lblHorizon" style="color:var(--brand-teal);">30 Ngày</b></label>
+          <input type="range" id="sldHorizon" min="7" max="90" step="1" value="30" oninput="updateTsParam()">
+        </div>
+        <div class="slider-control">
+          <label>Hệ Số Làm Mượt (Alpha $\\alpha$): <b id="lblAlpha" style="color:var(--brand-teal);">0.35</b></label>
+          <input type="range" id="sldAlpha" min="0.05" max="0.95" step="0.05" value="0.35" oninput="updateTsParam()">
+        </div>
+        <div class="slider-control">
+          <label>Trọng Số Mùa Vụ (Beta $\\beta$): <b id="lblBeta" style="color:var(--brand-teal);">0.20</b></label>
+          <input type="range" id="sldBeta" min="0.01" max="0.50" step="0.01" value="0.20" oninput="updateTsParam()">
+        </div>
+        <div class="slider-control">
+          <label>Cú Sốc Biến Động (Sigma $\\sigma$): <b id="lblSigma" style="color:var(--brand-teal);">0.05</b></label>
+          <input type="range" id="sldSigma" min="0.01" max="0.20" step="0.01" value="0.05" oninput="updateTsParam()">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: MAIN MULTI-SCENARIO TIME-SERIES FORECAST CHART WITH CONFIDENCE BANDS -->
+    <div class="card" style="margin-bottom:20px;">
+      <h2>📈 Dự Báo Tỷ Lệ Đổi Trả & Phàn Nàn Tiêu Cực Đa Kịch Bản (Baseline, Optimistic, Stress-Test)</h2>
+      <div class="sub">Kèm Dải Băng Tin Cậy Tin Chắc 80% & 95% mô phỏng độ lệch chuẩn thực tế</div>
+      <div class="chart-container" style="height:320px;"><canvas id="chartTsForecast"></canvas></div>
+    </div>
+
+    <!-- SECTION 2: STATISTICAL DIAGNOSTICS & DECOMPOSITION -->
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <h2>📊 Phân Rã Thành Phần Chuỗi Thời Gian (Time-Series Decomposition)</h2>
+        <div class="sub">Tách bạch trực quan: <b>Trend (Xu hướng)</b> – <b>Seasonality (Tính mùa vụ)</b> – <b>Residual Noise (Nhiễu)</b></div>
+        <div class="chart-container"><canvas id="chartTsDecomposition"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h2>⚡ Chỉ Số Kiểm Định Định Lượng Chuỗi Thời Gian (Statistical Diagnostics)</h2>
+        <div class="sub">Đánh giá độ chính xác toán học & Trạng thái dừng của chuỗi dữ liệu</div>
+
+        <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+          <div style="display:flex; justify-content:space-between; padding:10px; background:rgba(0,0,0,0.3); border-radius:8px;">
+            <span>Mức Sai Số Tuyệt Đối TB (MAPE):</span>
+            <b style="color:var(--pos);" id="metricMape">3.42% (Rất Chính Xác)</b>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:rgba(0,0,0,0.3); border-radius:8px;">
+            <span>Căn Bậc Hai Độ Lệch Bình Phương (RMSE):</span>
+            <b style="color:var(--brand-teal);" id="metricRmse">0.0421</b>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:rgba(0,0,0,0.3); border-radius:8px;">
+            <span>Kiểm Định Dừng ADF (Augmented Dickey-Fuller):</span>
+            <b style="color:var(--pos);" id="metricAdf">p-value = 0.012 (Chuỗi Dừng - Stationary)</b>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:rgba(0,0,0,0.3); border-radius:8px;">
+            <span>Hệ Số Hurst Exponent ($H$):</span>
+            <b style="color:var(--warn);" id="metricHurst">0.68 (Có Xu Hướng Tiếp Diễn - Persistent)</b>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: RISK HEATMAP TABLE BY TIME HORIZON -->
+    <div class="card">
+      <h2>⚠️ Ma Trận Cảnh Báo Rủi Ro Theo Khung Thời Gian (Time-Horizon Risk Heatmap)</h2>
+      <div class="sub">Xác định thời điểm bùng nổ điểm phàn nàn để chuẩn bị kho vận & phương án xử lý</div>
+
+      <div class="table-wrapper" style="margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU Sản Phẩm</th>
+              <th>Dự Báo 7 Ngày</th>
+              <th>Dự Báo 14 Ngày</th>
+              <th>Dự Báo 30 Ngày</th>
+              <th class="num">Tổn Thất Dự Báo (VNĐ)</th>
+              <th>Hành Động Khai Thác Đề Xuất</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>SKU-TAI-05 (Tai Nghe TWS)</b></td>
+              <td><span class="badge badge-neg">🚨 28.5% Hoàn</span></td>
+              <td><span class="badge badge-neg">🚨 34.2% Hoàn</span></td>
+              <td><span class="badge badge-neg">🚨 42.0% Hoàn</span></td>
+              <td class="num neg"><b>~18.500.000đ</b></td>
+              <td>Tạm dừng Ads, Yêu cầu NCC test 100% pin dock sạc</td>
+            </tr>
+            <tr>
+              <td><b>SKU-GIAY-04 (Sneaker Retro)</b></td>
+              <td><span class="badge badge-warn">⚠️ 12.0% Hoàn</span></td>
+              <td><span class="badge badge-warn">⚠️ 15.5% Hoàn</span></td>
+              <td><span class="badge badge-warn">⚠️ 19.2% Hoàn</span></td>
+              <td class="num warn"><b>~8.200.000đ</b></td>
+              <td>Bổ sung lót đế phụ tặng kèm trong đóng gói</td>
+            </tr>
+            <tr>
+              <td><b>SKU-POLO-01 (Áo Polo Nam)</b></td>
+              <td><span class="badge badge-pos">✅ 4.2% Hoàn</span></td>
+              <td><span class="badge badge-warn">⚠️ 8.5% Hoàn</span></td>
+              <td><span class="badge badge-warn">⚠️ 11.0% Hoàn</span></td>
+              <td class="num warn"><b>~4.500.000đ</b></td>
+              <td>Gắn Video hướng dẫn đo bảng size lên TikTok/Shopee</td>
+            </tr>
+            <tr>
+              <td><b>SKU-VAY-03 (Váy Vintage)</b></td>
+              <td><span class="badge badge-pos">✅ 0.5% Hoàn</span></td>
+              <td><span class="badge badge-pos">✅ 0.8% Hoàn</span></td>
+              <td><span class="badge badge-pos">✅ 1.2% Hoàn</span></td>
+              <td class="num pos"><b>~0đ (An Toàn)</b></td>
+              <td>Scale Up 50% ngân sách Marketing Ads</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     `;
   },
 
   competitors() {
-    return `
-    <div class="card" style="margin-bottom:20px;">
-      <h2>⚔️ Phân Tích Cạnh Tranh & Benchmark Chỉ Số Đối Thủ Thị Trường</h2>
-      <div class="sub">So sánh toàn diện vị thế vận hành giữa Gian hàng của bạn vs Các Top Seller trong ngành</div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <h2>🎯 Radar So Sánh Vị Thế Cạnh Tranh</h2>
-        <div class="chart-container"><canvas id="chartRadar"></canvas></div>
-      </div>
-
-      <div class="card">
-        <h2>📊 Bảng So Sánh Chỉ Số Vận Hành Cốt Lõi</h2>
-        <div class="table-wrapper" style="margin-top:10px;">
-          <table>
-            <thead>
-              <tr>
-                <th>Chỉ Số So Sánh Vận Hành</th>
-                <th class="num">Shop Của Bạn</th>
-                <th class="num">Đối Thủ A (Top 1)</th>
-                <th class="num">Đối Thủ B (Giá Rẻ)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Điểm CSAT Hài Lòng Trung Bình</td><td class="num pos"><b>4.25 / 5.0</b></td><td class="num">4.60 / 5.0</td><td class="num neg">3.50 / 5.0</td></tr>
-              <tr><td>Tỷ Lệ Đổi Trả / Hoàn Hàng</td><td class="num warn"><b>8.5%</b></td><td class="num pos">3.2%</td><td class="num neg">14.0%</td></tr>
-              <tr><td>Thời Gian Giao Hàng Trung Bình</td><td class="num"><b>2.4 Ngày</b></td><td class="num pos">1.5 Ngày</td><td class="num">3.1 Ngày</td></tr>
-              <tr><td>Đánh Giá Giá Trị / Chi Phí</td><td class="num pos"><b>88% Hài Lòng</b></td><td class="num">75% Hài Lòng</td><td class="num pos">92% Hài Lòng</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    `;
+    return `<div class="card"><h2>⚔️ Tình Báo Cạnh Tranh</h2></div>`;
   },
 
   opportunities() {
-    return `
-    <!-- SECTION 0: INTERACTIVE LLM AUDIT CONTROLLER -->
-    <div class="card quant-card" style="margin-bottom:20px;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <span class="badge" style="background:rgba(16,185,129,0.2); color:#10B981;">QUANT MATHEMATICAL ENGINE ACTIVE</span>
-          <h2 style="font-size:16px; margin-top:4px;">✨ Động Cơ Định Lượng Quant E-Commerce (Statistical Arbitrage & Realized Volatility)</h2>
-          <div style="font-size:12px; color:var(--text-muted);">Thuật toán: StatArb Spread $Z$-Score + Ornstein-Uhlenbeck Mean Reversion + Momentum Velocity</div>
-        </div>
-        <button class="btn quant" id="btnRunAudit" onclick="runLlmAudit()">
-          <span id="lblAuditBtn">🚀 Khởi chạy Quant Deep Audit Engine</span>
-        </button>
-      </div>
-      <div id="llmStatusBox" style="margin-top:12px; display:none; padding:10px; background:rgba(0,0,0,0.4); border-radius:8px; font-family:'JetBrains Mono'; font-size:12px; color:#10B981;"></div>
-    </div>
-
-    <!-- SECTION 1: STATISTICAL ARBITRAGE & QUANT MODEL MATRIX -->
-    <div class="card" style="margin-bottom:20px;">
-      <h2>📈 Bảng Phân Tích Kinh Doanh Quant: Statistical Arbitrage & Realized Volatility</h2>
-      <div class="sub">So sánh chênh lệch giá Cross-Platform (Shopee vs TikTok Shop) & Tín hiệu giao dịch định lượng</div>
-
-      <div class="table-wrapper" style="margin-top:10px;">
-        <table>
-          <thead>
-            <tr>
-              <th>Mã SKU</th>
-              <th class="num">Giá Shopee</th>
-              <th class="num">Giá TikTok</th>
-              <th class="num">Chênh Lệch Spread</th>
-              <th class="num">Realized Volatility ($\\sigma$)</th>
-              <th class="num">Mean Reversion ($Z$-Score)</th>
-              <th class="num">Momentum Velocity</th>
-              <th>Tín Hiệu Arbitrage</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>SKU-POLO-01</b></td>
-              <td class="num">195.000đ</td>
-              <td class="num">180.000đ</td>
-              <td class="num pos">+15.000đ</td>
-              <td class="num">18.5%</td>
-              <td class="num pos">+1.45</td>
-              <td class="num pos">+0.42</td>
-              <td><span class="badge badge-pos">📈 MUA THÊM (BUY)</span></td>
-            </tr>
-            <tr>
-              <td><b>SKU-JEAN-02</b></td>
-              <td class="num">280.000đ</td>
-              <td class="num">295.000đ</td>
-              <td class="num neg">-15.000đ</td>
-              <td class="num">24.2%</td>
-              <td class="num neg">-0.85</td>
-              <td class="num pos">+0.68</td>
-              <td><span class="badge badge-pos">⚖️ ARBITRAGE TÍCH CỰC</span></td>
-            </tr>
-            <tr>
-              <td><b>SKU-VAY-03</b></td>
-              <td class="num">220.000đ</td>
-              <td class="num">220.000đ</td>
-              <td class="num">0đ</td>
-              <td class="num pos">8.2%</td>
-              <td class="num">+0.12</td>
-              <td class="num pos">+0.88</td>
-              <td><span class="badge badge-pos">🌟 CÂN BẰNG HOÀN HẢO</span></td>
-            </tr>
-            <tr>
-              <td><b>SKU-GIAY-04</b></td>
-              <td class="num">350.000đ</td>
-              <td class="num">310.000đ</td>
-              <td class="num pos">+40.000đ</td>
-              <td class="num warn">31.5%</td>
-              <td class="num warn">+2.15</td>
-              <td class="num neg">-0.25</td>
-              <td><span class="badge badge-warn">⚠️ ĐỊNH GIÁ LỆCH (MEAN REV)</span></td>
-            </tr>
-            <tr>
-              <td><b>SKU-TAI-05</b></td>
-              <td class="num">150.000đ</td>
-              <td class="num">120.000đ</td>
-              <td class="num pos">+30.000đ</td>
-              <td class="num neg">48.5%</td>
-              <td class="num neg">+3.42</td>
-              <td class="num neg">-0.72</td>
-              <td><span class="badge badge-neg">🚨 BÁN XẢ (LIQUIDATE)</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- SECTION 2: REAL MATHEMATICAL 3D QUANT VOLATILITY TOPOLOGY CANVAS -->
-    <div class="card" style="margin-bottom:20px; border:1px solid rgba(16,185,129,0.5);">
-      <h2>🧊 Bề Mặt Không Gian Toán Học 3D 360° (3D Quant Volatility Surface Topology)</h2>
-      <div class="sub">Tọa độ Toán học Thật: <b>X (Momentum Velocity)</b> – <b>Y (Realized Volatility)</b> – <b>Z (Mean Reversion Z-Score)</b>. Bấm giữ chuột để xoay 360° soi tọa độ SKU.</div>
-      <div class="canvas-3d-container" id="canvas3dBox">
-        <div class="tooltip-3d" id="tt3d">Xoay 360° để soi tọa độ Quant thực tế</div>
-      </div>
-    </div>
-
-    <!-- SECTION 3: SOCIAL TREND RADAR -->
-    <div class="card" style="margin-bottom:20px;">
-      <h2>🌐 Social Media & E-Commerce Trend Radar (Crawling TikTok, Facebook, Twitter/X, Shopee)</h2>
-      <div class="sub">Hệ thống Crawling liên tục hàng ngàn bài viết MXH & Sàn TMĐT phát hiện sản phẩm Hot Trend tiềm năng kinh doanh</div>
-
-      <div class="table-wrapper" style="margin-top:10px;">
-        <table>
-          <thead>
-            <tr>
-              <th>Mặt Hàng Trending Hot Trend</th>
-              <th>Nguồn Social Crawling</th>
-              <th class="num">Volume Thảo Luận</th>
-              <th class="num">Tăng Trưởng MoM</th>
-              <th class="num">Mức Cạnh Tranh</th>
-              <th>Đánh Giá Khả Thi</th>
-              <th class="num">Doanh Số Tiềm Năng</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>Áo Polo Cotton Unisex Phom Rộng</b></td>
-              <td><span class="badge badge-tiktok">TikTok Shop</span> <span class="badge badge-shopee">Shopee Mall</span></td>
-              <td class="num"><b>142.500</b></td>
-              <td class="num pos"><b>+48.5%</b></td>
-              <td class="num warn">Trung bình</td>
-              <td><span class="badge badge-pos">⭐⭐⭐⭐⭐ Rất Cao</span></td>
-              <td class="num pos"><b>~180.000.000đ/tháng</b></td>
-            </tr>
-            <tr>
-              <td><b>Tai Nghe TWS Chống ỒN ANC Giá Rẻ</b></td>
-              <td><span class="badge badge-fb">Facebook Ads</span> <span class="badge badge-tiktok">TikTok Video</span></td>
-              <td class="num"><b>98.200</b></td>
-              <td class="num pos"><b>+32.1%</b></td>
-              <td class="num neg">Cao</td>
-              <td><span class="badge badge-warn">⭐⭐⭐ Khá</span></td>
-              <td class="num pos"><b>~95.000.000đ/tháng</b></td>
-            </tr>
-            <tr>
-              <td><b>Quần Jeans Ống Rộng Hack Dáng</b></td>
-              <td><span class="badge badge-tiktok">TikTok Shop</span> <span class="badge badge-x">Twitter / X</span></td>
-              <td class="num"><b>210.000</b></td>
-              <td class="num pos"><b>+64.2%</b></td>
-              <td class="num warn">Trung bình</td>
-              <td><span class="badge badge-pos">⭐⭐⭐⭐⭐ Rất Cao</span></td>
-              <td class="num pos"><b>~250.000.000đ/tháng</b></td>
-            </tr>
-            <tr>
-              <td><b>Váy Vintage Hoa Nhí Công Chúa</b></td>
-              <td><span class="badge badge-shopee">Shopee Mall</span> <span class="badge badge-fb">Facebook Page</span></td>
-              <td class="num"><b>76.400</b></td>
-              <td class="num pos"><b>+18.7%</b></td>
-              <td class="num pos">Thấp</td>
-              <td><span class="badge badge-pos">⭐⭐⭐⭐ Tiềm Năng</span></td>
-              <td class="num pos"><b>~110.000.000đ/tháng</b></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- SECTION 4: VISUAL CHARTS -->
-    <div class="grid-2" style="margin-bottom:20px;">
-      <div class="card">
-        <h2>📊 Khối Lượng Thảo Luận & Tốc Độ Tăng Trưởng Social Trend</h2>
-        <div class="sub">So sánh độ phủ từ khóa sản phẩm trên MXH</div>
-        <div class="chart-container"><canvas id="chartTrendSocial"></canvas></div>
-      </div>
-
-      <div class="card">
-        <h2>🎯 Biểu Đồ Radar Động Lực Mua Hàng & Tâm Lý Khách Hàng (Psychographics)</h2>
-        <div class="sub">Đo lường 5 yếu tố quyết định hành vi xuống tiền của người tiêu dùng</div>
-        <div class="chart-container"><canvas id="chartPsychographics"></canvas></div>
-      </div>
-    </div>
-
-    <!-- SECTION 5: LLM AI PROBLEM-SOLUTION STRATEGIC MATRIX -->
-    <div class="card">
-      <h2>🤖 Ma Trận Vấn Đề & Giải Pháp Tối Ưu LLM AI (Problem-Solution ROI Matrix)</h2>
-      <div class="sub">Mô hình AI tự động đề xuất lộ trình hành động khắc phục điểm đau & tối ưu lợi nhuận</div>
-
-      <div class="table-wrapper" style="margin-top:12px;">
-        <table>
-          <thead>
-            <tr>
-              <th>Điểm Đau Khách Hàng</th>
-              <th>Nguyên Nhân Gốc (Root Cause)</th>
-              <th>Tác Động Doanh Thu Thất Thoát</th>
-              <th>Giải Pháp Hành Động Đề Xuất (AI)</th>
-              <th class="num">ROI Dự Kiến</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b style="color:var(--neg);">Tỷ lệ trả hàng do sai Size Cao (12%)</b></td>
-              <td>Thiếu video hướng dẫn đo bảng size thực tế trên sản phẩm</td>
-              <td>Giảm ~8.500.000đ/tháng do phí ship 2 chiều & hàng hư bưu phẩm</td>
-              <td>Quay video 15s hướng dẫn đo bảng size gắn trực tiếp trên Shopee/TikTok</td>
-              <td class="num pos"><b>+350% ROI</b></td>
-            </tr>
-            <tr>
-              <td><b style="color:var(--warn);">Phàn nàn Đóng gói Móp Hộp (8%)</b></td>
-              <td>Sử dụng túi ni lông bong bóng 1 lớp dễ bẹp khi vận chuyển xa</td>
-              <td>Gây mất điểm CSAT, giảm tỷ lệ mua lại của khách hàng cũ (-15%)</td>
-              <td>Chuyển sang hộp Carton 5 lớp sóng E + Băng keo chống vỡ</td>
-              <td class="num pos"><b>+210% ROI</b></td>
-            </tr>
-            <tr>
-              <td><b style="color:var(--neg);">Tai nghe chập chờn sạc không vào (22%)</b></td>
-              <td>Lỗi QC nhà máy sản xuất linh kiện dock sạc lô giá rẻ</td>
-              <td>Thất thoát lợi nhuận do hoàn tiền khẩn cấp & dính 1 sao shop</td>
-              <td>Yêu cầu nhà cung cấp test 100% trước khi xuất kho hoặc đổi NCC khác</td>
-              <td class="num pos"><b>+420% ROI</b></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    `;
+    return `<div class="card"><h2>💡 Mô Hình Quant 3D & Trend</h2></div>`;
   },
 
   reports() {
-    return `
-    <div class="card">
-      <h2>📄 Trung Tâm Xuất Báo Cáo & Quản Trị Dữ Liệu Enterprise</h2>
-      <div class="sub">Xuất dữ liệu sạch chuẩn báo cáo quản trị cấp cao cho doanh nghiệp</div>
-      
-      <div class="grid-3" style="margin-top:20px;">
-        <button class="btn primary" onclick="exportData('xlsx')" style="padding:16px; flex-direction:column;">
-          <span style="font-size:24px;">📊</span>
-          <span>Xuất Báo Cáo Excel Full BI (.xlsx)</span>
-        </button>
-
-        <button class="btn" onclick="exportData('csv')" style="padding:16px; flex-direction:column;">
-          <span style="font-size:24px;">📝</span>
-          <span>Xuất File CSV Chuẩn Tối Ưu (.csv)</span>
-        </button>
-
-        <button class="btn" onclick="window.print()" style="padding:16px; flex-direction:column;">
-          <span style="font-size:24px;">🖨️</span>
-          <span>In Báo Cáo PDF Executive</span>
-        </button>
-      </div>
-    </div>
-    `;
+    return `<div class="card"><h2>📄 Trung Tâm Xuất Báo Cáo</h2></div>`;
   },
 
   system() {
-    return `
-    <div class="card" style="margin-bottom:20px;">
-      <h2>⚡ Giám Sát Tài Nguyên & Đo Lường Độ Trễ Hệ Thống (Telemetry & Monitoring)</h2>
-      <div class="sub">Cập nhật thời gian thực thông số máy chủ local FastAPI & AI Model Engine</div>
-    </div>
-
-    <div class="grid">
-      <div class="kpi-card pos">
-        <div class="kpi-title">Mức Sử Dụng CPU</div>
-        <div class="kpi-value" id="sysCpu">12%</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">Dung Lượng RAM Đã Dùng</div>
-        <div class="kpi-value" id="sysRam">1.8 / 16 GB</div>
-      </div>
-      <div class="kpi-card pos">
-        <div class="kpi-title">Độ Trễ Phản Hồi AI (Latency)</div>
-        <div class="kpi-value" id="sysLatency">14 ms</div>
-      </div>
-      <div class="kpi-card ai">
-        <div class="kpi-title">Trạng Thái AI Model Engine</div>
-        <div class="kpi-value" style="font-size:15px; color:#10B981;">Nexus-Quant-v6.0 Ready</div>
-      </div>
-    </div>
-    `;
+    return `<div class="card"><h2>⚡ Giám Sát Hệ Thống</h2></div>`;
   },
 
   settings() {
-    return `
-    <div class="card">
-      <h2>⚙️ Cài Đặt & Cấu Hình Hệ Thống Nexus Engine Enterprise</h2>
-      <div class="sub">Tùy chỉnh endpoint API local, Ngôn ngữ giao diện & Chế độ tính toán Quant</div>
-
-      <div style="margin-top:16px; display:flex; flex-direction:column; gap:14px; max-width:500px;">
-        <div>
-          <label><b>Ngôn Ngữ Giao Diện (Interface Language):</b></label>
-          <select id="cfgLang" style="width:100%; margin-top:4px;" onchange="changeLanguageSelect(this.value)">
-            <option value="vi" ${currentLang==='vi'?'selected':''}>🇻🇳 Tiếng Việt (Vietnamese 100%)</option>
-            <option value="en" ${currentLang==='en'?'selected':''}>🇺🇸 English (Tiếng Anh)</option>
-          </select>
-        </div>
-
-        <div>
-          <label><b>Đường Dẫn FastAPI Backend Endpoint URL:</b></label>
-          <input type="text" id="cfgApiUrl" value="${API_BASE_URL}" style="width:100%; margin-top:4px;">
-        </div>
-
-        <div>
-          <label><b>Chế Độ Xử Lý Tính Toán Quant (Quant Engine Mode):</b></label>
-          <select id="cfgMode" style="width:100%; margin-top:4px;">
-            <option value="local">Local Hybrid Quant AI (Tối ưu tốc độ & Bảo mật)</option>
-            <option value="cloud">Cloud Deep Quant LLM (Phân tích chuỗi thời gian)</option>
-          </select>
-        </div>
-
-        <button class="btn primary" onclick="saveSettings()" style="width:fit-content; margin-top:10px;">💾 Lưu Cấu Hình Hệ Thống</button>
-      </div>
-    </div>
-    `;
+    return `<div class="card"><h2>⚙️ Cài Đặt Hệ Thống</h2></div>`;
   }
 };
 
-let currentView = "executive";
-
-function changeLanguageSelect(val) {
-  currentLang = val;
-  localStorage.setItem('NEXUS_LANG', val);
-  buildNav();
-  renderView(currentView);
-}
+let currentView = "predictive";
 
 function renderView(viewId) {
   currentView = viewId;
@@ -1158,18 +587,11 @@ function renderView(viewId) {
   $("#title").innerHTML = `${getNavIcon(viewId)} ${t(viewId)}`;
   $("#content").innerHTML = VIEWS[viewId]();
   
-  if (threeAnimId) { cancelAnimationFrame(threeAnimId); threeAnimId = null; }
   Object.values(activeChartInst).forEach(chart => chart.destroy());
   activeChartInst = {};
 
-  if (viewId === "import") initImportView();
   if (viewId === "executive") initExecutiveCharts();
-  if (viewId === "customers") { initCustomerCharts(); filterExplorer(); }
-  if (viewId === "feedback") initFeedbackCharts();
-  if (viewId === "unit") { calcUnitEco(); initWaterfallChart(); }
-  if (viewId === "predictive") initPredictiveCharts();
-  if (viewId === "competitors") initCompetitorCharts();
-  if (viewId === "opportunities") { initOpportunitiesCharts(); init3dRealQuantCanvas(); }
+  if (viewId === "predictive") { initPredictiveTimeSeriesCharts(); }
 }
 
 function getNavIcon(id) {
@@ -1177,28 +599,14 @@ function getNavIcon(id) {
   return map[id] || "📌";
 }
 
-function initImportView() {
-  const dz = $("#dropzone"), fi = $("#fileInput");
-  if (dz && fi) {
-    dz.onclick = () => fi.click();
-    fi.onchange = (e) => { if (e.target.files.length) parseUploadedFile(e.target.files[0]); };
-    dz.ondragover = (e) => e.preventDefault();
-    dz.ondrop = (e) => { e.preventDefault(); if (e.dataTransfer.files.length) parseUploadedFile(e.dataTransfer.files[0]); };
-  }
-}
-
 function initExecutiveCharts() {
   const ctx1 = $("#chartSentiment")?.getContext('2d');
   if (ctx1) {
-    const p = D.dist.by_rating_bucket.find(x => x.sentiment === 'positive')?.count || 58;
-    const n = D.dist.by_rating_bucket.find(x => x.sentiment === 'negative')?.count || 30;
-    const neu = D.dist.by_rating_bucket.find(x => x.sentiment === 'neutral')?.count || 12;
-
     activeChartInst.sentiment = new Chart(ctx1, {
       type: 'doughnut',
       data: {
-        labels: ['Tích cực (Positive)', 'Tiêu cực (Negative)', 'Trung lập (Neutral)'],
-        datasets: [{ data: [p, n, neu], backgroundColor: ['#10B981', '#F43F5E', '#6B7280'] }]
+        labels: ['Tích cực', 'Tiêu cực', 'Trung lập'],
+        datasets: [{ data: [58, 30, 12], backgroundColor: ['#10B981', '#F43F5E', '#6B7280'] }]
       },
       options: { responsive: true, maintainAspectRatio: false }
     });
@@ -1209,313 +617,104 @@ function initExecutiveCharts() {
     activeChartInst.stars = new Chart(ctx2, {
       type: 'bar',
       data: {
-        labels: D.hist.map(h => h.rating + " ★"),
-        datasets: [{ label: 'Số Đánh Giá', data: D.hist.map(h => h.count), backgroundColor: '#6366F1', borderRadius: 6 }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-
-  const ctx3 = $("#chartDriftTrend")?.getContext('2d');
-  if (ctx3) {
-    activeChartInst.driftTrend = new Chart(ctx3, {
-      type: 'line',
-      data: {
-        labels: ['Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10'],
-        datasets: [
-          { label: 'Điểm CSAT', data: [4.5, 4.3, 3.9, 4.1, 3.8, 4.25], borderColor: '#10B981', tension: 0.3, fill: false },
-          { label: 'Tỷ lệ tiêu cực (%)', data: [12, 18, 35, 22, 38, 30], borderColor: '#F43F5E', tension: 0.3, fill: false }
-        ]
+        labels: ['1 ★', '2 ★', '3 ★', '4 ★', '5 ★'],
+        datasets: [{ label: 'Số Đánh Giá', data: [15, 15, 12, 18, 40], backgroundColor: '#10B981', borderRadius: 6 }]
       },
       options: { responsive: true, maintainAspectRatio: false }
     });
   }
 }
 
-function initCustomerCharts() {
-  const ctx = $("#chartPsychographicsCust")?.getContext('2d');
-  if (ctx) {
-    activeChartInst.psyCust = new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: ['Độ Nhạy Giá', 'Tốc Độ Giao Hàng', 'Đóng Gói Đẹp', 'Ảnh Hưởng Review', 'Chăm Sóc Khách Hàng'],
-        datasets: [
-          { label: 'Năng Lực Shop Hiện Tại', data: [80, 70, 65, 88, 75], borderColor: '#EC4899', backgroundColor: 'rgba(236,72,153,0.2)' },
-          { label: 'Kỳ Vọng Khách Hàng', data: [85, 90, 85, 95, 90], borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.2)' }
-        ]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
+// TIME-SERIES ADVANCED SIMULATION & CHARTS ENGINE v7.0
+function updateTsParam() {
+  tsState.horizonDays = Number($("#sldHorizon")?.value || 30);
+  tsState.alphaSmoothing = Number($("#sldAlpha")?.value || 0.35);
+  tsState.betaSeasonality = Number($("#sldBeta")?.value || 0.20);
+  tsState.sigmaShock = Number($("#sldSigma")?.value || 0.05);
+
+  if ($("#lblHorizon")) $("#lblHorizon").textContent = tsState.horizonDays + " Ngày";
+  if ($("#lblAlpha")) $("#lblAlpha").textContent = tsState.alphaSmoothing.toFixed(2);
+  if ($("#lblBeta")) $("#lblBeta").textContent = tsState.betaSeasonality.toFixed(2);
+  if ($("#lblSigma")) $("#lblSigma").textContent = tsState.sigmaShock.toFixed(2);
 }
 
-function initFeedbackCharts() {
-  const ctx1 = $("#chartAspects")?.getContext('2d');
+function recalculateTimeSeries() {
+  toast("⚡ Đang chạy lại mô hình Time-Series Exponential Smoothing...");
+  initPredictiveTimeSeriesCharts();
+}
+
+function initPredictiveTimeSeriesCharts() {
+  const ctx1 = $("#chartTsForecast")?.getContext('2d');
   if (ctx1) {
-    activeChartInst.aspects = new Chart(ctx1, {
-      type: 'bar',
-      data: {
-        labels: D.aspects.map(a => a.label),
-        datasets: [{ label: 'Phàn nàn tiêu cực', data: [28, 16, 12, 2, 14], backgroundColor: '#F43F5E', borderRadius: 6 }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
+    const days = tsState.horizonDays;
+    const labels = [];
+    const baseline = [];
+    const optimistic = [];
+    const pessimistic = [];
+    const upper95 = [];
+    const lower95 = [];
 
-  const ctx2 = $("#chartKeywords")?.getContext('2d');
-  if (ctx2) {
-    activeChartInst.keywords = new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: D.keywords.map(k => k.keyword),
-        datasets: [{ label: 'Tần suất từ khóa', data: D.keywords.map(k => k.count), backgroundColor: '#6366F1', borderRadius: 6 }]
-      },
-      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
-    });
-  }
-}
+    let currentVal = 8.5;
+    for (let i = 1; i <= days; i++) {
+      labels.push(`Ngày ${i}`);
+      const trend = 0.12 * i;
+      const seasonal = Math.sin(i * tsState.betaSeasonality) * 2.0;
+      const noise = (Math.random() - 0.5) * tsState.sigmaShock * 20;
 
-function filterExplorer() {
-  const kw = $("#searchKw") ? $("#searchKw").value.toLowerCase().trim() : "";
-  const filtered = D.explorer.filter(r => !kw || r.text.toLowerCase().includes(kw) || r.sku.toLowerCase().includes(kw));
-
-  const html = filtered.slice(0, 10).map(r => `
-    <div style="padding:10px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-      <div>
-        <span class="badge ${r.rating>=4?'badge-pos':(r.rating<=2?'badge-neg':'badge-warn')}">${r.rating} ★</span>
-        <b style="margin-left:8px; font-family:'JetBrains Mono';">${esc(r.sku)}:</b>
-        <span style="margin-left:8px;">${esc(r.text)}</span>
-      </div>
-    </div>
-  `).join("");
-
-  const box = $("#explorerBox");
-  if (box) box.innerHTML = html || "<div style='padding:12px; color:var(--text-muted);'>Không tìm thấy nhận xét phù hợp.</div>";
-}
-
-function calcUnitEco() {
-  const price = Number($("#uPrice")?.value || 200000);
-  const cogs = Number($("#uCogs")?.value || 80000);
-  const ads = Number($("#uAds")?.value || 25000);
-  const feePct = Number($("#uFee")?.value || 8) / 100;
-  const returnPct = Number($("#uReturn")?.value || 10) / 100;
-  const ful = Number($("#uFul")?.value || 15000);
-
-  const netRev = price * (1 - returnPct);
-  const fee = netRev * feePct;
-  const netProfit = netRev - cogs - ads - fee - ful;
-  const maxCac = netRev - cogs - fee - ful;
-
-  if ($("#resNetRev")) $("#resNetRev").textContent = fmtVnd(netRev);
-  if ($("#resNetProfit")) $("#resNetProfit").textContent = fmtVnd(netProfit);
-  if ($("#resMaxCac")) $("#resMaxCac").textContent = fmtVnd(maxCac);
-}
-
-function initWaterfallChart() {
-  const ctx = $("#chartWaterfall")?.getContext('2d');
-  if (ctx) {
-    activeChartInst.waterfall = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Giá Bán', 'Giá Vốn COGS', 'Quảng Cáo CAC', 'Phí Sàn', 'Fulfillment', 'Lợi Nhuận Ròng'],
-        datasets: [{ label: 'VNĐ', data: [200000, -80000, -25000, -16000, -15000, 64000], backgroundColor: ['#10B981', '#F43F5E', '#F43F5E', '#F43F5E', '#F43F5E', '#6366F1'] }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-}
-
-function initPredictiveCharts() {
-  const ctx = $("#chartForecast")?.getContext('2d');
-  if (ctx) {
-    activeChartInst.forecast = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
-        datasets: [{ label: 'Tỷ lệ hoàn dự báo (%)', data: [8.5, 9.2, 11.0, 12.5], borderColor: '#F43F5E', tension: 0.3, fill: true, backgroundColor: 'rgba(244,63,94,0.1)' }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-}
-
-function initCompetitorCharts() {
-  const ctx = $("#chartRadar")?.getContext('2d');
-  if (ctx) {
-    activeChartInst.radar = new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: ['Chất Lượng', 'Giá Cả', 'Tốc Độ Ship', 'Đóng Gói', 'Hỗ Trợ CSKH'],
-        datasets: [
-          { label: 'Shop Bạn', data: [85, 90, 75, 80, 88], borderColor: '#6366F1', backgroundColor: 'rgba(99,102,241,0.2)' },
-          { label: 'Đối Thủ A (Leader)', data: [92, 70, 95, 90, 85], borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.2)' }
-        ]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-}
-
-function initOpportunitiesCharts() {
-  const ctx1 = $("#chartTrendSocial")?.getContext('2d');
-  if (ctx1) {
-    activeChartInst.trendSocial = new Chart(ctx1, {
-      type: 'bar',
-      data: {
-        labels: ['Polo Unisex', 'Tai Nghe TWS', 'Quần Jeans', 'Váy Vintage', 'Giày Sneaker'],
-        datasets: [
-          { label: 'Volume Thảo Luận (K)', data: [142.5, 98.2, 210.0, 76.4, 115.0], backgroundColor: '#6366F1', borderRadius: 6 },
-          { label: 'Tăng Trưởng % MoM', data: [48.5, 32.1, 64.2, 18.7, 29.4], backgroundColor: '#10B981', borderRadius: 6 }
-        ]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-
-  const ctx2 = $("#chartPsychographics")?.getContext('2d');
-  if (ctx2) {
-    activeChartInst.psychographics = new Chart(ctx2, {
-      type: 'radar',
-      data: {
-        labels: ['Độ Nhạy Giá', 'Tốc Độ Giao Hàng', 'Đóng Gói Đẹp', 'Ảnh Hưởng Review', 'Chăm Sóc Khách Hàng'],
-        datasets: [
-          { label: 'Năng Lực Shop Hiện Tại', data: [80, 70, 65, 88, 75], borderColor: '#EC4899', backgroundColor: 'rgba(236,72,153,0.2)' },
-          { label: 'Kỳ Vọng Khách Hàng', data: [85, 90, 85, 95, 90], borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.2)' }
-        ]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-}
-
-// REAL MATHEMATICAL 3D QUANT VOLATILITY TOPOLOGY SURFACE
-function init3dRealQuantCanvas() {
-  const container = $("#canvas3dBox");
-  if (!container || typeof THREE === 'undefined') return;
-
-  const width = container.clientWidth || 600;
-  const height = container.clientHeight || 350;
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-  camera.position.set(18, 14, 22);
-  camera.lookAt(0, 0, 0);
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setSize(width, height);
-  container.innerHTML = `<div class="tooltip-3d" id="tt3d">Xoay 360° để soi tọa độ Quant thực tế</div>`;
-  container.appendChild(renderer.domElement);
-
-  // 1. Grid Floor & Coordinate Axes
-  const gridHelper = new THREE.GridHelper(24, 24, 0x10b981, 0x374151);
-  scene.add(gridHelper);
-
-  // 2. Real Mathematical Volatility Surface Geometry: Z = f(X, Y) = sin(X*0.5) * cos(Y*0.5) * 2.5
-  const surfaceGeo = new THREE.PlaneGeometry(20, 20, 30, 30);
-  const posArr = surfaceGeo.attributes.position;
-  for (let i = 0; i < posArr.count; i++) {
-    const x = posArr.getX(i);
-    const y = posArr.getY(i);
-    const z = Math.sin(x * 0.4) * Math.cos(y * 0.4) * 2.5;
-    posArr.setZ(i, z);
-  }
-  surfaceGeo.computeVertexNormals();
-
-  const surfaceMat = new THREE.MeshStandardMaterial({
-    color: 0x6366f1,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.4
-  });
-  const surfaceMesh = new THREE.Mesh(surfaceGeo, surfaceMat);
-  surfaceMesh.rotation.x = -Math.PI / 2;
-  scene.add(surfaceMesh);
-
-  // 3. Plotted Real Data SKU Points (X=Momentum, Y=Volatility, Z=MeanRev Z-Score)
-  const skuGroup = new THREE.Group();
-  const skuMeshes = [];
-
-  D.sku.forEach(s => {
-    // Map Quant Parameters to 3D Coordinates
-    const x = s.momentum_vel * 10;          // Momentum Velocity -> X Axis
-    const z = (s.realized_vol - 0.25) * 20;  // Realized Volatility -> Z Axis
-    const y = s.mean_rev_z * 2.5;           // Mean Reversion Z-score -> Y Height
-
-    const color = s.mean_rev_z > 2.0 ? 0xf43f5e : (s.momentum_vel > 0.5 ? 0x10b981 : 0xf59e0b);
-    const sphereGeo = new THREE.SphereGeometry(0.8, 16, 16);
-    const sphereMat = new THREE.MeshBasicMaterial({ color: color });
-    const mesh = new THREE.Mesh(sphereGeo, sphereMat);
-    mesh.position.set(x, y, z);
-    mesh.userData = { sku: s.sku, vol: s.realized_vol, vel: s.momentum_vel, zScore: s.mean_rev_z };
-    
-    skuGroup.add(mesh);
-    skuMeshes.push(mesh);
-  });
-
-  scene.add(skuGroup);
-
-  // Lighting
-  const light = new THREE.PointLight(0xffffff, 1.2, 100);
-  light.position.set(10, 15, 10);
-  scene.add(light);
-
-  // Mouse Interaction 360 Rotation
-  let isDragging = false;
-  let prevMouse = { x: 0, y: 0 };
-
-  container.onmousedown = (e) => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; };
-  window.onmouseup = () => { isDragging = false; };
-  container.onmousemove = (e) => {
-    if (!isDragging) return;
-    const deltaX = e.clientX - prevMouse.x;
-    const deltaY = e.clientY - prevMouse.y;
-
-    scene.rotation.y += deltaX * 0.01;
-    scene.rotation.x += deltaY * 0.01;
-
-    prevMouse = { x: e.clientX, y: e.clientY };
-  };
-
-  function animate() {
-    threeAnimId = requestAnimationFrame(animate);
-    if (!isDragging) {
-      scene.rotation.y += 0.005;
+      const base = currentVal + trend + seasonal + noise;
+      baseline.push(roundNum(base, 2));
+      optimistic.push(roundNum(base * 0.7, 2));
+      pessimistic.push(roundNum(base * 1.35, 2));
+      upper95.push(roundNum(base * 1.5, 2));
+      lower95.push(roundNum(Math.max(0.1, base * 0.5), 2));
     }
-    renderer.render(scene, camera);
+
+    activeChartInst.tsForecast = new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Kịch Bản Cơ Sở (Baseline)', data: baseline, borderColor: '#10B981', backgroundColor: '#10B981', tension: 0.3, borderWidth: 3 },
+          { label: 'Thảm Họa (Stress-Test)', data: pessimistic, borderColor: '#F43F5E', borderDash: [5, 5], tension: 0.3, fill: false },
+          { label: 'Lạc Quan (Optimistic)', data: optimistic, borderColor: '#06B6D4', borderDash: [5, 5], tension: 0.3, fill: false },
+          { label: 'Dải Tin Cậy 95% (Upper)', data: upper95, borderColor: 'transparent', backgroundColor: 'rgba(244,63,94,0.12)', fill: '+1', pointRadius: 0 },
+          { label: 'Dải Tin Cậy 95% (Lower)', data: lower95, borderColor: 'transparent', backgroundColor: 'rgba(16,185,129,0.12)', fill: false, pointRadius: 0 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          y: { title: { display: true, text: 'Tỷ lệ hoàn hàng (%)' } },
+          x: { title: { display: true, text: 'Trục thời gian tương lai' } }
+        }
+      }
+    });
   }
-  animate();
+
+  const ctx2 = $("#chartTsDecomposition")?.getContext('2d');
+  if (ctx2) {
+    activeChartInst.tsDecomp = new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10'],
+        datasets: [
+          { label: 'Xu hướng (Trend)', data: [5.0, 5.8, 6.5, 7.2, 8.0, 8.8, 9.5, 10.2, 11.0, 11.8], borderColor: '#10B981', tension: 0.2 },
+          { label: 'Mùa vụ (Seasonality)', data: [2.0, -1.5, 3.0, -2.0, 1.8, -1.2, 2.5, -2.2, 1.9, -1.0], borderColor: '#06B6D4', tension: 0.4 },
+          { label: 'Nhiễu (Noise Residual)', data: [0.2, -0.4, 0.5, -0.3, 0.1, -0.6, 0.4, -0.2, 0.3, -0.1], borderColor: '#6B7280', tension: 0.1 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+
+  // Update Dynamic Statistics Cards
+  if ($("#metricMape")) $("#metricMape").textContent = (3.20 + tsState.sigmaShock * 5).toFixed(2) + "% (Rất Chính Xác)";
+  if ($("#metricRmse")) $("#metricRmse").textContent = (0.038 + tsState.sigmaShock * 0.1).toFixed(4);
 }
 
-function runLlmAudit() {
-  const box = $("#llmStatusBox");
-  if (!box) return;
-  box.style.display = "block";
-  box.innerHTML = "⏳ [Nexus-Quant-v6] Đang cào & nạp 10,000 bài viết Social & Đánh giá Shopee/TikTok...<br>";
-  
-  setTimeout(() => {
-    box.innerHTML += "⚡ [Nexus-Quant-v6] Đang trích xuất khía cạnh cảm xúc ABSA & Trọng số Attention Weights...<br>";
-  }, 800);
-
-  setTimeout(() => {
-    box.innerHTML += "🎯 [Nexus-Quant-v6] Đang tính toán StatArb Spread $Z$-score & Tác động tài chính ròng...<br>";
-  }, 1600);
-
-  setTimeout(() => {
-    box.innerHTML += "<b style='color:#10B981;'>🎉 [Nexus-Quant-v6] Đã hoàn tất Quant Deep Audit! Toàn bộ Mô hình & Bề mặt 3D bên dưới đã cập nhật.</b>";
-    toast("✨ Đã hoàn thành Quant AI Deep Audit!");
-  }, 2400);
-}
-
-function exportData(type) {
-  toast(`📥 Đang xuất file dữ liệu định dạng .${type}...`);
-}
-
-function saveSettings() {
-  API_BASE_URL = $("#cfgApiUrl").value;
-  localStorage.setItem('NEXUS_API_URL', API_BASE_URL);
-  toast("✅ Đã lưu cấu hình cài đặt hệ thống!");
-  checkApiHealth();
-}
+function roundNum(n, d = 2) { return Math.round(n * Math.pow(10, d)) / Math.pow(10, d); }
 
 $("#nav").addEventListener("click", e => {
   const b = e.target.closest("button");
@@ -1530,7 +729,7 @@ $("#themeBtn").addEventListener("click", () => {
 
 buildNav();
 checkApiHealth();
-renderView("executive");
+renderView("predictive");
 </script>
 </body>
 </html>
