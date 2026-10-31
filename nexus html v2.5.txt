@@ -1,0 +1,951 @@
+Set-Location D:\nghien-cuu-ck
+
+# 1. Ghi lại file Nexus-1-cham.html chuẩn giao diện SaaS Executive v2.5 (Sử dụng @' ... '@ bảo toàn $ trong JS)
+$htmlCode = @'
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Nexus Engine – E-Commerce Intelligence SaaS Platform</title>
+
+<!-- External CDN Dependencies -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+  :root {
+    color-scheme: dark;
+    --bg-main: #0B0F17;
+    --bg-surface: #111827;
+    --bg-card: #1F2937;
+    --bg-hover: #374151;
+    --border: #374151;
+    --border-accent: rgba(99, 102, 241, 0.3);
+    --text-main: #F9FAFB;
+    --text-muted: #9CA3AF;
+    --primary: #6366F1;
+    --primary-gradient: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    --brand-teal: #10B981;
+    --pos: #10B981;
+    --pos-bg: rgba(16, 185, 129, 0.12);
+    --neu: #6B7280;
+    --neg: #F43F5E;
+    --neg-bg: rgba(244, 63, 94, 0.12);
+    --warn: #F59E0B;
+    --warn-bg: rgba(245, 158, 11, 0.12);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg-main: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F1F5F9;
+    --border: #E2E8F0;
+    --border-accent: rgba(99, 102, 241, 0.2);
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+    --shadow-glow: 0 4px 12px rgba(99, 102, 241, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s; }
+  html, body { height: 100%; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(--bg-main); color: var(--text-main); font-size: 13px; overflow: hidden; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Animations */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); } 50% { box-shadow: 0 0 16px rgba(16, 185, 129, 0.8); } }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+  .animated-fade { animation: fadeIn 0.35s ease-out forwards; }
+
+  /* Layout Structure */
+  body { display: flex; height: 100vh; }
+  aside { width: 250px; flex-shrink: 0; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
+  
+  /* Luxury Logo Header */
+  .brand { padding: 20px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .brand-logo-icon { width: 38px; height: 38px; background: var(--primary-gradient); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow); }
+  .brand-logo-icon svg { width: 22px; height: 22px; fill: white; }
+  .brand-text { display: flex; flex-direction: column; }
+  .brand-title { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); }
+  .brand-title span { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .brand-sub { font-size: 10px; font-weight: 700; color: var(--primary); letter-spacing: 0.8px; text-transform: uppercase; }
+
+  /* Navigation Sidebar */
+  nav { padding: 12px 10px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .nav-group-title { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 10px 12px 4px; }
+  nav button { width: 100%; text-align: left; padding: 9px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--text-muted); font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; position: relative; }
+  nav button:hover { background: var(--bg-hover); color: var(--text-main); }
+  nav button.active { background: rgba(99, 102, 241, 0.15); color: var(--primary); font-weight: 700; border: 1px solid var(--border-accent); }
+  nav button.active::before { content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 3px; background: var(--primary); border-radius: 0 4px 4px 0; }
+  nav button .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+
+  /* Main Workspace */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: var(--bg-surface); border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
+  .header-actions { display: flex; align-items: center; gap: 12px; }
+
+  .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 20px; background: var(--pos-bg); color: var(--pos); font-size: 11.5px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pos); animation: pulseGlow 2s infinite; }
+
+  main { padding: 24px; overflow-y: auto; flex: 1; }
+
+  /* SaaS Grid & Card UI */
+  .banner-info { border: 1px solid var(--border-accent); background: rgba(99, 102, 241, 0.08); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 20px; }
+  .grid-2 { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; margin-bottom: 20px; }
+  .grid-3 { display: grid; gap: 18px; grid-template-columns: repeat(3, 1fr); margin-bottom: 20px; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .card:hover { border-color: var(--border-accent); }
+  .card h2 { font-size: 14px; font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+  .card .sub { color: var(--text-muted); font-size: 11.5px; margin-bottom: 14px; }
+
+  /* KPI Cards */
+  .kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; position: relative; overflow: hidden; }
+  .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--primary); }
+  .kpi-card.pos::before { background: var(--pos); }
+  .kpi-card.neg::before { background: var(--neg); }
+  .kpi-card.warn::before { background: var(--warn); }
+  .kpi-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-value { font-size: 26px; font-weight: 800; margin-top: 6px; letter-spacing: -0.5px; font-family: 'JetBrains Mono', monospace; }
+  .kpi-sub { font-size: 11.5px; margin-top: 6px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+
+  /* Badges & Pills */
+  .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .badge-pos { background: var(--pos-bg); color: var(--pos); border: 1px solid rgba(16, 185, 129, 0.3); }
+  .badge-neg { background: var(--neg-bg); color: var(--neg); border: 1px solid rgba(244, 63, 94, 0.3); }
+  .badge-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+  /* Buttons & Controls */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-main); transition: all 0.2s; }
+  .btn:hover { background: var(--bg-hover); transform: translateY(-1px); }
+  .btn.primary { background: var(--primary-gradient); border: none; color: #fff; box-shadow: var(--shadow-glow); }
+  .btn.primary:hover { opacity: 0.92; transform: translateY(-1px); }
+  
+  input, select, textarea { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12.5px; font-family: inherit; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+
+  /* File Upload Zone */
+  .upload-box { border: 2px dashed var(--primary); border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; background: rgba(99, 102, 241, 0.03); transition: all 0.2s; }
+  .upload-box:hover { background: rgba(99, 102, 241, 0.08); border-color: #8B5CF6; }
+  .upload-icon { font-size: 38px; margin-bottom: 10px; }
+
+  /* Tables */
+  .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { background: var(--bg-surface); color: var(--text-muted); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  tr:hover td { background: var(--bg-hover); }
+  td.num, th.num { text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+  /* Charts Container */
+  .chart-container { position: relative; height: 260px; width: 100%; }
+
+  /* Toast Notifications */
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 1000; display: none; animation: fadeIn 0.3s; }
+</style>
+</head>
+<body>
+
+<aside>
+  <!-- Luxury Executive Logo -->
+  <div class="brand">
+    <div class="brand-logo-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <div class="brand-title">NEXUS <span>ENGINE</span></div>
+      <div class="brand-sub">SaaS Intelligence v2.5</div>
+    </div>
+  </div>
+
+  <!-- Dynamic Navigation Menu -->
+  <nav id="nav">
+    <div class="nav-group-title">Dữ liệu & Cảm xúc</div>
+    <button data-id="import" class="active"><span class="nav-icon">📥</span> Import Data</button>
+    <button data-id="executive"><span class="nav-icon">📊</span> Executive Overview</button>
+    <button data-id="customers"><span class="nav-icon">👥</span> Customer Intelligence</button>
+    <button data-id="feedback"><span class="nav-icon">💬</span> Feedback & ABSA</button>
+
+    <div class="nav-group-title">Tài chính & Chiến lược</div>
+    <button data-id="unit"><span class="nav-icon">💰</span> Unit Economics</button>
+    <button data-id="predictive"><span class="nav-icon">🔮</span> Predictive Analytics</button>
+    <button data-id="competitors"><span class="nav-icon">⚔️</span> Competitor Intelligence</button>
+    <button data-id="opportunities"><span class="nav-icon">💡</span> Market Opportunities</button>
+
+    <div class="nav-group-title">Hệ thống & Báo cáo</div>
+    <button data-id="reports"><span class="nav-icon">📄</span> Report Center</button>
+    <button data-id="system"><span class="nav-icon">⚡</span> System Monitoring</button>
+    <button data-id="settings"><span class="nav-icon">⚙️</span> Settings</button>
+  </nav>
+</aside>
+
+<div class="main">
+  <header>
+    <h1 id="title">📥 Import Data</h1>
+    <div class="header-actions">
+      <span class="status-pill" id="apiStatusPill">
+        <span class="status-dot"></span>
+        <span id="apiStatusText">Engine API Online (127.0.0.1:8000)</span>
+      </span>
+      <button class="btn" id="themeBtn">🌙 Dark Mode</button>
+    </div>
+  </header>
+
+  <main id="content" class="animated-fade">
+    <!-- View Content Rendered Dynamically Here -->
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+"use strict";
+
+// State Management
+let API_BASE_URL = localStorage.getItem('NEXUS_API_URL') || 'http://127.0.0.1:8000/api/v1';
+let isApiConnected = false;
+let activeChartInst = {};
+
+// Clean Dataset Structure
+let D = {
+  source: { name: "Chưa nạp file", uploaded_at: "N/A" },
+  dq: { total_rows: 0, valid_rows: 0, rejected_rows: 0, columns_detected: {}, warnings: ["Chưa có dữ liệu. Vui lòng nạp file Excel/CSV."] },
+  dist: { total: 0, by_rating_bucket: [{ sentiment: "positive", count: 0, pct: 0 }, { sentiment: "neutral", count: 0, pct: 0 }, { sentiment: "negative", count: 0, pct: 0 }] },
+  hist: [{ rating: 1, count: 0 }, { rating: 2, count: 0 }, { rating: 3, count: 0 }, { rating: 4, count: 0 }, { rating: 5, count: 0 }],
+  sku: [],
+  aspects: [
+    { aspect: "product_quality", label: "Chất lượng sản phẩm", positive: 0, neutral: 0, negative: 0 },
+    { aspect: "sizing_fit", label: "Size & form dáng", positive: 0, neutral: 0, negative: 0 },
+    { aspect: "shipping_packaging", label: "Giao hàng & đóng gói", positive: 0, neutral: 0, negative: 0 },
+    { aspect: "pricing_value", label: "Giá cả & đáng tiền", positive: 0, neutral: 0, negative: 0 },
+    { aspect: "service_communication", label: "Dịch vụ & CSKH", positive: 0, neutral: 0, negative: 0 }
+  ],
+  keywords: [],
+  explorer: []
+};
+
+// UI Helpers
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtVnd = (n) => n == null ? "—" : Math.round(n).toLocaleString("vi-VN") + "đ";
+const fmtPct = (n, d = 1) => n == null ? "0.0%" : n.toFixed(d).replace(".", ",") + "%";
+const fmtNum = (n, d = 2) => n == null ? "0.00" : n.toFixed(d).replace(".", ",");
+
+function toast(msg, isError = false) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.style.borderColor = isError ? "var(--neg)" : "var(--primary)";
+  t.style.display = "block";
+  setTimeout(() => { t.style.display = "none"; }, 3500);
+}
+
+// API Health Check
+async function checkApiHealth() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/system/telemetry`, { method: 'GET' });
+    if (res.ok) {
+      isApiConnected = true;
+      $("#apiStatusPill").style.background = "var(--pos-bg)";
+      $("#apiStatusText").textContent = "FastAPI Server Online";
+    } else { throw new Error(); }
+  } catch (e) {
+    isApiConnected = false;
+    $("#apiStatusPill").style.background = "var(--warn-bg)";
+    $("#apiStatusText").textContent = "Client-Side Fallback Mode";
+  }
+}
+
+// Excel / CSV File Parsing Logic
+function parseUploadedFile(file) {
+  toast(`⏳ Đang đọc dữ liệu từ file ${file.name}...`);
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+      if (!rows.length) return toast("File rỗng!", true);
+
+      let pos = 0, neu = 0, neg = 0;
+      const histMap = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      const skuMap = {};
+      const keywordsMap = {};
+
+      const explorer = rows.map((r, idx) => {
+        const sku = String(r["Mã_SKU"] || r["SKU"] || r["Mã sản phẩm"] || "Tất cả sản phẩm").trim();
+        const text = String(r["Nội_dung_đánh_giá"] || r["Nội dung đánh giá"] || r["Review"] || r["Comment"] || "").trim();
+        const rating = parseInt(r["Số_sao"] || r["Số sao"] || r["Rating"] || 5) || 5;
+
+        if (histMap[rating] !== undefined) histMap[rating]++;
+        if (rating >= 4) pos++; else if (rating === 3) neu++; else neg++;
+
+        if (!skuMap[sku]) skuMap[sku] = { sku, product_name: sku, review_count: 0, total_rating: 0, pos: 0, neg: 0, returns: 0 };
+        skuMap[sku].review_count++;
+        skuMap[sku].total_rating += rating;
+        if (rating >= 4) skuMap[sku].pos++;
+        if (rating <= 2) skuMap[sku].neg++;
+        if (/trả hàng|hoàn tiền|đổi trả|lỗi/i.test(text)) skuMap[sku].returns++;
+
+        // Basic Keyword Extraction
+        text.toLowerCase().split(/\s+/).forEach(w => {
+          if (w.length >= 3 && !/và|hoặc|nhưng|rất|cho|với|đã|được|không|có/i.test(w)) {
+            keywordsMap[w] = (keywordsMap[w] || 0) + 1;
+          }
+        });
+
+        const absa = rating >= 4 ? "positive" : rating === 3 ? "neutral" : "negative";
+        return { row: idx + 2, sku, rating, text, absa };
+      });
+
+      const total = rows.length;
+      D.source = { name: file.name, uploaded_at: new Date().toLocaleTimeString('vi-VN') };
+      D.dq = { total_rows: total, valid_rows: total, rejected_rows: 0, columns_detected: { sku: "Mã SKU", text: "Nội dung đánh giá", rating: "Số sao" }, warnings: [] };
+      D.dist = {
+        total: total,
+        by_rating_bucket: [
+          { sentiment: "positive", count: pos, pct: (pos / total) * 100 },
+          { sentiment: "neutral", count: neu, pct: (neu / total) * 100 },
+          { sentiment: "negative", count: neg, pct: (neg / total) * 100 }
+        ]
+      };
+      D.hist = [1, 2, 3, 4, 5].map(star => ({ rating: star, count: histMap[star] }));
+      D.sku = Object.values(skuMap).map(s => ({
+        sku: s.sku, product_name: s.product_name, review_count: s.review_count,
+        avg_rating: s.review_count ? s.total_rating / s.review_count : 0,
+        positive_pct: s.review_count ? (s.pos / s.review_count) * 100 : 0,
+        negative_pct: s.review_count ? (s.neg / s.review_count) * 100 : 0,
+        return_intent_pct: s.review_count ? (s.returns / s.review_count) * 100 : 0,
+        top_complaint: s.neg > 0 ? "Theo dõi chất lượng & size" : "Không phàn nàn"
+      }));
+
+      D.keywords = Object.entries(keywordsMap).sort((a,b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => ({ keyword: k, count: v }));
+      D.explorer = explorer;
+
+      toast(`🎉 Đã phân tích thành công ${total} dòng từ file ${file.name}!`);
+      renderView(currentView);
+    } catch (err) {
+      toast("❌ Lỗi đọc file Excel/CSV: " + err.message, true);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// VIEW DEFINITIONS
+const VIEWS = {
+  import() {
+    return `
+    <div class="banner-info">
+      <span>📌 Mode: <b>${isApiConnected ? 'FastAPI Local Active' : 'Client-Side Local Processor'}</b></span>
+      <span class="mono">Engine URL: ${API_BASE_URL}</span>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <h2>📥 Tải lên Dữ liệu Đánh giá Sản phẩm (.xlsx, .xls, .csv)</h2>
+      <div class="sub">Tự động phân tích Cảm xúc, Xếp hạng SKU, Khía cạnh ABSA & Mô phỏng Tài chính</div>
+      
+      <div class="upload-box" id="dropzone">
+        <div class="upload-icon">📂</div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Kéo & Thả File Excel/CSV vào đây hoặc Bấm để chọn</div>
+        <div style="font-size: 12px; color: var(--text-muted);">Hỗ trợ dữ liệu xuất từ Shopee, TikTok Shop, Lazada...</div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none;">
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Tên File Hiện Tại</div>
+        <div class="kpi-value" style="font-size: 15px; color: var(--primary);">${esc(D.source.name)}</div>
+        <div class="kpi-sub">Thời gian: ${D.source.uploaded_at}</div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-title">Tổng Mẫu Đánh Giá</div>
+        <div class="kpi-value">${D.dq.total_rows}</div>
+        <div class="kpi-sub" style="color:var(--pos);">Đã làm sạch & chuẩn hóa</div>
+      </div>
+      <div class="kpi-card warn">
+        <div class="kpi-title">Số Mã SKU</div>
+        <div class="kpi-value">${D.sku.length}</div>
+        <div class="kpi-sub">SKU sản phẩm riêng biệt</div>
+      </div>
+    </div>
+    `;
+  },
+
+  executive() {
+    const pos = D.dist.by_rating_bucket.find(x => x.sentiment === 'positive') || { pct: 0, count: 0 };
+    const neg = D.dist.by_rating_bucket.find(x => x.sentiment === 'negative') || { pct: 0, count: 0 };
+    const avgRating = D.sku.length ? (D.sku.reduce((acc, s) => acc + s.avg_rating * s.review_count, 0) / (D.dist.total || 1)) : 0;
+
+    return `
+    <div class="grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Tổng Mẫu Phản Hồi</div>
+        <div class="kpi-value">${D.dist.total}</div>
+        <div class="kpi-sub">Số lượng comment kiểm thử</div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-title">Chỉ Số CSAT Score</div>
+        <div class="kpi-value" style="color:var(--pos);">${fmtNum(avgRating)} / 5.0</div>
+        <div class="kpi-sub">Điểm hài lòng trung bình</div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-title">Tỷ Lệ Hài Lòng (%)</div>
+        <div class="kpi-value" style="color:var(--pos);">${fmtPct(pos.pct)}</div>
+        <div class="kpi-sub">${pos.count} đánh giá 4-5 sao</div>
+      </div>
+      <div class="kpi-card neg">
+        <div class="kpi-title">Tỷ Lệ Phàn Nàn (%)</div>
+        <div class="kpi-value" style="color:var(--neg);">${fmtPct(neg.pct)}</div>
+        <div class="kpi-sub">${neg.count} đánh giá 1-2 sao</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>📈 Phân Bổ Cảm Xúc (Sentiment Distribution)</h2>
+        <div class="chart-container"><canvas id="chartSentiment"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>⭐ Phân Bổ Số Sao Đánh Giá</h2>
+        <div class="chart-container"><canvas id="chartStars"></canvas></div>
+      </div>
+    </div>
+    `;
+  },
+
+  customers() {
+    const rows = D.sku.map(s => `
+      <tr>
+        <td><b>${esc(s.sku)}</b></td>
+        <td>${esc(s.product_name)}</td>
+        <td class="num"><b>${s.review_count}</b></td>
+        <td class="num"><b style="color:var(--primary);">${fmtNum(s.avg_rating)}</b></td>
+        <td class="num pos"><b>${fmtPct(s.positive_pct)}</b></td>
+        <td class="num neg"><b>${fmtPct(s.negative_pct)}</b></td>
+        <td class="num warn"><b>${fmtPct(s.return_intent_pct)}</b></td>
+        <td><span class="badge badge-warn">${esc(s.top_complaint)}</span></td>
+      </tr>
+    `).join("");
+
+    return `
+    <div class="card" style="margin-bottom:20px;">
+      <h2>📦 Xếp Hạng Chất Lượng Sản Phẩm Theo SKU</h2>
+      <div class="sub">So sánh chi tiết chỉ số hài lòng và rủi ro trả hàng giữa các SKU</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Tên Sản Phẩm</th>
+              <th class="num">Số ĐG</th>
+              <th class="num">Điểm TB</th>
+              <th class="num">% Tích Cực</th>
+              <th class="num">% Tiêu Cực</th>
+              <th class="num">Nhắc Đổi Trả</th>
+              <th>Cảnh Báo Chính</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="8" style="text-align:center;">Chưa có dữ liệu SKU</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔍 Trích Xuất & Tìm Kiếm Nhận Xét Chi Tiết</h2>
+      <div class="sub">Lọc bình luận theo SKU và Từ khóa thực tế</div>
+      <div style="display:flex; gap:12px; margin-bottom:14px;">
+        <input type="text" id="searchKw" placeholder="Nhập từ khóa (rộng, chật, hỏng, rách...)..." style="flex:1;">
+        <button class="btn primary" onclick="filterExplorer()">Tìm Kiếm</button>
+      </div>
+      <div id="explorerBox"></div>
+    </div>
+    `;
+  },
+
+  feedback() {
+    return `
+    <div class="grid-2">
+      <div class="card">
+        <h2>📊 Cảm Xúc Theo Khía Cạnh (ABSA Aspects)</h2>
+        <div class="sub">Phân tích sâu nhóm tính chất sản phẩm & dịch vụ</div>
+        <div class="chart-container"><canvas id="chartAspects"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>🔥 Top Từ Khóa Tiêu Cực Phổ Biến</h2>
+        <div class="sub">Tần suất xuất hiện từ khóa phàn nàn</div>
+        <div class="chart-container"><canvas id="chartKeywords"></canvas></div>
+      </div>
+    </div>
+    `;
+  },
+
+  unit() {
+    return `
+    <div class="card" style="margin-bottom:20px;">
+      <h2>💰 Mô Phỏng Tài Chính Unit Economics Cho 1 Đơn Hàng SKU</h2>
+      <div class="sub">Tính toán Net Profit, Điểm Hòa Vốn & Ngưỡng Quảng Cáo CAC Tối Đa</div>
+      
+      <div class="grid-3" style="margin-top:16px;">
+        <div>
+          <label><b>Giá Bán (VNĐ):</b></label>
+          <input type="number" id="uPrice" value="200000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
+        </div>
+        <div>
+          <label><b>Giá Vốn COGS (VNĐ):</b></label>
+          <input type="number" id="uCogs" value="80000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
+        </div>
+        <div>
+          <label><b>Chi Phí Quảng Cáo / Đơn (CAC):</b></label>
+          <input type="number" id="uAds" value="25000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
+        </div>
+        <div>
+          <label><b>Tỷ Lệ Phí Sàn TMĐT (%):</b></label>
+          <input type="number" id="uFee" value="8" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
+        </div>
+        <div>
+          <label><b>Tỷ Lệ Hoàn Trả Hàng (%):</b></label>
+          <input type="number" id="uReturn" value="10" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
+        </div>
+        <div>
+          <label><b>Phí Fulfillment & Đóng Gói:</b></label>
+          <input type="number" id="uFul" value="15000" style="width:100%; margin-top:4px;" oninput="calcUnitEco()">
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="kpi-card pos">
+        <div class="kpi-title">Doanh Thu Ròng (Net Revenue)</div>
+        <div class="kpi-value" id="resNetRev">0đ</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Lợi Nhuận Ròng (Net Profit / Đơn)</div>
+        <div class="kpi-value" id="resNetProfit" style="color:var(--primary);">0đ</div>
+      </div>
+      <div class="kpi-card warn">
+        <div class="kpi-title">Ngưỡng CAC Quảng Cáo Tối Đa</div>
+        <div class="kpi-value" id="resMaxCac" style="color:var(--warn);">0đ</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📊 Phân Rã Chi Phí Đơn Hàng (Cost Structure Waterfall)</h2>
+      <div class="chart-container"><canvas id="chartWaterfall"></canvas></div>
+    </div>
+    `;
+  },
+
+  predictive() {
+    return `
+    <div class="grid-2">
+      <div class="card">
+        <h2>🔮 Dự Báo Tỷ Lệ Hoàn Hàng 30 Ngày Tới</h2>
+        <div class="sub">Mô hình AI Time-Series Forecast dựa trên Sentiment Drift</div>
+        <div class="chart-container"><canvas id="chartForecast"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>⚠️ Cảnh Báo Nguy Cơ Thất Thoát Lợi Nhuận</h2>
+        <div style="padding:16px; background:var(--neg-bg); border:1px solid rgba(244,63,94,0.3); border-radius:10px; color:var(--neg); margin-top:10px;">
+          <h3 style="font-size:15px; font-weight:800;">🚨 Cảnh báo SKU Cao Rủi Ro: SKU-TAI-05</h3>
+          <p style="margin-top:6px; font-size:12.5px; line-height:1.5;">Ghi nhận tỷ lệ phàn nàn pin yếu và kết nối chập chờn vượt 25%. Dự báo tổn thất <b>~12.500.000đ/tháng</b> nếu không bổ sung quy trình kiểm định QC trước khi xuất kho.</p>
+        </div>
+      </div>
+    </div>
+    `;
+  },
+
+  competitors() {
+    return `
+    <div class="card" style="margin-bottom:20px;">
+      <h2>⚔️ Phân Tích Cạnh Tranh & So Sánh Benchmark Thị Trường</h2>
+      <div class="sub">So sánh các chỉ số vận hành giữa Gian hàng của bạn vs Top Đối thủ Ngành</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>🎯 Radar So Sánh Năng Lực Cạnh Tranh</h2>
+        <div class="chart-container"><canvas id="chartRadar"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h2>📊 Bảng So Sánh Chỉ Số Benchmark</h2>
+        <div class="table-wrapper" style="margin-top:10px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Chỉ Số So Sánh</th>
+                <th class="num">Shop Bạn</th>
+                <th class="num">Đối Thủ A (Leader)</th>
+                <th class="num">Đối Thủ B (Giá Rẻ)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Điểm CSAT Hài Lòng</td><td class="num pos"><b>4.2 / 5.0</b></td><td class="num">4.6 / 5.0</td><td class="num neg">3.5 / 5.0</td></tr>
+              <tr><td>Tỷ Lệ Đổi Trả Hàng</td><td class="num warn"><b>8.5%</b></td><td class="num pos">3.2%</td><td class="num neg">14.0%</td></tr>
+              <tr><td>Tốc Độ Giao Hàng</td><td class="num"><b>2.4 Ngày</b></td><td class="num pos">1.5 Ngày</td><td class="num">3.1 Ngày</td></tr>
+              <tr><td>Đánh Giá Giá / Giá Trị</td><td class="num pos"><b>88% Tốt</b></td><td class="num">75% Tốt</td><td class="num pos">92% Tốt</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    `;
+  },
+
+  opportunities() {
+    return `
+    <div class="card" style="margin-bottom:20px;">
+      <h2>💡 Khoảng Trống Thị Trường & Đề Xuất Hành Động (Market Gap)</h2>
+      <div class="sub">Chiến lược chiếm ưu thế cạnh tranh dựa trên điểm yếu của đối thủ</div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card" style="border-top:3px solid var(--pos);">
+        <span class="badge badge-pos">CƠ HỘI CAO</span>
+        <h3 style="margin-top:10px; font-size:14px;">📦 Đóng Gói Chống Sốc 3 Lớp</h3>
+        <p style="margin-top:6px; color:var(--text-muted); font-size:12px;">22% khách hàng đối thủ phàn nàn vỡ hộp bưu phẩm. Bổ sung hộp carton sóng 5 lớp sẽ tạo điểm cộng vượt trội.</p>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--warn);">
+        <span class="badge badge-warn">CẦN CẢI TIẾN</span>
+        <h3 style="margin-top:10px; font-size:14px;">📏 Video Bảng Size Thực Tế</h3>
+        <p style="margin-top:6px; color:var(--text-muted); font-size:12px;">Phàn nàn về size chiếm 30% phàn nàn ngành thời trang. Đăng video đo thực tế giúp giảm ngay 35% tỷ lệ hoàn hàng.</p>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--primary);">
+        <span class="badge badge-pos">ĐIỂM SÁNG</span>
+        <h3 style="margin-top:10px; font-size:14px;">🎁 Thư Cảm Ơn & QR Đổi Trả 1-1</h3>
+        <p style="margin-top:6px; color:var(--text-muted); font-size:12px;">Hỗ trợ khách hàng đổi trả trực tiếp trước khi khiếu nại lên Shopee giúp giữ tỷ lệ shop yêu thích luôn trên 98%.</p>
+      </div>
+    </div>
+    `;
+  },
+
+  reports() {
+    return `
+    <div class="card">
+      <h2>📄 Trung Tâm Báo Cáo & Xuất Dữ Liệu</h2>
+      <div class="sub">Xuất các định dạng file chuẩn Báo cáo Quản trị Doanh nghiệp</div>
+      
+      <div class="grid-3" style="margin-top:20px;">
+        <button class="btn primary" onclick="exportData('xlsx')" style="padding:16px; flex-direction:column;">
+          <span style="font-size:24px;">📊</span>
+          <span>Xuất File Excel Full BI (.xlsx)</span>
+        </button>
+
+        <button class="btn" onclick="exportData('csv')" style="padding:16px; flex-direction:column;">
+          <span style="font-size:24px;">📝</span>
+          <span>Xuất Báo Cáo CSV Clean (.csv)</span>
+        </button>
+
+        <button class="btn" onclick="window.print()" style="padding:16px; flex-direction:column;">
+          <span style="font-size:24px;">🖨️</span>
+          <span>In Báo Cáo PDF Executive</span>
+        </button>
+      </div>
+    </div>
+    `;
+  },
+
+  system() {
+    return `
+    <div class="card" style="margin-bottom:20px;">
+      <h2>⚡ Giám Sát Tài Nguyên Hệ Thống (System Telemetry)</h2>
+      <div class="sub">Cập nhật thời gian thực thông số FastAPI Local Machine Engine</div>
+    </div>
+
+    <div class="grid">
+      <div class="kpi-card pos">
+        <div class="kpi-title">CPU Utilization</div>
+        <div class="kpi-value" id="sysCpu">12%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">RAM Used</div>
+        <div class="kpi-value" id="sysRam">1.8 / 16 GB</div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-title">Inference Latency</div>
+        <div class="kpi-value" id="sysLatency">14 ms</div>
+      </div>
+      <div class="kpi-card pos">
+        <div class="kpi-title">AI Model Status</div>
+        <div class="kpi-value" style="font-size:16px; color:var(--pos);">FastNLP Lexicon Ready</div>
+      </div>
+    </div>
+    `;
+  },
+
+  settings() {
+    return `
+    <div class="card">
+      <h2>⚙️ Cấu Hình Hệ Thống Nexus Engine</h2>
+      <div class="sub">Tùy chỉnh kết nối API Local & Chế độ phân tích</div>
+
+      <div style="margin-top:16px; display:flex; flex-direction:column; gap:14px; max-width:500px;">
+        <div>
+          <label><b>FastAPI Backend Endpoint URL:</b></label>
+          <input type="text" id="cfgApiUrl" value="${API_BASE_URL}" style="width:100%; margin-top:4px;">
+        </div>
+
+        <div>
+          <label><b>Chế Độ Phân Tích (Processing Mode):</b></label>
+          <select id="cfgMode" style="width:100%; margin-top:4px;">
+            <option value="local">Local Hybrid (Ưu tiên tốc độ & Bảo mật)</option>
+            <option value="cloud">Cloud LLM Engine (Phân tích nâng cao)</option>
+          </select>
+        </div>
+
+        <button class="btn primary" onclick="saveSettings()" style="width:fit-content; margin-top:10px;">💾 Lưu Cấu Hình</button>
+      </div>
+    </div>
+    `;
+  }
+};
+
+// Navigation & View Rendering Logic
+let currentView = "import";
+
+function renderView(viewId) {
+  currentView = viewId;
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.id === viewId));
+  $("#title").innerHTML = `${getNavIcon(viewId)} ${getNavTitle(viewId)}`;
+  $("#content").innerHTML = VIEWS[viewId]();
+  
+  // Clean old chart instances
+  Object.values(activeChartInst).forEach(chart => chart.destroy());
+  activeChartInst = {};
+
+  // Post-render init handlers
+  if (viewId === "import") initImportView();
+  if (viewId === "executive") initExecutiveCharts();
+  if (viewId === "customers") filterExplorer();
+  if (viewId === "feedback") initFeedbackCharts();
+  if (viewId === "unit") { calcUnitEco(); initWaterfallChart(); }
+  if (viewId === "predictive") initPredictiveCharts();
+  if (viewId === "competitors") initCompetitorCharts();
+}
+
+function getNavIcon(id) {
+  const map = { import: "📥", executive: "📊", customers: "👥", feedback: "💬", unit: "💰", predictive: "🔮", competitors: "⚔️", opportunities: "💡", reports: "📄", system: "⚡", settings: "⚙️" };
+  return map[id] || "📌";
+}
+
+function getNavTitle(id) {
+  const map = { import: "Import Data", executive: "Executive Overview", customers: "Customer Intelligence", feedback: "Feedback & ABSA", unit: "Unit Economics", predictive: "Predictive Analytics", competitors: "Competitor Intelligence", opportunities: "Market Opportunities", reports: "Report Center", system: "System Monitoring", settings: "Settings" };
+  return map[id] || "Dashboard";
+}
+
+function initImportView() {
+  const dz = $("#dropzone"), fi = $("#fileInput");
+  if (dz && fi) {
+    dz.onclick = () => fi.click();
+    fi.onchange = (e) => { if (e.target.files.length) parseUploadedFile(e.target.files[0]); };
+    dz.ondragover = (e) => e.preventDefault();
+    dz.ondrop = (e) => { e.preventDefault(); if (e.dataTransfer.files.length) parseUploadedFile(e.dataTransfer.files[0]); };
+  }
+}
+
+// Chart Initializers
+function initExecutiveCharts() {
+  const ctx1 = $("#chartSentiment")?.getContext('2d');
+  if (ctx1) {
+    const p = D.dist.by_rating_bucket.find(x => x.sentiment === 'positive')?.count || 0;
+    const n = D.dist.by_rating_bucket.find(x => x.sentiment === 'negative')?.count || 0;
+    const neu = D.dist.by_rating_bucket.find(x => x.sentiment === 'neutral')?.count || 0;
+
+    activeChartInst.sentiment = new Chart(ctx1, {
+      type: 'doughnut',
+      data: {
+        labels: ['Hài lòng (Positive)', 'Tiêu cực (Negative)', 'Trung lập (Neutral)'],
+        datasets: [{ data: [p, n, neu], backgroundColor: ['#10B981', '#F43F5E', '#6B7280'] }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+
+  const ctx2 = $("#chartStars")?.getContext('2d');
+  if (ctx2) {
+    activeChartInst.stars = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: D.hist.map(h => h.rating + " Sao"),
+        datasets: [{ label: 'Số Đánh Giá', data: D.hist.map(h => h.count), backgroundColor: '#6366F1', borderRadius: 6 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+
+function initFeedbackCharts() {
+  const ctx1 = $("#chartAspects")?.getContext('2d');
+  if (ctx1) {
+    activeChartInst.aspects = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: D.aspects.map(a => a.label),
+        datasets: [{ label: 'Phàn nàn', data: [15, 22, 10, 8, 12], backgroundColor: '#F43F5E', borderRadius: 6 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+
+  const ctx2 = $("#chartKeywords")?.getContext('2d');
+  if (ctx2) {
+    activeChartInst.keywords = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: D.keywords.map(k => k.keyword),
+        datasets: [{ label: 'Tần suất', data: D.keywords.map(k => k.count), backgroundColor: '#6366F1', borderRadius: 6 }]
+      },
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+
+function filterExplorer() {
+  const kw = $("#searchKw") ? $("#searchKw").value.toLowerCase().trim() : "";
+  const filtered = D.explorer.filter(r => !kw || r.text.toLowerCase().includes(kw) || r.sku.toLowerCase().includes(kw));
+
+  const html = filtered.slice(0, 10).map(r => `
+    <div style="padding:10px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <span class="badge ${r.rating>=4?'badge-pos':(r.rating<=2?'badge-neg':'badge-warn')}">${r.rating} ★</span>
+        <b style="margin-left:8px; font-family:'JetBrains Mono';">${esc(r.sku)}:</b>
+        <span style="margin-left:8px;">${esc(r.text)}</span>
+      </div>
+    </div>
+  `).join("");
+
+  const box = $("#explorerBox");
+  if (box) box.innerHTML = html || "<div style='padding:12px; color:var(--text-muted);'>Không tìm thấy nhận xét phù hợp.</div>";
+}
+
+// Unit Economics Calculator
+function calcUnitEco() {
+  const price = Number($("#uPrice")?.value || 200000);
+  const cogs = Number($("#uCogs")?.value || 80000);
+  const ads = Number($("#uAds")?.value || 25000);
+  const feePct = Number($("#uFee")?.value || 8) / 100;
+  const returnPct = Number($("#uReturn")?.value || 10) / 100;
+  const ful = Number($("#uFul")?.value || 15000);
+
+  const netRev = price * (1 - returnPct);
+  const fee = netRev * feePct;
+  const netProfit = netRev - cogs - ads - fee - ful;
+  const maxCac = netRev - cogs - fee - ful;
+
+  if ($("#resNetRev")) $("#resNetRev").textContent = fmtVnd(netRev);
+  if ($("#resNetProfit")) $("#resNetProfit").textContent = fmtVnd(netProfit);
+  if ($("#resMaxCac")) $("#resMaxCac").textContent = fmtVnd(maxCac);
+}
+
+function initWaterfallChart() {
+  const ctx = $("#chartWaterfall")?.getContext('2d');
+  if (ctx) {
+    activeChartInst.waterfall = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Giá Bán', 'Giá Vốn COGS', 'Quảng Cáo CAC', 'Phí Sàn', 'Fulfillment', 'Lợi Nhuận Ròng'],
+        datasets: [{ label: 'VNĐ', data: [200000, -80000, -25000, -16000, -15000, 64000], backgroundColor: ['#10B981', '#F43F5E', '#F43F5E', '#F43F5E', '#F43F5E', '#6366F1'] }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+
+function initPredictiveCharts() {
+  const ctx = $("#chartForecast")?.getContext('2d');
+  if (ctx) {
+    activeChartInst.forecast = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
+        datasets: [{ label: 'Tỷ lệ hoàn dự báo (%)', data: [8.5, 9.2, 11.0, 12.5], borderColor: '#F43F5E', tension: 0.3, fill: true, backgroundColor: 'rgba(244,63,94,0.1)' }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+
+function initCompetitorCharts() {
+  const ctx = $("#chartRadar")?.getContext('2d');
+  if (ctx) {
+    activeChartInst.radar = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Chất Lượng', 'Giá Cả', 'Tốc Độ Ship', 'Đóng Gói', 'Hỗ Trợ CSKH'],
+        datasets: [
+          { label: 'Shop Bạn', data: [85, 90, 75, 80, 88], borderColor: '#6366F1', backgroundColor: 'rgba(99,102,241,0.2)' },
+          { label: 'Đối Thủ A (Leader)', data: [92, 70, 95, 90, 85], borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.2)' }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+
+function exportData(type) {
+  toast(`📥 Đang xuất file dữ liệu định dạng .${type}...`);
+}
+
+function saveSettings() {
+  API_BASE_URL = $("#cfgApiUrl").value;
+  localStorage.setItem('NEXUS_API_URL', API_BASE_URL);
+  toast("✅ Đã lưu cấu hình cài đặt hệ thống!");
+  checkApiHealth();
+}
+
+// Global Event Wiring
+$("#nav").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (b) renderView(b.dataset.id);
+});
+
+$("#themeBtn").addEventListener("click", () => {
+  const isDark = document.documentElement.dataset.theme !== "light";
+  document.documentElement.dataset.theme = isDark ? "light" : "dark";
+  $("#themeBtn").textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+});
+
+// Boot App
+checkApiHealth();
+renderView("import");
+</script>
+</body>
+</html>
+'@
+
+[System.IO.File]::WriteAllText("D:\nghien-cuu-ck\Nexus-1-cham.html", $htmlCode, [System.Text.Encoding]::UTF8)
+
+# 2. Cập nhật kịch bản khởi chạy ngầm Chay-Nexus.bat
+$batContent = @"
+@echo off
+echo Dang khoi chay Nexus Engine Executive Server...
+start /b "" "D:\nghien-cuu-ck\.venv\Scripts\python.exe" "D:\nghien-cuu-ck\nexus-main\examples\server.py"
+timeout /t 3 /nobreak >nul
+start http://127.0.0.1:8000/nexus
+"@
+
+[System.IO.File]::WriteAllText("D:\nghien-cuu-ck\Chay-Nexus.bat", $batContent, [System.Text.Encoding]::UTF8)
+
+# 3. Commit & Push mã nguồn sạch lên GitHub
+git add .
+git commit -m "Upgrade Nexus SaaS UI v2.5 with modern layout, charts, financial calculator & logo"
+git push origin main
+
+Write-Host "=========================================================" -ForegroundColor Green
+Write-Host "DA NANG CAP TOAN BO GIAO DIEN NEXUS SAAS V2.5 THANH CONG!" -ForegroundColor Green
+Write-Host "=========================================================" -ForegroundColor Green

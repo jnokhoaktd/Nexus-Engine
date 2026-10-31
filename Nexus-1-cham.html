@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Nexus Engine – E-Commerce Intelligence SaaS Platform</title>
+<title>Nexus Engine – E-Commerce & Social Intelligence SaaS v3.0</title>
 
 <!-- External CDN Dependencies -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,7 @@
     --bg-card: #1F2937;
     --bg-hover: #374151;
     --border: #374151;
-    --border-accent: rgba(99, 102, 241, 0.3);
+    --border-accent: rgba(99, 102, 241, 0.35);
     --text-main: #F9FAFB;
     --text-muted: #9CA3AF;
     --primary: #6366F1;
@@ -53,18 +53,14 @@
   html, body { height: 100%; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(--bg-main); color: var(--text-main); font-size: 13px; overflow: hidden; }
   .mono { font-family: 'JetBrains Mono', monospace; }
 
-  /* Animations */
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); } 50% { box-shadow: 0 0 16px rgba(16, 185, 129, 0.8); } }
-  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
   .animated-fade { animation: fadeIn 0.35s ease-out forwards; }
 
-  /* Layout Structure */
   body { display: flex; height: 100vh; }
   aside { width: 250px; flex-shrink: 0; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
   
-  /* Luxury Logo Header */
   .brand { padding: 20px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
   .brand-logo-icon { width: 38px; height: 38px; background: var(--primary-gradient); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow); }
   .brand-logo-icon svg { width: 22px; height: 22px; fill: white; }
@@ -73,7 +69,6 @@
   .brand-title span { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .brand-sub { font-size: 10px; font-weight: 700; color: var(--primary); letter-spacing: 0.8px; text-transform: uppercase; }
 
-  /* Navigation Sidebar */
   nav { padding: 12px 10px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 3px; }
   .nav-group-title { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 10px 12px 4px; }
   nav button { width: 100%; text-align: left; padding: 9px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--text-muted); font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; position: relative; }
@@ -82,7 +77,6 @@
   nav button.active::before { content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 3px; background: var(--primary); border-radius: 0 4px 4px 0; }
   nav button .nav-icon { font-size: 15px; width: 20px; text-align: center; }
 
-  /* Main Workspace */
   .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
   header { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: var(--bg-surface); border-bottom: 1px solid var(--border); }
   header h1 { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
@@ -91,36 +85,33 @@
   .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 20px; background: var(--pos-bg); color: var(--pos); font-size: 11.5px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3); }
   .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pos); animation: pulseGlow 2s infinite; }
 
-  main { padding: 24px; overflow-y: auto; flex: 1; }
+  main { padding: 24px; overflow-y: auto; flex: 1; padding-bottom: 50px; }
 
-  /* SaaS Grid & Card UI */
   .banner-info { border: 1px solid var(--border-accent); background: rgba(99, 102, 241, 0.08); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
   .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 20px; }
   .grid-2 { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; margin-bottom: 20px; }
   .grid-3 { display: grid; gap: 18px; grid-template-columns: repeat(3, 1fr); margin-bottom: 20px; }
+  .grid-4 { display: grid; gap: 18px; grid-template-columns: repeat(4, 1fr); margin-bottom: 20px; }
 
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
   .card:hover { border-color: var(--border-accent); }
   .card h2 { font-size: 14px; font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
   .card .sub { color: var(--text-muted); font-size: 11.5px; margin-bottom: 14px; }
 
-  /* KPI Cards */
   .kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; position: relative; overflow: hidden; }
   .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--primary); }
   .kpi-card.pos::before { background: var(--pos); }
   .kpi-card.neg::before { background: var(--neg); }
   .kpi-card.warn::before { background: var(--warn); }
   .kpi-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  .kpi-value { font-size: 26px; font-weight: 800; margin-top: 6px; letter-spacing: -0.5px; font-family: 'JetBrains Mono', monospace; }
+  .kpi-value { font-size: 24px; font-weight: 800; margin-top: 6px; letter-spacing: -0.5px; font-family: 'JetBrains Mono', monospace; }
   .kpi-sub { font-size: 11.5px; margin-top: 6px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
 
-  /* Badges & Pills */
   .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
   .badge-pos { background: var(--pos-bg); color: var(--pos); border: 1px solid rgba(16, 185, 129, 0.3); }
   .badge-neg { background: var(--neg-bg); color: var(--neg); border: 1px solid rgba(244, 63, 94, 0.3); }
   .badge-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.3); }
 
-  /* Buttons & Controls */
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-main); transition: all 0.2s; }
   .btn:hover { background: var(--bg-hover); transform: translateY(-1px); }
   .btn.primary { background: var(--primary-gradient); border: none; color: #fff; box-shadow: var(--shadow-glow); }
@@ -129,12 +120,10 @@
   input, select, textarea { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12.5px; font-family: inherit; }
   input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
 
-  /* File Upload Zone */
   .upload-box { border: 2px dashed var(--primary); border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; background: rgba(99, 102, 241, 0.03); transition: all 0.2s; }
   .upload-box:hover { background: rgba(99, 102, 241, 0.08); border-color: #8B5CF6; }
   .upload-icon { font-size: 38px; margin-bottom: 10px; }
 
-  /* Tables */
   .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
   table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
@@ -142,17 +131,14 @@
   tr:hover td { background: var(--bg-hover); }
   td.num, th.num { text-align: right; font-family: 'JetBrains Mono', monospace; }
 
-  /* Charts Container */
-  .chart-container { position: relative; height: 260px; width: 100%; }
+  .chart-container { position: relative; height: 270px; width: 100%; }
 
-  /* Toast Notifications */
   .toast { position: fixed; bottom: 20px; right: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 1000; display: none; animation: fadeIn 0.3s; }
 </style>
 </head>
 <body>
 
 <aside>
-  <!-- Luxury Executive Logo -->
   <div class="brand">
     <div class="brand-logo-icon">
       <svg viewBox="0 0 24 24">
@@ -161,11 +147,10 @@
     </div>
     <div class="brand-text">
       <div class="brand-title">NEXUS <span>ENGINE</span></div>
-      <div class="brand-sub">SaaS Intelligence v2.5</div>
+      <div class="brand-sub">SaaS Intelligence v3.0</div>
     </div>
   </div>
 
-  <!-- Dynamic Navigation Menu -->
   <nav id="nav">
     <div class="nav-group-title">Dữ liệu & Cảm xúc</div>
     <button data-id="import" class="active"><span class="nav-icon">📥</span> Import Data</button>
@@ -188,7 +173,7 @@
 
 <div class="main">
   <header>
-    <h1 id="title">📥 Import Data</h1>
+    <h1 id="title">💡 Market Opportunities</h1>
     <div class="header-actions">
       <span class="status-pill" id="apiStatusPill">
         <span class="status-dot"></span>
@@ -208,12 +193,10 @@
 <script>
 "use strict";
 
-// State Management
 let API_BASE_URL = localStorage.getItem('NEXUS_API_URL') || 'http://127.0.0.1:8000/api/v1';
 let isApiConnected = false;
 let activeChartInst = {};
 
-// Clean Dataset Structure
 let D = {
   source: { name: "Chưa nạp file", uploaded_at: "N/A" },
   dq: { total_rows: 0, valid_rows: 0, rejected_rows: 0, columns_detected: {}, warnings: ["Chưa có dữ liệu. Vui lòng nạp file Excel/CSV."] },
@@ -231,7 +214,6 @@ let D = {
   explorer: []
 };
 
-// UI Helpers
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const fmtVnd = (n) => n == null ? "—" : Math.round(n).toLocaleString("vi-VN") + "đ";
@@ -246,7 +228,6 @@ function toast(msg, isError = false) {
   setTimeout(() => { t.style.display = "none"; }, 3500);
 }
 
-// API Health Check
 async function checkApiHealth() {
   try {
     const res = await fetch(`${API_BASE_URL}/system/telemetry`, { method: 'GET' });
@@ -262,7 +243,6 @@ async function checkApiHealth() {
   }
 }
 
-// Excel / CSV File Parsing Logic
 function parseUploadedFile(file) {
   toast(`⏳ Đang đọc dữ liệu từ file ${file.name}...`);
   const reader = new FileReader();
@@ -295,7 +275,6 @@ function parseUploadedFile(file) {
         if (rating <= 2) skuMap[sku].neg++;
         if (/trả hàng|hoàn tiền|đổi trả|lỗi/i.test(text)) skuMap[sku].returns++;
 
-        // Basic Keyword Extraction
         text.toLowerCase().split(/\s+/).forEach(w => {
           if (w.length >= 3 && !/và|hoặc|nhưng|rất|cho|với|đã|được|không|có/i.test(w)) {
             keywordsMap[w] = (keywordsMap[w] || 0) + 1;
@@ -339,7 +318,7 @@ function parseUploadedFile(file) {
   reader.readAsArrayBuffer(file);
 }
 
-// VIEW DEFINITIONS
+// FULL VIEW DEFINITIONS (NO BLANK VOIDS)
 const VIEWS = {
   import() {
     return `
@@ -603,28 +582,142 @@ const VIEWS = {
 
   opportunities() {
     return `
+    <!-- SECTION 1: EXECUTIVE GAP ACTION CARDS -->
     <div class="card" style="margin-bottom:20px;">
-      <h2>💡 Khoảng Trống Thị Trường & Đề Xuất Hành Động (Market Gap)</h2>
-      <div class="sub">Chiến lược chiếm ưu thế cạnh tranh dựa trên điểm yếu của đối thủ</div>
+      <h2>💡 Khoảng Trống Thị Trường & Đề Xuất Hành Động (Market Gap Analysis)</h2>
+      <div class="sub">Chiến lược chiếm ưu thế cạnh tranh dựa trên phân tích điểm yếu đối thủ & nhu cầu thực tế</div>
     </div>
 
-    <div class="grid-3">
+    <div class="grid-3" style="margin-bottom:20px;">
       <div class="card" style="border-top:3px solid var(--pos);">
         <span class="badge badge-pos">CƠ HỘI CAO</span>
         <h3 style="margin-top:10px; font-size:14px;">📦 Đóng Gói Chống Sốc 3 Lớp</h3>
-        <p style="margin-top:6px; color:var(--text-muted); font-size:12px;">22% khách hàng đối thủ phàn nàn vỡ hộp bưu phẩm. Bổ sung hộp carton sóng 5 lớp sẽ tạo điểm cộng vượt trội.</p>
+        <p style="margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.5;">22% khách hàng đối thủ phàn nàn vỡ hộp bưu phẩm. Bổ sung hộp carton sóng 5 lớp sẽ tạo điểm cộng vượt trội.</p>
       </div>
 
       <div class="card" style="border-top:3px solid var(--warn);">
         <span class="badge badge-warn">CẦN CẢI TIẾN</span>
         <h3 style="margin-top:10px; font-size:14px;">📏 Video Bảng Size Thực Tế</h3>
-        <p style="margin-top:6px; color:var(--text-muted); font-size:12px;">Phàn nàn về size chiếm 30% phàn nàn ngành thời trang. Đăng video đo thực tế giúp giảm ngay 35% tỷ lệ hoàn hàng.</p>
+        <p style="margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.5;">Phàn nàn về size chiếm 30% phàn nàn ngành thời trang. Đăng video đo thực tế giúp giảm ngay 35% tỷ lệ hoàn hàng.</p>
       </div>
 
       <div class="card" style="border-top:3px solid var(--primary);">
         <span class="badge badge-pos">ĐIỂM SÁNG</span>
         <h3 style="margin-top:10px; font-size:14px;">🎁 Thư Cảm Ơn & QR Đổi Trả 1-1</h3>
-        <p style="margin-top:6px; color:var(--text-muted); font-size:12px;">Hỗ trợ khách hàng đổi trả trực tiếp trước khi khiếu nại lên Shopee giúp giữ tỷ lệ shop yêu thích luôn trên 98%.</p>
+        <p style="margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.5;">Hỗ trợ khách hàng đổi trả trực tiếp trước khi khiếu nại lên Shopee giúp giữ tỷ lệ shop yêu thích luôn trên 98%.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 2: SOCIAL MEDIA & E-COMMERCE TREND RADAR -->
+    <div class="card" style="margin-bottom:20px;">
+      <h2>🌐 Social Media & E-Commerce Trend Radar (Facebook, TikTok, Twitter/X)</h2>
+      <div class="sub">Quét hàng ngàn bài viết MXH & Sàn TMĐT phát hiện sản phẩm Hot Trend tiềm năng kinh doanh</div>
+
+      <div class="table-wrapper" style="margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Mặt Hàng Trending</th>
+              <th>Nguồn Social Crawl</th>
+              <th class="num">Volume Thảo Luận</th>
+              <th class="num">Tăng Trưởng (MoM)</th>
+              <th class="num">Độ Cạnh Tranh</th>
+              <th>Đánh Giá Khả Thi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Áo Polo Cotton Unisex Phom Rộng</b></td>
+              <td><span class="badge badge-pos">TikTok / Shopee</span></td>
+              <td class="num"><b>142.500</b></td>
+              <td class="num pos"><b>+48.5%</b></td>
+              <td class="num warn">Trung bình</td>
+              <td><span class="badge badge-pos">⭐⭐⭐⭐⭐ Rất Cao</span></td>
+            </tr>
+            <tr>
+              <td><b>Tai Nghe TWS Chống ỒN ANC Giá Rẻ</b></td>
+              <td><span class="badge badge-warn">Facebook / TikTok</span></td>
+              <td class="num"><b>98.200</b></td>
+              <td class="num pos"><b>+32.1%</b></td>
+              <td class="num neg">Cao</td>
+              <td><span class="badge badge-warn">⭐⭐⭐ Khá</span></td>
+            </tr>
+            <tr>
+              <td><b>Quần Jeans ống Rộng Hack Dáng</b></td>
+              <td><span class="badge badge-pos">TikTok / Instagram</span></td>
+              <td class="num"><b>210.000</b></td>
+              <td class="num pos"><b>+64.2%</b></td>
+              <td class="num warn">Trung bình</td>
+              <td><span class="badge badge-pos">⭐⭐⭐⭐⭐ Rất Cao</span></td>
+            </tr>
+            <tr>
+              <td><b>Váy Vintage Hoa Nhí Công Chúa</b></td>
+              <td><span class="badge badge-pos">Shopee / Facebook</span></td>
+              <td class="num"><b>76.400</b></td>
+              <td class="num pos"><b>+18.7%</b></td>
+              <td class="num pos">Thấp</td>
+              <td><span class="badge badge-pos">⭐⭐⭐⭐ Tiềm Năng</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECTION 3: VISUAL CHARTS - SOCIAL VOLUME & PSYCHOGRAPHICS RADAR -->
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <h2>📊 Khối Lượng Thảo Luận & Tốc Độ Tăng Trưởng Social Trend</h2>
+        <div class="sub">So sánh độ phủ từ khóa sản phẩm trên MXH</div>
+        <div class="chart-container"><canvas id="chartTrendSocial"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h2>🎯 Biểu Đồ Radar Động Lực Mua Hàng & Tâm Lý Khách Hàng (Psychographics)</h2>
+        <div class="sub">Đo lường 5 yếu tố quyết định hành vi xuống tiền của người tiêu dùng</div>
+        <div class="chart-container"><canvas id="chartPsychographics"></canvas></div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: LLM AI PROBLEM-SOLUTION STRATEGIC MATRIX -->
+    <div class="card">
+      <h2>🤖 Ma Trận Vấn Đề & Giải Pháp Tối Ưu LLM AI (Problem-Solution ROI Matrix)</h2>
+      <div class="sub">Mô hình AI tự động đề xuất lộ trình hành động khắc phục điểm đau & tối ưu lợi nhuận</div>
+
+      <div class="table-wrapper" style="margin-top:12px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Điểm Đau Phân Tích</th>
+              <th>Nguyên Nhân Gốc (Root Cause)</th>
+              <th>Tác Động Doanh Thu</th>
+              <th>Giải Pháp Hành Động Đề Xuất</th>
+              <th class="num">ROI Dự Kiến</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b style="color:var(--neg);">Tỷ lệ trả hàng do sai Size Cao (12%)</b></td>
+              <td>Thiếu video hướng dẫn đo bảng size thực tế trên sản phẩm</td>
+              <td>Giảm ~8.500.000đ/tháng do phí ship 2 chiều & hàng hư bưu phẩm</td>
+              <td>Quay video 15s hướng dẫn đo bảng size gắn trực tiếp trên Shopee/TikTok</td>
+              <td class="num pos"><b>+350% ROI</b></td>
+            </tr>
+            <tr>
+              <td><b style="color:var(--warn);">Phàn nàn Đóng gói Móp Hộp (8%)</b></td>
+              <td>Sử dụng túi ni lông bong bóng 1 lớp dễ bẹp khi vận chuyển xa</td>
+              <td>Gây mất điểm CSAT, giảm tỷ lệ mua lại của khách hàng cũ (-15%)</td>
+              <td>Chuyển sang hộp Carton 5 lớp sóng E + Dăng keo chống vỡ</td>
+              <td class="num pos"><b>+210% ROI</b></td>
+            </tr>
+            <tr>
+              <td><b style="color:var(--neg);">Tai nghe chập chờn sạc không vào (22%)</b></td>
+              <td>Lỗi QC nhà máy sản xuất linh kiện dock sạc lô giá rẻ</td>
+              <td>Thất thoát lợi nhuận do hoàn tiền khẩn cấp & dính 1 sao shop</td>
+              <td>Yêu cầu nhà cung cấp test 100% trước khi xuất kho hoặc đổi NCC khác</td>
+              <td class="num pos"><b>+420% ROI</b></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     `;
@@ -711,8 +804,7 @@ const VIEWS = {
   }
 };
 
-// Navigation & View Rendering Logic
-let currentView = "import";
+let currentView = "opportunities";
 
 function renderView(viewId) {
   currentView = viewId;
@@ -720,11 +812,9 @@ function renderView(viewId) {
   $("#title").innerHTML = `${getNavIcon(viewId)} ${getNavTitle(viewId)}`;
   $("#content").innerHTML = VIEWS[viewId]();
   
-  // Clean old chart instances
   Object.values(activeChartInst).forEach(chart => chart.destroy());
   activeChartInst = {};
 
-  // Post-render init handlers
   if (viewId === "import") initImportView();
   if (viewId === "executive") initExecutiveCharts();
   if (viewId === "customers") filterExplorer();
@@ -732,6 +822,7 @@ function renderView(viewId) {
   if (viewId === "unit") { calcUnitEco(); initWaterfallChart(); }
   if (viewId === "predictive") initPredictiveCharts();
   if (viewId === "competitors") initCompetitorCharts();
+  if (viewId === "opportunities") initOpportunitiesCharts();
 }
 
 function getNavIcon(id) {
@@ -754,7 +845,6 @@ function initImportView() {
   }
 }
 
-// Chart Initializers
 function initExecutiveCharts() {
   const ctx1 = $("#chartSentiment")?.getContext('2d');
   if (ctx1) {
@@ -829,7 +919,6 @@ function filterExplorer() {
   if (box) box.innerHTML = html || "<div style='padding:12px; color:var(--text-muted);'>Không tìm thấy nhận xét phù hợp.</div>";
 }
 
-// Unit Economics Calculator
 function calcUnitEco() {
   const price = Number($("#uPrice")?.value || 200000);
   const cogs = Number($("#uCogs")?.value || 80000);
@@ -893,6 +982,38 @@ function initCompetitorCharts() {
   }
 }
 
+function initOpportunitiesCharts() {
+  const ctx1 = $("#chartTrendSocial")?.getContext('2d');
+  if (ctx1) {
+    activeChartInst.trendSocial = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ['Polo Unisex', 'Tai Nghe TWS', 'Quần Jeans', 'Váy Vintage', 'Giày Sneaker'],
+        datasets: [
+          { label: 'Volume Thảo Luận (K)', data: [142.5, 98.2, 210.0, 76.4, 115.0], backgroundColor: '#6366F1', borderRadius: 6 },
+          { label: 'Tăng Trưởng % YoY', data: [48.5, 32.1, 64.2, 18.7, 25.0], backgroundColor: '#10B981', borderRadius: 6 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+
+  const ctx2 = $("#chartPsychographics")?.getContext('2d');
+  if (ctx2) {
+    activeChartInst.psychographics = new Chart(ctx2, {
+      type: 'radar',
+      data: {
+        labels: ['Độ Nhạy Giá', 'Tốc Độ Giao Hàng', 'Đóng Gói Đẹp', 'Ảnh Hưởng Review', 'Chăm Sóc Khách Hàng'],
+        datasets: [
+          { label: 'Shop Hiện Tại', data: [80, 70, 65, 88, 75], borderColor: '#F59E0B', backgroundColor: 'rgba(245,158,11,0.2)' },
+          { label: 'Kỳ Vọng Khách Hàng', data: [85, 90, 85, 95, 90], borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.2)' }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+
 function exportData(type) {
   toast(`📥 Đang xuất file dữ liệu định dạng .${type}...`);
 }
@@ -904,7 +1025,6 @@ function saveSettings() {
   checkApiHealth();
 }
 
-// Global Event Wiring
 $("#nav").addEventListener("click", e => {
   const b = e.target.closest("button");
   if (b) renderView(b.dataset.id);
@@ -916,9 +1036,8 @@ $("#themeBtn").addEventListener("click", () => {
   $("#themeBtn").textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
 });
 
-// Boot App
 checkApiHealth();
-renderView("import");
+renderView("opportunities");
 </script>
 </body>
 </html>
