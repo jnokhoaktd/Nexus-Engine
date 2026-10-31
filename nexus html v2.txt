@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Nexus Engine - API Connected Dashboard</title>
+<style>
+  :root { color-scheme: light dark; --bg:#f8fafc; --surface:#fff; --border:#e2e8f0; --text:#0f172a; --muted:#64748b; --hover:#f1f5f9; --primary:#6366f1; --pos:#10b981; --neu:#94a3b8; --neg:#ef4444; --warn:#f59e0b; }
+  :root[data-theme="dark"] { --bg:#0f172a; --surface:#1e293b; --border:#334155; --text:#f8fafc; --muted:#94a3b8; --hover:#273449; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: Inter, "Plus Jakarta Sans", system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: 13px; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  aside { width: 230px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+  .brand { padding: 16px 18px; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+  .brand span { color: var(--primary); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--neu); }
+  .status-dot.online { background: var(--pos); }
+  .status-dot.offline { background: var(--warn); }
+  nav { padding: 0 8px; overflow-y: auto; flex: 1; }
+  nav button { width: 100%; text-align: left; padding: 8px 10px; margin-bottom: 2px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; }
+  nav button:hover { background: var(--hover); }
+  nav button.active { background: rgba(99,102,241,.15); color: var(--primary); font-weight: 600; }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header { display: flex; align-items: center; gap: 12px; padding: 12px 22px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  .hright { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
+  .btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .btn.primary:hover { opacity: 0.9; }
+  main { padding: 20px; overflow: auto; flex: 1; }
+  .banner { border: 1px solid rgba(99,102,241,.4); background: rgba(99,102,241,.08); border-radius: 6px; padding: 10px 12px; font-size: 12px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; min-width: 0; }
+  .card h2 { font-size: 13px; margin: 0 0 2px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .card .sub { color: var(--muted); font-size: 11px; margin-bottom: 10px; }
+  .tag { border: 1px solid var(--border); color: var(--muted); border-radius: 4px; padding: 1px 6px; font-family: "JetBrains Mono", monospace; font-size: 10px; text-transform: uppercase; }
+  .tag.actual { border-color: rgba(16,185,129,.5); color: var(--pos); }
+  .tag.demo { border-color: rgba(245,158,11,.6); color: var(--warn); }
+  .tag.insuf { border-color: rgba(245,158,11,.6); color: var(--warn); }
+  .kpi .v { font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 600; margin-top: 4px; }
+  .kpi .l { color: var(--muted); font-size: 12px; }
+  .insuf-box { border: 1px dashed rgba(245,158,11,.6); border-radius: 6px; padding: 10px; font-size: 12px; }
+  .insuf-box b { color: var(--warn); font-family: "JetBrains Mono", monospace; font-size: 11px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; }
+  td.num, th.num { text-align: right; font-family: "JetBrains Mono", monospace; }
+  .bar-row { display: grid; grid-template-columns: 110px 1fr 60px; gap: 8px; align-items: center; margin: 6px 0; font-size: 12px; }
+  .bar-track { height: 14px; background: var(--hover); border-radius: 3px; overflow: hidden; display: flex; }
+  .bar-fill { height: 100%; }
+  .stack-row { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: center; margin: 6px 0; font-size: 12px; }
+  .legend { display: flex; gap: 12px; font-size: 11px; color: var(--muted); margin-bottom: 8px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+  .pareto { display: flex; align-items: flex-end; gap: 8px; height: 180px; padding-top: 16px; border-bottom: 1px solid var(--border); }
+  .pcol { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
+  .pcol .b { width: 70%; background: var(--neg); border-radius: 3px 3px 0 0; }
+  .pcol .c { font-size: 10px; color: var(--warn); font-family: "JetBrains Mono", monospace; margin-bottom: 2px; }
+  .pcol .n { font-size: 10px; color: var(--muted); text-align: center; margin-top: 4px; height: 36px; overflow: hidden; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
+  input, select { background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; font-size: 12px; }
+  .upload-box { border: 2px dashed var(--border); border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; transition: border-color .2s; }
+  .upload-box:hover { border-color: var(--primary); background: var(--hover); }
+  .chip { display: inline-block; background: rgba(99,102,241,.15); color: var(--primary); padding: 1px 6px; border-radius: 4px; font-size: 11px; margin: 1px 2px 1px 0; }
+  .pill { color: #fff; padding: 1px 7px; border-radius: 4px; font-size: 11px; }
+  .pos { color: var(--pos); } .neg { color: var(--neg); } .neu { color: var(--muted); }
+  .muted { color: var(--muted); }
+  .note { font-size: 11px; color: var(--muted); margin-top: 8px; }
+  .label-row { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+  .wrap { white-space: normal; }
+  .pg { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-top: 8px; font-size: 12px; }
+  .toast { position: fixed; bottom: 16px; right: 16px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 10px 14px; border-radius: 6px; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; display: none; }
+</style>
+</head>
+<body>
+<aside>
+  <div class="brand">
+    Nexus <span>Engine</span>
+    <div id="api-status" class="status-dot offline" title="API Status: Checking..."></div>
+  </div>
+  <nav id="nav"></nav>
+</aside>
+<div class="main">
+  <header>
+    <h1 id="title"></h1>
+    <div class="hright">
+      <span id="src"></span>
+      <button class="btn" id="theme">Light</button>
+    </div>
+  </header>
+  <main id="content"></main>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+// ==========================================
+// CONFIGURATION & DYNAMIC API SERVICE
+// ==========================================
+const API_BASE_URL = '/api/v1';
+let isApiConnected = false;
+let telemetryTimer = null;
+
+// Default Offline Fallback Data (D)
+let D = {"source":{"name":"shopee_demo_50.csv","uploaded_at":"demo (offline)"},"dq":{"file_encoding":"utf-8-sig","columns_detected":{"sku":"Mã_SKU","product_name":"Tên_Sản_Phẩm","text":"Nội dung đánh giá","rating":"Số_sao"},"total_rows":50,"valid_rows":50,"rejected_rows":0,"issues":[],"issues_truncated":false,"missing_by_column":{"sku":0,"product_name":0,"text":0,"rating":0},"has_timestamp":false,"warnings":["Không có cột ngày đánh giá: xu hướng, sentiment drift và anomaly sẽ hiển thị Insufficient Data."]},"dist":{"data_type":"actual","method":"rating_bucket(4-5=positive, 3=neutral, 1-2=negative)","total":50,"by_rating_bucket":[{"sentiment":"positive","count":25,"pct":50.0},{"sentiment":"neutral","count":4,"pct":8.0},{"sentiment":"negative","count":21,"pct":42.0}],"by_absa":[{"sentiment":"positive","count":22,"pct":44.0},{"sentiment":"neutral","count":3,"pct":6.0},{"sentiment":"negative","count":25,"pct":50.0}]},"hist":[{"rating":1,"count":10},{"rating":2,"count":11},{"rating":3,"count":4},{"rating":4,"count":5},{"rating":5,"count":20}],"rva":[{"rating":1,"positive":0,"neutral":1,"negative":9},{"rating":2,"positive":0,"neutral":0,"negative":11},{"rating":3,"positive":0,"neutral":0,"negative":4},{"rating":4,"positive":4,"neutral":0,"negative":1},{"rating":5,"positive":18,"neutral":2,"negative":0}],"sku":[{"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","review_count":10,"avg_rating":3.2,"positive_pct":40.0,"neutral_pct":20.0,"negative_pct":40.0,"return_intent_pct":20.0,"return_intent_note":"Tỷ lệ đánh giá nhắc đến hoàn/đổi trả. Đây là proxy, KHÔNG phải tỷ lệ hoàn thực tế.","top_complaint":"Size & form không đúng","data_type":"actual"},{"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","review_count":10,"avg_rating":3.1,"positive_pct":40.0,"neutral_pct":10.0,"negative_pct":50.0,"return_intent_pct":20.0,"return_intent_note":"Tỷ lệ đánh giá nhắc đến hoàn/đổi trả. Đây là proxy, KHÔNG phải tỷ lệ hoàn thực tế.","top_complaint":"Giao sai / thiếu hàng","data_type":"actual"},{"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","review_count":10,"avg_rating":3.2,"positive_pct":50.0,"neutral_pct":10.0,"negative_pct":40.0,"return_intent_pct":20.0,"return_intent_note":"Tỷ lệ đánh giá nhắc đến hoàn/đổi trả. Đây là proxy, KHÔNG phải tỷ lệ hoàn thực tế.","top_complaint":"Size & form không đúng","data_type":"actual"},{"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","review_count":10,"avg_rating":2.0,"positive_pct":20.0,"neutral_pct":0.0,"negative_pct":80.0,"return_intent_pct":20.0,"return_intent_note":"Tỷ lệ đánh giá nhắc đến hoàn/đổi trả. Đây là proxy, KHÔNG phải tỷ lệ hoàn thực tế.","top_complaint":"Lỗi chức năng thiết bị","data_type":"actual"},{"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","review_count":10,"avg_rating":4.9,"positive_pct":100.0,"neutral_pct":0.0,"negative_pct":0.0,"return_intent_pct":0.0,"return_intent_note":"Tỷ lệ đánh giá nhắc đến hoàn/đổi trả. Đây là proxy, KHÔNG phải tỷ lệ hoàn thực tế.","top_complaint":"Size & form không đúng","data_type":"actual"}],"aspects":[{"aspect":"product_quality","label":"Chất lượng sản phẩm","mentions":57,"positive":27,"neutral":7,"negative":23,"net_score":0.07},{"aspect":"sizing_fit","label":"Size & form","mentions":19,"positive":7,"neutral":4,"negative":8,"net_score":-0.05},{"aspect":"shipping_packaging","label":"Giao hàng & đóng gói","mentions":14,"positive":4,"neutral":2,"negative":8,"net_score":-0.29},{"aspect":"pricing_value","label":"Giá & giá trị","mentions":6,"positive":4,"neutral":2,"negative":0,"net_score":0.67},{"aspect":"service_communication","label":"Dịch vụ & hỗ trợ","mentions":17,"positive":5,"neutral":3,"negative":9,"net_score":-0.24}],"matrix":[{"sku":"SKU-GIAY-04","aspect":"product_quality","positive":6,"neutral":0,"negative":4},{"sku":"SKU-GIAY-04","aspect":"sizing_fit","positive":1,"neutral":1,"negative":3},{"sku":"SKU-GIAY-04","aspect":"shipping_packaging","positive":0,"neutral":0,"negative":3},{"sku":"SKU-GIAY-04","aspect":"pricing_value","positive":0,"neutral":0,"negative":0},{"sku":"SKU-GIAY-04","aspect":"service_communication","positive":1,"neutral":0,"negative":2},{"sku":"SKU-JEAN-02","aspect":"product_quality","positive":5,"neutral":1,"negative":7},{"sku":"SKU-JEAN-02","aspect":"sizing_fit","positive":2,"neutral":1,"negative":2},{"sku":"SKU-JEAN-02","aspect":"shipping_packaging","positive":2,"neutral":0,"negative":3},{"sku":"SKU-JEAN-02","aspect":"pricing_value","positive":1,"neutral":0,"negative":0},{"sku":"SKU-JEAN-02","aspect":"service_communication","positive":1,"neutral":1,"negative":3},{"sku":"SKU-POLO-01","aspect":"product_quality","positive":7,"neutral":2,"negative":3},{"sku":"SKU-POLO-01","aspect":"sizing_fit","positive":2,"neutral":1,"negative":2},{"sku":"SKU-POLO-01","aspect":"shipping_packaging","positive":2,"neutral":1,"negative":2},{"sku":"SKU-POLO-01","aspect":"pricing_value","positive":1,"neutral":1,"negative":0},{"sku":"SKU-POLO-01","aspect":"service_communication","positive":1,"neutral":2,"negative":1},{"sku":"SKU-TAI-05","aspect":"product_quality","positive":2,"neutral":3,"negative":8},{"sku":"SKU-TAI-05","aspect":"sizing_fit","positive":0,"neutral":0,"negative":0},{"sku":"SKU-TAI-05","aspect":"shipping_packaging","positive":0,"neutral":0,"negative":0},{"sku":"SKU-TAI-05","aspect":"pricing_value","positive":1,"neutral":1,"negative":0},{"sku":"SKU-TAI-05","aspect":"service_communication","positive":0,"neutral":0,"negative":3},{"sku":"SKU-VAY-03","aspect":"product_quality","positive":7,"neutral":1,"negative":1},{"sku":"SKU-VAY-03","aspect":"sizing_fit","positive":2,"neutral":1,"negative":1},{"sku":"SKU-VAY-03","aspect":"shipping_packaging","positive":0,"neutral":1,"negative":0},{"sku":"SKU-VAY-03","aspect":"pricing_value","positive":1,"neutral":0,"negative":0},{"sku":"SKU-VAY-03","aspect":"service_communication","positive":2,"neutral":0,"negative":0}],"pareto":{"data_type":"actual","method":"Phân loại mệnh đề tiêu cực theo từ khóa nguyên nhân gốc","total_negative_clauses":48,"items":[{"cause":"Size & form không đúng","count":13,"pct":27.1,"cumulative_pct":27.1,"vital_few":true},{"cause":"Lỗi chức năng thiết bị","count":7,"pct":14.6,"cumulative_pct":41.7,"vital_few":true},{"cause":"Giao sai / thiếu hàng","count":7,"pct":14.6,"cumulative_pct":56.2,"vital_few":true},{"cause":"Chất liệu / màu / mùi","count":6,"pct":12.5,"cumulative_pct":68.8,"vital_few":true},{"cause":"Khác","count":6,"pct":12.5,"cumulative_pct":81.2,"vital_few":true},{"cause":"Đóng gói / bưu phẩm hư hại","count":3,"pct":6.2,"cumulative_pct":87.5,"vital_few":false},{"cause":"Gia công / đường may / keo","count":2,"pct":4.2,"cumulative_pct":91.7,"vital_few":false},{"cause":"Giao hàng chậm","count":2,"pct":4.2,"cumulative_pct":95.8,"vital_few":false},{"cause":"Hướng dẫn & hỗ trợ","count":2,"pct":4.2,"cumulative_pct":100.0,"vital_few":false}]},"keywords":[{"keyword":"size","count":4},{"keyword":"màu","count":2},{"keyword":"móp","count":2},{"keyword":"chật","count":2},{"keyword":"hỏng","count":2},{"keyword":"nồng","count":2},{"keyword":"mùi","count":2},{"keyword":"ngắn","count":2},{"keyword":"nhỏ","count":2},{"keyword":"keo","count":2},{"keyword":"sạc","count":2},{"keyword":"pin","count":2},{"keyword":"chập chờn","count":2},{"keyword":"rộng","count":1},{"keyword":"mỏng","count":1}],"trend":{"status":"insufficient_data","reason":"File không có cột ngày đánh giá nên không thể tính xu hướng theo thời gian."},"drift":{"status":"insufficient_data","reason":"Cần chuỗi thời gian để phát hiện suy giảm cảm xúc (drift)."},"anomaly":{"status":"insufficient_data","reason":"Cần ngày đánh giá để so sánh khối lượng theo thời gian."},"impact":{"status":"insufficient_data","reason":"Cần giá bán và COGS của SKU để ước tính thiệt hại tài chính."},"bench":{"data_type":"actual","profiles":{"own":{"review_count":50,"avg_rating":3.28,"positive_pct":50.0,"negative_pct":42.0,"aspect_net_score":{"product_quality":0.07,"sizing_fit":-0.05,"shipping_packaging":-0.29,"pricing_value":0.67,"service_communication":-0.24},"root_cause_counts":{"Size & form không đúng":13,"Lỗi chức năng thiết bị":7,"Giao sai / thiếu hàng":7,"Chất liệu / màu / mùi":6,"Khác":6,"Đóng gói / bưu phẩm hư hại":3,"Gia công / đường may / keo":2,"Giao hàng chậm":2,"Hướng dẫn & hỗ trợ":2},"total_negative_clauses":48}},"competitor_count":0,"comparable_competitors":[],"warnings":["Không kiểm chứng được tính tương đương thời gian (không có cột ngày)."]},"gaps":{"status":"partial","reason":"Chưa có đối thủ đủ mẫu để so sánh.","warnings":["Không kiểm chứng được tính tương đương thời gian (không có cột ngày)."],"items":[{"pain_point":"Size & form không đúng","own_share_pct":27.1,"competitor_share_pct":null,"gap_pp":null,"status":"no_competitor_data","estimated_demand":"Insufficient Data: chỉ dựa trên số đánh giá, không suy ra quy mô thị trường."},{"pain_point":"Lỗi chức năng thiết bị","own_share_pct":14.6,"competitor_share_pct":null,"gap_pp":null,"status":"no_competitor_data","estimated_demand":"Insufficient Data: chỉ dựa trên số đánh giá, không suy ra quy mô thị trường."},{"pain_point":"Giao sai / thiếu hàng","own_share_pct":14.6,"competitor_share_pct":null,"gap_pp":null,"status":"no_competitor_data","estimated_demand":"Insufficient Data: chỉ dựa trên số đánh giá, không suy ra quy mô thị trường."},{"pain_point":"Chất liệu / màu / mùi","own_share_pct":12.5,"competitor_share_pct":null,"gap_pp":null,"status":"no_competitor_data","estimated_demand":"Insufficient Data: chỉ dựa trên số đánh giá, không suy ra quy mô thị trường."},{"pain_point":"Khác","own_share_pct":12.5,"competitor_share_pct":null,"gap_pp":null,"status":"no_competitor_data","estimated_demand":"Insufficient Data: chỉ dựa trên số đánh giá, không suy ra quy mô thị trường."},{"pain_point":"Đóng gói / bưu phẩm hư hại","own_share_pct":6.2,"competitor_share_pct":null,"gap_pp":null,"status":"no_competitor_data","estimated_demand":"Insufficient Data: chỉ dựa trên số đánh giá, không suy ra quy mô thị trường."},{"pain_point":"Gia công / đường may / keo","own_share_pct":4.2,"competitor_share_pct":null,"gap_pp":null,"status":"no_competitor_data","estimated_demand":"Insufficient Data: chỉ dựa trên số đánh giá, không suy ra quy mô thị trường."},{"pain_point":"Giao hàng chậm","own_share_pct":4.2,"competitor_share_pct":null,"gap_pp":null,"status":"no_competitor_data","estimated_demand":"Insufficient Data: chỉ dựa trên số đánh giá, không suy ra quy mô thị trường."},{"pain_point":"Hướng dẫn & hỗ trợ","own_share_pct":4.2,"competitor_share_pct":null,"gap_pp":null,"status":"no_competitor_data","estimated_demand":"Insufficient Data: chỉ dựa trên số đánh giá, không suy ra quy mô thị trường."}]},"explorer":[{"row":2,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":5,"text":"Áo chất vải thun cotton mặc rất mát, co giãn tốt, màu chuẩn hình.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Áo chất vải thun cotton mặc rất mát"},{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"màu chuẩn hình"}]},{"row":3,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":5,"text":"Giao hàng siêu nhanh, mới đặt hôm qua hôm nay đã nhận được. Đóng gói cẩn thận.","absa":"positive","aspects":[{"aspect":"shipping_packaging","sentiment":"positive","confidence":0.84,"evidence":"Giao hàng siêu nhanh"},{"aspect":"shipping_packaging","sentiment":"neutral","confidence":0.55,"evidence":"mới đặt hôm qua hôm nay đã nhận được"},{"aspect":"shipping_packaging","sentiment":"positive","confidence":0.72,"evidence":"Đóng gói cẩn thận"}]},{"row":4,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":3,"text":"Áo đẹp nhưng size L bị rộng quá, mặc như size XL luôn. Muốn đổi size M.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Áo đẹp"},{"aspect":"sizing_fit","sentiment":"negative","confidence":0.72,"evidence":"size L bị rộng quá"},{"aspect":"sizing_fit","sentiment":"neutral","confidence":0.55,"evidence":"mặc như size XL luôn"},{"aspect":"sizing_fit","sentiment":"negative","confidence":0.72,"evidence":"Muốn đổi size M"},{"aspect":"service_communication","sentiment":"negative","confidence":0.72,"evidence":"Muốn đổi size M"}]},{"row":5,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":2,"text":"Vải hơi mỏng so với hình chụp, may bị dư nhiều chỉ thừa ở cổ áo.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Vải hơi mỏng so với hình chụp"},{"aspect":"product_quality","sentiment":"neutral","confidence":0.55,"evidence":"may bị dư nhiều chỉ thừa ở cổ áo"}]},{"row":6,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":1,"text":"Hàng nhận bị rách một đoạn ở đường may nách áo, shop cho xin thủ tục hoàn tiền đổi trả.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Hàng nhận bị rách một đoạn ở đường may nách áo"},{"aspect":"service_communication","sentiment":"neutral","confidence":0.55,"evidence":"shop cho xin thủ tục hoàn tiền đổi trả"}]},{"row":7,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":5,"text":"Áo mặc vừa vặn, form dáng rất đẹp, sang trọng đáng tiền.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Áo mặc vừa vặn"},{"aspect":"sizing_fit","sentiment":"positive","confidence":0.72,"evidence":"Áo mặc vừa vặn"},{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"form dáng rất đẹp"},{"aspect":"sizing_fit","sentiment":"positive","confidence":0.72,"evidence":"form dáng rất đẹp"},{"aspect":"pricing_value","sentiment":"positive","confidence":0.84,"evidence":"sang trọng đáng tiền"}]},{"row":8,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":1,"text":"Giặt lần đầu đã bị phai màu ra các quần áo khác, rất thất vọng.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Giặt lần đầu đã bị phai màu ra các quần áo khác"}]},{"row":9,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":4,"text":"Giá 120k mà chất lượng thế này là rất ok rồi, sẽ ủng hộ shop tiếp.","absa":"positive","aspects":[{"aspect":"pricing_value","sentiment":"neutral","confidence":0.55,"evidence":"Giá 120k"},{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"chất lượng thế này là rất ok rồi"},{"aspect":"service_communication","sentiment":"positive","confidence":0.72,"evidence":"sẽ ủng hộ shop tiếp"}]},{"row":10,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":2,"text":"Ship hàng chậm mất 5 ngày mới tới, hộp bưu phẩm bị móp xép.","absa":"negative","aspects":[{"aspect":"shipping_packaging","sentiment":"negative","confidence":0.72,"evidence":"Ship hàng chậm mất 5 ngày mới tới"},{"aspect":"shipping_packaging","sentiment":"negative","confidence":0.72,"evidence":"hộp bưu phẩm bị móp xép"}]},{"row":11,"sku":"SKU-POLO-01","product_name":"Áo thun Polo nam phong cách Hàn Quốc","rating":4,"text":"Màu sắc bên ngoài tối hơn trên ảnh shop đăng một chút, nhưng chất vải sờ ưng tay.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"neutral","confidence":0.55,"evidence":"Màu sắc bên ngoài tối hơn trên ảnh shop đăng một chút"},{"aspect":"service_communication","sentiment":"neutral","confidence":0.55,"evidence":"Màu sắc bên ngoài tối hơn trên ảnh shop đăng một chút"},{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"chất vải sờ ưng tay"}]},{"row":12,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":5,"text":"Form quần chuẩn đét, vải bò dày dặn không bị co rút khi giặt.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Form quần chuẩn đét"},{"aspect":"sizing_fit","sentiment":"positive","confidence":0.72,"evidence":"Form quần chuẩn đét"},{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"vải bò dày dặn không bị co rút khi giặt"}]},{"row":13,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":2,"text":"Quần bị chật cạp bụng quá không nín thở nổi, muốn hỗ trợ đổi trả lên 1 size.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Quần bị chật cạp bụng quá không nín thở nổi"},{"aspect":"sizing_fit","sentiment":"negative","confidence":0.72,"evidence":"Quần bị chật cạp bụng quá không nín thở nổi"},{"aspect":"sizing_fit","sentiment":"neutral","confidence":0.55,"evidence":"muốn hỗ trợ đổi trả lên 1 size"},{"aspect":"service_communication","sentiment":"neutral","confidence":0.55,"evidence":"muốn hỗ trợ đổi trả lên 1 size"}]},{"row":14,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":1,"text":"Khóa kéo bị hỏng không kéo lên được, chưa mặc lần nào đã lỗi.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.84,"evidence":"Khóa kéo bị hỏng không kéo lên được"},{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"chưa mặc lần nào đã lỗi"}]},{"row":15,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":5,"text":"Mặc lên dáng rất rộng rãi thoải mái, phối đồ cá tính lắm nha.","absa":"positive","aspects":[{"aspect":"sizing_fit","sentiment":"positive","confidence":0.72,"evidence":"Mặc lên dáng rất rộng rãi thoải mái"}]},{"row":16,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":2,"text":"Hàng giao thiếu mất cái đai lưng tặng kèm như shop quảng cáo.","absa":"negative","aspects":[{"aspect":"shipping_packaging","sentiment":"negative","confidence":0.72,"evidence":"Hàng giao thiếu mất cái đai lưng tặng kèm như shop quảng cáo"},{"aspect":"service_communication","sentiment":"negative","confidence":0.72,"evidence":"Hàng giao thiếu mất cái đai lưng tặng kèm như shop quảng cáo"}]},{"row":17,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":5,"text":"Chất liệu jean co giãn nhẹ, may chắc chắn, đáng tiền.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Chất liệu jean co giãn nhẹ"},{"aspect":"product_quality","sentiment":"positive","confidence":0.84,"evidence":"may chắc chắn"},{"aspect":"pricing_value","sentiment":"positive","confidence":0.72,"evidence":"đáng tiền"}]},{"row":18,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":2,"text":"Mùi vải nhuộm quá nồng và hôi, ngâm xả vải 2 lần vẫn chưa hết mùi.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.84,"evidence":"Mùi vải nhuộm quá nồng và hôi"},{"aspect":"product_quality","sentiment":"neutral","confidence":0.55,"evidence":"ngâm xả vải 2 lần vẫn chưa hết mùi"}]},{"row":19,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":1,"text":"Giao sai màu rồi shop ơi, đặt màu xanh nhạt lại giao màu đen. Cho mình trả hàng nhé.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Giao sai màu rồi shop ơi"},{"aspect":"shipping_packaging","sentiment":"negative","confidence":0.72,"evidence":"Giao sai màu rồi shop ơi"},{"aspect":"service_communication","sentiment":"negative","confidence":0.72,"evidence":"Giao sai màu rồi shop ơi"},{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"đặt màu xanh nhạt lại giao màu đen"},{"aspect":"shipping_packaging","sentiment":"negative","confidence":0.72,"evidence":"đặt màu xanh nhạt lại giao màu đen"},{"aspect":"service_communication","sentiment":"negative","confidence":0.72,"evidence":"Cho mình trả hàng nhé"}]},{"row":20,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":5,"text":"Shipper thân thiện nhiệt tình, quần đóng gói sạch sẽ chỉn chu.","absa":"positive","aspects":[{"aspect":"shipping_packaging","sentiment":"positive","confidence":0.84,"evidence":"Shipper thân thiện nhiệt tình"},{"aspect":"service_communication","sentiment":"positive","confidence":0.84,"evidence":"Shipper thân thiện nhiệt tình"},{"aspect":"product_quality","sentiment":"positive","confidence":0.95,"evidence":"quần đóng gói sạch sẽ chỉn chu"},{"aspect":"shipping_packaging","sentiment":"positive","confidence":0.95,"evidence":"quần đóng gói sạch sẽ chỉn chu"}]},{"row":21,"sku":"SKU-JEAN-02","product_name":"Quần Jeans ống rộng Unisex","rating":3,"text":"Chiều dài quần hơi ngắn so với bạn nào cao trên 1m75.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Chiều dài quần hơi ngắn so với bạn nào cao trên 1m75"},{"aspect":"sizing_fit","sentiment":"negative","confidence":0.72,"evidence":"Chiều dài quần hơi ngắn so với bạn nào cao trên 1m75"}]},{"row":22,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":5,"text":"Váy đẹp xuất sắc luôn ạ, tôn dáng da trắng lắm. Rất hài lòng!","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.84,"evidence":"Váy đẹp xuất sắc luôn ạ"},{"aspect":"sizing_fit","sentiment":"positive","confidence":0.72,"evidence":"tôn dáng da trắng lắm"}]},{"row":23,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":5,"text":"Chất voan lụa mềm mịn mát mẻ, có lớp lót bên trong không sợ lộ.","absa":"neutral","aspects":[{"aspect":"product_quality","sentiment":"neutral","confidence":0.55,"evidence":"có lớp lót bên trong không sợ lộ"}]},{"row":24,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":5,"text":"Shop tư vấn nhiệt tình chuẩn size, mặc vừa khít luôn.","absa":"positive","aspects":[{"aspect":"sizing_fit","sentiment":"positive","confidence":0.84,"evidence":"Shop tư vấn nhiệt tình chuẩn size"},{"aspect":"service_communication","sentiment":"positive","confidence":0.84,"evidence":"Shop tư vấn nhiệt tình chuẩn size"},{"aspect":"sizing_fit","sentiment":"neutral","confidence":0.55,"evidence":"mặc vừa khít luôn"}]},{"row":25,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":5,"text":"Váy xinh lắm, mặc đi du lịch sống ảo cực kỳ ăn ảnh.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Váy xinh lắm"}]},{"row":26,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":5,"text":"Giao hàng siêu tốc, gói hàng cẩn thận còn thơm phức nữa.","absa":"neutral","aspects":[{"aspect":"shipping_packaging","sentiment":"neutral","confidence":0.55,"evidence":"Giao hàng siêu tốc"}]},{"row":27,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":5,"text":"Váy đẹp y hình quảng cáo, họa tiết hoa nhí sắc nét.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Váy đẹp y hình quảng cáo"},{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"họa tiết hoa nhí sắc nét"}]},{"row":28,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":5,"text":"Giá 180k quá rẻ cho một chiếc váy chất lượng như thế này.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Giá 180k quá rẻ cho một chiếc váy chất lượng như thế này"},{"aspect":"pricing_value","sentiment":"positive","confidence":0.72,"evidence":"Giá 180k quá rẻ cho một chiếc váy chất lượng như thế này"}]},{"row":29,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":5,"text":"Đường may cẩn thận tỉ mỉ, không có sợi chỉ thừa nào.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.84,"evidence":"Đường may cẩn thận tỉ mỉ"}]},{"row":30,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":4,"text":"Lớp lót hơi ngắn một xíu nhưng tổng thể vẫn rất đẹp ok.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Lớp lót hơi ngắn một xíu"},{"aspect":"sizing_fit","sentiment":"negative","confidence":0.72,"evidence":"Lớp lót hơi ngắn một xíu"},{"aspect":"product_quality","sentiment":"positive","confidence":0.84,"evidence":"tổng thể vẫn rất đẹp ok"}]},{"row":31,"sku":"SKU-VAY-03","product_name":"Váy hoa nhí dáng xòe Vintage","rating":5,"text":"Sẽ tiếp tục ủng hộ các sản phẩm khác của shop.","absa":"positive","aspects":[{"aspect":"service_communication","sentiment":"positive","confidence":0.72,"evidence":"Sẽ tiếp tục ủng hộ các sản phẩm khác của shop"}]},{"row":32,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":5,"text":"Giày đi rất êm chân, đế cao su chống trơn trượt tốt.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Giày đi rất êm chân"},{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"đế cao su chống trơn trượt tốt"}]},{"row":33,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":2,"text":"Form giày bị nhỏ, m đi size 38 mà xỏ vào chật ngón chân. Muốn đổi lại.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Form giày bị nhỏ"},{"aspect":"sizing_fit","sentiment":"negative","confidence":0.72,"evidence":"Form giày bị nhỏ"},{"aspect":"sizing_fit","sentiment":"neutral","confidence":0.55,"evidence":"m đi size 38"},{"aspect":"sizing_fit","sentiment":"negative","confidence":0.72,"evidence":"xỏ vào chật ngón chân"},{"aspect":"service_communication","sentiment":"negative","confidence":0.95,"evidence":"Muốn đổi lại"}]},{"row":34,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":2,"text":"Hộp giày bị đè bẹp móp xẹo làm biến dạng mũi giày khi nhận.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.95,"evidence":"Hộp giày bị đè bẹp móp xẹo làm biến dạng mũi giày khi nhận"},{"aspect":"shipping_packaging","sentiment":"negative","confidence":0.95,"evidence":"Hộp giày bị đè bẹp móp xẹo làm biến dạng mũi giày khi nhận"}]},{"row":35,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":1,"text":"Đế giày bị bung keo ngay trong ngày đầu tiên đi học, tệ vô cùng.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Đế giày bị bung keo ngay trong ngày đầu tiên đi học"}]},{"row":36,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":5,"text":"Kiểu dáng thời trang trẻ trung, phối với quần jeans rất hợp.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Kiểu dáng thời trang trẻ trung"},{"aspect":"sizing_fit","sentiment":"positive","confidence":0.72,"evidence":"Kiểu dáng thời trang trẻ trung"},{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"phối với quần jeans rất hợp"}]},{"row":37,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":3,"text":"Mùi keo dán hơi nồng khi mới bóc hộp ra.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Mùi keo dán hơi nồng khi mới bóc hộp ra"}]},{"row":38,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":5,"text":"Shop tặng kèm dây giày dự phòng và tất rất dễ thương.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.72,"evidence":"Shop tặng kèm dây giày dự phòng và tất rất dễ thương"},{"aspect":"service_communication","sentiment":"positive","confidence":0.72,"evidence":"Shop tặng kèm dây giày dự phòng và tất rất dễ thương"}]},{"row":39,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":1,"text":"Giao lộn size rồi, bóc ra thấy ghi 39 mà tui đặt 41. Cho yêu cầu trả hàng hoàn tiền ngay.","absa":"negative","aspects":[{"aspect":"sizing_fit","sentiment":"negative","confidence":0.72,"evidence":"Giao lộn size rồi"},{"aspect":"shipping_packaging","sentiment":"negative","confidence":0.72,"evidence":"Giao lộn size rồi"},{"aspect":"service_communication","sentiment":"negative","confidence":0.72,"evidence":"Cho yêu cầu trả hàng hoàn tiền ngay"}]},{"row":40,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":3,"text":"Giao hàng hơi lâu mất gần 1 tuần mới tới nơi.","absa":"negative","aspects":[{"aspect":"shipping_packaging","sentiment":"negative","confidence":0.72,"evidence":"Giao hàng hơi lâu mất gần 1 tuần mới tới nơi"}]},{"row":41,"sku":"SKU-GIAY-04","product_name":"Giày Sneaker thể thao nam nữ","rating":5,"text":"Giày đẹp êm chân, đúng như mô tả sản phẩm.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.84,"evidence":"Giày đẹp êm chân"}]},{"row":42,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":1,"text":"Tai nghe bên trái không bắt được bluetooth, sạc không vào điện. Yêu cầu hoàn tiền khẩn cấp!","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Tai nghe bên trái không bắt được bluetooth"},{"aspect":"product_quality","sentiment":"neutral","confidence":0.55,"evidence":"sạc không vào điện"},{"aspect":"service_communication","sentiment":"negative","confidence":0.84,"evidence":"Yêu cầu hoàn tiền khẩn cấp"}]},{"row":43,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":1,"text":"Pin sạc rất nhanh tụt, nghe được tầm 20 phút là báo pin yếu tắt ngỏm.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"neutral","confidence":0.55,"evidence":"Pin sạc rất nhanh tụt"},{"aspect":"product_quality","sentiment":"negative","confidence":0.84,"evidence":"nghe được tầm 20 phút là báo pin yếu tắt ngỏm"}]},{"row":44,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":2,"text":"Âm thanh bị rè và nhỏ khi bật max volume, chất lượng quá tệ.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Âm thanh bị rè và nhỏ khi bật max volume"},{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"chất lượng quá tệ"}]},{"row":45,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":2,"text":"Không có tờ hướng dẫn sử dụng bằng tiếng Việt nên không biết kết nối ra sao.","absa":"negative","aspects":[{"aspect":"service_communication","sentiment":"negative","confidence":0.72,"evidence":"Không có tờ hướng dẫn sử dụng bằng tiếng Việt"},{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"không biết kết nối ra sao"}]},{"row":46,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":1,"text":"Đã bấm hoàn hàng trả tiền vì tai nghe bị hỏng cảm ứng.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Đã bấm hoàn hàng trả tiền vì tai nghe bị hỏng cảm ứng"},{"aspect":"service_communication","sentiment":"negative","confidence":0.72,"evidence":"Đã bấm hoàn hàng trả tiền vì tai nghe bị hỏng cảm ứng"}]},{"row":47,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":4,"text":"Nghe gọi chống ồn tốt trong tầm giá dưới 200k.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.84,"evidence":"Nghe gọi chống ồn tốt trong tầm giá dưới 200k"},{"aspect":"pricing_value","sentiment":"positive","confidence":0.84,"evidence":"Nghe gọi chống ồn tốt trong tầm giá dưới 200k"}]},{"row":48,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":4,"text":"Thiết kế dock sạc nhỏ gọn xinh xắn dễ mang theo.","absa":"positive","aspects":[{"aspect":"product_quality","sentiment":"positive","confidence":0.95,"evidence":"Thiết kế dock sạc nhỏ gọn xinh xắn dễ mang theo"}]},{"row":49,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":2,"text":"Màn hình LED hiển thị % pin bị chập chờn lúc hiện lúc không.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.72,"evidence":"Màn hình LED hiển thị % pin bị chập chờn lúc hiện lúc không"}]},{"row":50,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":2,"text":"Kết nối hay bị chập chờn đứt đoạn khi đi xa điện thoại trên 3m.","absa":"negative","aspects":[{"aspect":"product_quality","sentiment":"negative","confidence":0.84,"evidence":"Kết nối hay bị chập chờn đứt đoạn khi đi xa điện thoại trên 3m"}]},{"row":51,"sku":"SKU-TAI-05","product_name":"Tai nghe Bluetooth không dây TWS","rating":1,"text":"Hàng giá rẻ lỗi nhiều, khuyên mọi người không nên mua.","absa":"neutral","aspects":[{"aspect":"product_quality","sentiment":"neutral","confidence":0.55,"evidence":"Hàng giá rẻ lỗi nhiều"},{"aspect":"pricing_value","sentiment":"neutral","confidence":0.55,"evidence":"Hàng giá rẻ lỗi nhiều"}]}],"csv":{"reviews":"","aspects":"","sku_summary":"","root_causes":""}};
+
+// System Telemetry Data Cache
+let telemetryData = null;
+
+// Helper Functions
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtVnd = (n) => n == null ? "—" : Math.round(n).toLocaleString("vi-VN") + "đ";
+const fmtPct = (n, d = 1) => n == null ? "—" : n.toFixed(d).replace(".", ",") + "%";
+const fmtNum = (n, d = 2) => n == null ? "—" : n.toFixed(d).replace(".", ",");
+
+const ASP = { product_quality: "Chất lượng", sizing_fit: "Size & form", shipping_packaging: "Giao hàng & đóng gói", pricing_value: "Giá & giá trị", service_communication: "Dịch vụ & hỗ trợ" };
+const SENT = { positive: "Tích cực", neutral: "Trung lập", negative: "Tiêu cực" };
+const COL = { positive: "#10b981", neutral: "#94a3b8", negative: "#ef4444" };
+
+function toast(msg, isError = false) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.style.borderColor = isError ? "var(--neg)" : "var(--primary)";
+  t.style.display = "block";
+  setTimeout(() => { t.style.display = "none"; }, 4000);
+}
+
+function updateApiStatus(connected) {
+  isApiConnected = connected;
+  const dot = $("#api-status");
+  dot.className = "status-dot " + (connected ? "online" : "offline");
+  dot.title = connected ? "API Online: Connected to " + API_BASE_URL : "API Offline: Running in local fallback mode";
+}
+
+async function apiCall(endpoint, options = {}) {
+  try {
+    const res = await fetch(API_BASE_URL + endpoint, options);
+    if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+    updateApiStatus(true);
+    return await res.json();
+  } catch (err) {
+    updateApiStatus(false);
+    throw err;
+  }
+}
+
+// Check initial API availability
+async function initApiCheck() {
+  try {
+    const activeData = await apiCall('/datasets/active');
+    if (activeData && activeData.source) {
+      D = activeData;
+      toast("Đã đồng bộ dữ liệu mới nhất từ API backend.");
+    }
+  } catch (err) {
+    console.warn("Backend API không khả dụng, sử dụng bộ dữ liệu Offline Demo.", err);
+  } finally {
+    go(current);
+  }
+}
+
+// UI Rendering Helpers
+const insuf = (reason) => `<div class="insuf-box"><b>INSUFFICIENT DATA</b><div class="muted" style="margin-top:4px">${esc(reason)}</div></div>`;
+const tag = (t) => `<span class="tag ${t === 'actual' ? 'actual' : 'demo'}">${esc(t)}</span>`;
+const pill = (s) => `<span class="pill" style="background:${COL[s]}">${SENT[s]}</span>`;
+
+function bars(items, color = "#6366f1", max = null, unit = "%") {
+  const m = max ?? Math.max(...items.map(i => i.value), 1);
+  return items.map(i => `<div class="bar-row"><span class="muted">${esc(i.label)}</span><div class="bar-track"><div class="bar-fill" style="width:${(i.value / m * 100).toFixed(1)}%;background:${i.color || color}"></div></div><span class="mono" style="text-align:right">${unit === "%" ? fmtPct(i.value) : i.value}</span></div>`).join("");
+}
+
+function stacked(items) {
+  return items.map(i => {
+    const t = (i.positive + i.neutral + i.negative) || 1;
+    const seg = (k) => `<div style="width:${(i[k] / t * 100).toFixed(1)}%;background:${COL[k]}" title="${SENT[k]}: ${i[k]}"></div>`;
+    return `<div class="stack-row"><span class="muted">${esc(i.label)}</span><div class="bar-track">${seg("positive")}${seg("neutral")}${seg("negative")}</div></div>`;
+  }).join("");
+}
+
+const legend = () => `<div class="legend"><span><i style="background:${COL.positive}"></i>Tích cực</span><span><i style="background:${COL.neutral}"></i>Trung lập</span><span><i style="background:${COL.negative}"></i>Tiêu cực</span></div>`;
+
+// ==========================================
+// VIEW PAGES DEFINITION
+// ==========================================
+const PAGES = {
+  import() {
+    const dq = D.dq;
+    const cols = Object.entries(dq.columns_detected).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td><td class="num">${dq.missing_by_column[k]}</td></tr>`).join("");
+    const issues = dq.issues.length ? dq.issues.map(i => `<tr><td class="num">${i.row}</td><td>${esc(i.code)}</td><td>${esc(i.message)}</td></tr>`).join("") : `<tr><td colspan="3" class="muted">Không có dòng lỗi.</td></tr>`;
+    return `
+    <div class="banner">
+      <span>Trạng thái nạp dữ liệu: <b>${isApiConnected ? 'API Connected' : 'Local Demo Mode'}</b></span>
+      <span class="muted">POST ${API_BASE_URL}/datasets/upload</span>
+    </div>
+    
+    <div class="card" style="margin-bottom:14px">
+      <h2>Tải lên file đánh giá CSV (Shopee / TMĐT)</h2>
+      <div class="sub">Hệ thống sẽ chạy qua mô hình xử lý từ khóa và phân tích khía cạnh (ABSA).</div>
+      <div class="upload-box" id="dropzone">
+        <input type="file" id="file-input" accept=".csv" style="display:none" />
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px">Kéo thả file CSV vào đây hoặc click để chọn file</div>
+        <div class="muted">Hỗ trợ định dạng CSV chuẩn UTF-8 / UTF-8-BOM</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card kpi"><div class="l">Tên File</div><div class="v" style="font-size:14px">${esc(D.source.name)}</div></div>
+      <div class="card kpi"><div class="l">Dòng đọc được</div><div class="v">${dq.total_rows}</div></div>
+      <div class="card kpi"><div class="l">Dòng hợp lệ</div><div class="v pos">${dq.valid_rows}</div></div>
+      <div class="card kpi"><div class="l">Dòng bị loại</div><div class="v neg">${dq.rejected_rows}</div></div>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 1fr">
+      <div class="card"><h2>Ánh xạ cột ${tag(D.dist.data_type)}</h2><div class="sub">Mã hóa: ${esc(dq.file_encoding)}</div>
+        <table><thead><tr><th>Trường chuẩn</th><th>Cột trong file</th><th class="num">Ô trống</th></tr></thead><tbody>${cols}</tbody></table></div>
+      <div class="card"><h2>Cảnh báo chất lượng</h2><div class="sub">Kiểm tra chất lượng dữ liệu</div>
+        <ul style="margin:0;padding-left:18px">${dq.warnings.map(w => `<li style="margin:4px 0">${esc(w)}</li>`).join("")}</ul>
+        <h2 style="margin-top:14px">Dòng bị loại</h2><div class="sub">${dq.issues.length} vấn đề</div>
+        <table><thead><tr><th class="num">Dòng</th><th>Mã lỗi</th><th>Chi tiết</th></tr></thead><tbody>${issues}</tbody></table></div>
+    </div>`;
+  },
+
+  executive() {
+    const pos = D.dist.by_rating_bucket.find(x => x.sentiment === "positive");
+    const neg = D.dist.by_rating_bucket.find(x => x.sentiment === "negative");
+    const avg = D.sku.reduce((s, x) => s + x.avg_rating * x.review_count, 0) / (D.sku.reduce((s, x) => s + x.review_count, 0) || 1);
+    const reason = "Doanh thu và lợi nhuận cần dữ liệu đơn hàng và chi phí. File này chỉ có đánh giá.";
+    return `
+    <div class="grid">
+      <div class="card kpi"><h2>Số đánh giá ${tag(D.dist.data_type)}</h2><div class="v">${D.dist.total}</div><div class="l">${D.sku.length} SKU · đã làm sạch</div></div>
+      <div class="card kpi"><h2>Điểm trung bình ${tag(D.dist.data_type)}</h2><div class="v">${fmtNum(avg)}</div><div class="l">Trung bình số sao</div></div>
+      <div class="card kpi"><h2>Tích cực (4–5★) ${tag(D.dist.data_type)}</h2><div class="v pos">${fmtPct(pos ? pos.pct : 0)}</div><div class="l">${pos ? pos.count : 0} đánh giá</div></div>
+      <div class="card kpi"><h2>Tiêu cực (1–2★) ${tag(D.dist.data_type)}</h2><div class="v neg">${fmtPct(neg ? neg.pct : 0)}</div><div class="l">${neg ? neg.count : 0} đánh giá</div></div>
+    </div>
+    <div class="card"><h2>Doanh thu & lợi nhuận <span class="tag insuf">Insufficient</span></h2><div class="sub">Không hiển thị số giả</div>
+      <div class="grid" style="margin:0">${insuf(reason)}${insuf(reason)}${insuf(reason)}</div></div>`;
+  },
+
+  customers() {
+    const rows = D.sku.map(s => `<tr><td>${esc(s.sku)}</td><td>${esc(s.product_name)}</td><td class="num">${s.review_count}</td><td class="num">${fmtNum(s.avg_rating)}</td><td class="num pos">${fmtPct(s.positive_pct)}</td><td class="num neg">${fmtPct(s.negative_pct)}</td><td class="num">${fmtPct(s.return_intent_pct)}</td><td>${esc(s.top_complaint ?? "—")}</td></tr>`).join("");
+    const hist = D.hist.map(h => ({ label: h.rating + "★", value: h.count }));
+    const rva = D.rva.map(r => ({ label: r.rating + "★", ...r }));
+    return `
+    <div class="grid">
+      <div class="card"><h2>Phân bố cảm xúc ${tag(D.dist.data_type)}</h2><div class="sub">% đánh giá theo số sao</div>
+        ${bars(D.dist.by_rating_bucket.map(x => ({ label: SENT[x.sentiment], value: x.pct, color: COL[x.sentiment] })))}
+        <div class="note">So với nhãn ABSA tổng hợp: ${D.dist.by_absa.map(x => `${SENT[x.sentiment]} ${x.count}`).join(" · ")}</div></div>
+      <div class="card"><h2>Phân bố số sao ${tag(D.dist.data_type)}</h2><div class="sub">Số đánh giá</div>${bars(hist, "#6366f1", null, "n")}</div>
+      <div class="card"><h2>Số sao × cảm xúc ABSA ${tag(D.dist.data_type)}</h2><div class="sub">Kiểm tra số sao có khớp nội dung không</div>${legend()}${stacked(rva)}</div>
+    </div>
+    <div class="card"><h2>Thống kê theo SKU ${tag(D.dist.data_type)}</h2>
+      <div class="sub">"Nhắc hoàn/đổi" là proxy từ nội dung đánh giá, KHÔNG phải tỷ lệ hoàn thực tế.</div>
+      <div style="overflow-x:auto"><table><thead><tr><th>SKU</th><th>Sản phẩm</th><th class="num">Số ĐG</th><th class="num">Điểm TB</th><th class="num">% tích cực</th><th class="num">% tiêu cực</th><th class="num">Nhắc hoàn/đổi (proxy)</th><th>Phàn nàn chính</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+    <div class="grid" style="margin-top:14px">
+      <div class="card"><h2>Xu hướng cảm xúc</h2>${insuf(D.trend.reason)}</div>
+      <div class="card"><h2>Khối lượng đánh giá bất thường</h2>${insuf(D.anomaly.reason)}</div>
+    </div>
+    <div class="card" style="margin-top:14px"><h2>Explorer đánh giá ${tag(D.dist.data_type)}</h2>
+      <div class="controls">
+        <select id="fsku"><option value="">Tất cả SKU</option>${D.sku.map(s => `<option>${esc(s.sku)}</option>`).join("")}</select>
+        <select id="fsent"><option value="">Mọi cảm xúc</option><option value="positive">Tích cực</option><option value="neutral">Trung lập</option><option value="negative">Tiêu cực</option></select>
+        <input id="fq" placeholder="Tìm trong nội dung…" style="width:240px" />
+        <a class="btn" id="dl-reviews" href="#">Tải CSV đánh giá</a>
+      </div>
+      <div id="explorer"></div>
+    </div>`;
+  },
+
+  feedback() {
+    const asp = D.aspects.map(a => ({ label: ASP[a.aspect], positive: a.positive, neutral: a.neutral, negative: a.negative }));
+    const p = D.pareto;
+    const maxC = Math.max(...p.items.map(i => i.count), 1);
+    const cols = p.items.map(i => `<div class="pcol"><div class="c">${fmtPct(i.cumulative_pct, 0)}</div><div class="b" style="height:${(i.count / maxC * 100).toFixed(1)}%;${i.vital_few ? "" : "opacity:.45"}" title="${esc(i.cause)}: ${i.count}"></div><div class="n">${esc(i.cause)} (${i.count})</div></div>`).join("");
+    const matrixSkus = [...new Set(D.matrix.map(m => m.sku))];
+    const mrows = matrixSkus.map(sku => `<tr><td>${esc(sku)}</td>${Object.keys(ASP).map(k => {
+      const c = D.matrix.find(m => m.sku === sku && m.aspect === k);
+      if (!c || c.positive + c.negative + c.neutral === 0) return `<td class="muted">—</td>`;
+      const net = c.positive - c.negative;
+      return `<td class="num ${net > 0 ? "pos" : net < 0 ? "neg" : "neu"}">+${c.positive} / −${c.negative}</td>`;
+    }).join("")}</tr>`).join("");
+    return `
+    <div class="banner">ABSA là <b>rule-based lexicon</b> (từ khóa và cụm cảm xúc). Confidence là heuristic, chạy trực tiếp trên backend/local.</div>
+    <div class="grid">
+      <div class="card"><h2>Cảm xúc theo khía cạnh ${tag("actual")}</h2><div class="sub">Số mệnh đề (một đánh giá có thể nhiều khía cạnh)</div>${legend()}${stacked(asp)}</div>
+      <div class="card"><h2>Từ khóa tiêu cực ${tag("actual")}</h2><div class="sub">Số đánh giá chứa từ khóa</div>${bars(D.keywords.map(k => ({ label: k.keyword, value: k.count })), "#6366f1", null, "n")}</div>
+      <div class="card"><h2>Drift cảm xúc</h2>${insuf(D.drift.reason)}</div>
+    </div>
+    <div class="card"><h2>Pareto nguyên nhân gốc ${tag("actual")}</h2>
+      <div class="sub">${p.total_negative_clauses} mệnh đề tiêu cực · cột = số mệnh đề, số trên cột = % lũy kế. Màu đậm = nhóm chiếm 80% (vital few).</div>
+      <div class="pareto">${cols}</div></div>
+    <div class="card" style="margin-top:14px"><h2>Ma trận SKU × khía cạnh ${tag("actual")}</h2>
+      <div class="sub">Số mệnh đề tích cực / tiêu cực</div>
+      <div style="overflow-x:auto"><table><thead><tr><th>SKU</th>${Object.keys(ASP).map(k => `<th class="num">${ASP[k]}</th>`).join("")}</tr></thead><tbody>${mrows}</tbody></table></div>
+      <div class="controls" style="margin-top:10px"><a class="btn" id="dl-aspects" href="#">Tải CSV mệnh đề</a></div></div>`;
+  },
+
+  unit() {
+    const DEF = { selling_price: 200000, cogs: 80000, discount_rate: 0.1, return_rate: 0.1, platform_fee_rate: 0.06, ad_cost_per_order: 15000, fulfillment_cost: 20000, reverse_shipping_cost: 18000, forward_shipping_nonrecovered: 5000, packaging_write_off: 2000, defect_loss: 10000, other_opex: 3000 };
+    const F = [["selling_price","Giá bán (VNĐ)",1000],["cogs","Giá vốn (VNĐ)",1000],["discount_rate","Chiết khấu (0–1)",0.01],["return_rate","Tỷ lệ hoàn (0–1)",0.01],["platform_fee_rate","Phí sàn (0–1)",0.01],["ad_cost_per_order","Quảng cáo / đơn",1000],["fulfillment_cost","Fulfillment (giữ lại)",1000],["reverse_shipping_cost","Phí hoàn / đơn hoàn",1000],["forward_shipping_nonrecovered","Phí chiều đi không thu hồi",1000],["packaging_write_off","Bao bì hủy",1000],["defect_loss","Hàng hư không bán lại",1000],["other_opex","Chi phí khác / đơn",1000]];
+    return `
+    <div class="banner">Các thông số tài chính dưới đây là <b>mô phỏng định phí</b> (mặc định cho 1 đơn hàng SKU).</div>
+    <div class="grid" style="grid-template-columns:320px 1fr">
+      <div class="card"><h2>Đầu vào SKU <span class="tag demo">SIMULATED</span></h2><div class="sub">Một đơn đặt trung bình</div>
+        ${F.map(([k, l, s]) => `<div class="label-row"><span class="muted">${l}</span><input class="u-in" data-k="${k}" type="number" step="${s}" value="${DEF[k]}" style="width:120px;text-align:right" /></div>`).join("")}
+        <div class="controls" style="margin-top:10px"><button class="btn primary" id="u-calc">Tính Toán</button></div></div>
+      <div class="card"><h2>Phân rã đơn hàng <span class="tag demo">SIMULATED</span></h2><div class="sub">VNĐ trên một đơn đặt</div><div id="u-out"></div></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h2>What-if: Đổi giá & Chi phí Quảng cáo</h2>
+      <div class="controls"><label>Giá mới <input id="w-price" type="number" value="220000" style="width:130px"/></label><label>Quảng cáo mới / đơn <input id="w-ads" type="number" value="20000" style="width:130px"/></label><button class="btn primary" id="w-run">Mô phỏng</button></div>
+      <div id="w-out"></div></div>`;
+  },
+
+  predictive() {
+    const r = "Thiếu cột ngày đánh giá (chuỗi thời gian) và dữ liệu lịch sử đơn hàng.";
+    return `<div class="grid">
+      <div class="card"><h2>Dự báo tỷ lệ hoàn <span class="tag insuf">Insufficient</span></h2><div class="sub">Theo SKU, 7/14/30 ngày</div>${insuf(r)}</div>
+      <div class="card"><h2>Dự báo doanh thu <span class="tag insuf">Insufficient</span></h2><div class="sub">Đơn, tuần, tháng, nhu cầu SKU</div>${insuf(r)}</div>
+      <div class="card"><h2>Lợi nhuận có nguy cơ thất thoát <span class="tag insuf">Insufficient</span></h2><div class="sub">Expected / worst-case / actual</div>${insuf(r)}</div>
+    </div><p class="note">Hệ thống không tạo dự báo khi dữ liệu không đủ điều kiện.</p>`;
+  },
+
+  competitors() {
+    const p = D.bench.profiles.own;
+    const rows = [["Số đánh giá", p.review_count], ["Điểm TB", fmtNum(p.avg_rating)], ["% tích cực", fmtPct(p.positive_pct)], ["% tiêu cực", fmtPct(p.negative_pct)], ["Mệnh đề tiêu cực", p.total_negative_clauses]].map(([a, b]) => `<tr><td>${a}</td><td class="num">${b}</td></tr>`).join("");
+    return `
+    <div class="banner">Tải lên file dữ liệu đối thủ qua API endpoint: <code>POST ${API_BASE_URL}/competitors/import</code></div>
+    <div class="card" style="margin-bottom:14px">
+      <h2>Nạp dữ liệu đánh giá đối thủ (CSV)</h2>
+      <div class="controls">
+        <input type="file" id="comp-file-input" accept=".csv" />
+        <button class="btn primary" id="btn-import-comp">Tải Lên Đối Thủ</button>
+      </div>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 1fr">
+      <div class="card"><h2>Benchmark Shop Của Bạn ${tag("actual")}</h2><div class="sub">Tập dữ liệu hiện tại</div>
+        <table><thead><tr><th>Chỉ số</th><th class="num">Shop của bạn</th></tr></thead><tbody>${rows}</tbody></table>
+        <ul class="note">${D.bench.warnings.map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>
+      <div class="card"><h2>So Sánh Đối Thủ <span class="tag insuf">Insufficient</span></h2><div class="sub">Cần nạp ít nhất một đối thủ đủ mẫu (≥10 đánh giá)</div>${insuf("Chưa có dữ liệu đối thủ để so sánh.")}</div>
+    </div>`;
+  },
+
+  opportunities() {
+    const g = D.gaps;
+    const rows = g.items.map(i => `<tr><td>${esc(i.pain_point)}</td><td class="num">${fmtPct(i.own_share_pct)}</td><td class="num muted">—</td><td class="num muted">—</td><td class="muted">${esc(i.estimated_demand)}</td></tr>`).join("");
+    return `
+    <div class="banner">Trạng thái: <b>${g.status}</b>. ${esc(g.reason ?? "")} Bảng dưới thể hiện các điểm đau chính từ chính shop của bạn.</div>
+    <div class="card"><h2>Điểm đau khách hàng ${tag("actual")}</h2><div class="sub">% trên tổng mệnh đề tiêu cực của shop</div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Nguyên nhân gốc</th><th class="num">Shop bạn</th><th class="num">Đối thủ</th><th class="num">Chênh</th><th>Nhu cầu ước tính</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <ul class="note">${g.warnings.map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>`;
+  },
+
+  reports() {
+    const kinds = [["reviews","Đánh giá + cảm xúc"],["aspects","Mệnh đề theo khía cạnh"],["sku_summary","Tổng hợp theo SKU"],["root_causes","Pareto nguyên nhân gốc"]];
+    return `<div class="card"><h2>Xuất báo cáo CSV ${tag("actual")}</h2><div class="sub">UTF-8 có BOM, mở được trên Microsoft Excel.</div>
+      <div class="grid" style="margin:0">${kinds.map(([k, t]) => `<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${t}</b><div class="muted" style="font-size:11px">nexus_${k}.csv</div></div><a class="btn primary" href="data:text/csv;base64,${D.csv[k] || ''}" download="nexus_${k}.csv">Tải CSV</a></div>`).join("")}</div></div>`;
+  },
+
+  system() {
+    return `
+    <div class="banner">
+      <span>Kết nối Telemetry: <code>GET ${API_BASE_URL}/system/telemetry</code></span>
+      <button class="btn" id="btn-refresh-telemetry">Tải Lại Số Liệu</button>
+    </div>
+    <div class="grid" id="telemetry-grid">
+      <div class="card kpi"><div class="l">CPU Usage</div><div class="v" id="t-cpu">${telemetryData ? telemetryData.cpu + '%' : '—'}</div></div>
+      <div class="card kpi"><div class="l">RAM Usage</div><div class="v" id="t-ram">${telemetryData ? telemetryData.ram + '%' : '—'}</div></div>
+      <div class="card kpi"><div class="l">Disk Storage</div><div class="v" id="t-disk">${telemetryData ? telemetryData.disk + '%' : '—'}</div></div>
+      <div class="card kpi"><div class="l">GPU / VRAM</div><div class="v" id="t-gpu">${telemetryData ? telemetryData.gpu + '%' : '—'}</div></div>
+      <div class="card kpi"><div class="l">Trạng thái Model</div><div class="v pos" id="t-status">${telemetryData ? telemetryData.model_status : 'Ready'}</div></div>
+      <div class="card kpi"><div class="l">Độ trễ suy luận</div><div class="v" id="t-latency">${telemetryData ? telemetryData.latency_ms + ' ms' : '—'}</div></div>
+    </div>`;
+  },
+
+  settings() {
+    return `<div class="card"><h2>Cấu hình & Chế độ xử lý ${tag("actual")}</h2><div class="sub">Quản lý qua biến môi trường NEXUS_PROCESSING_MODE</div>
+      <p>Chế độ hiện tại: <b class="mono">local</b> — Dữ liệu không rời máy. ABSA và phân tích chạy nội bộ.</p>
+      <ul class="note"><li><b>hybrid</b>: Xử lý dữ liệu nhạy cảm cục bộ, gửi dữ liệu tổng hợp lên cloud.</li><li><b>cloud</b>: Sử dụng hạ tầng cloud full-scale.</li></ul></div>`;
+  }
+};
+
+const NAV = [
+  ["import","Import Data"],["executive","Executive Overview"],["customers","Customer Intelligence"],["feedback","Feedback & ABSA"],
+  ["unit","Unit Economics"],["predictive","Predictive Analytics"],["competitors","Competitor Intelligence"],["opportunities","Market Opportunities"],
+  ["reports","Report Center"],["system","System Monitoring"],["settings","Settings"]
+];
+
+// ==========================================
+// INTERACTIVE EVENT WIRING
+// ==========================================
+function renderExplorer() {
+  const sku = $("#fsku") ? $("#fsku").value : "", sent = $("#fsent") ? $("#fsent").value : "", q = $("#fq") ? $("#fq").value.trim().toLowerCase() : "";
+  const rows = (D.explorer || []).filter(r => (!sku || r.sku === sku) && (!sent || r.absa === sent) && (!q || r.text.toLowerCase().includes(q) || r.sku.toLowerCase().includes(q)));
+  const pageSize = 8;
+  const pages = Math.max(1, Math.ceil(rows.length / pageSize));
+  window.__page = Math.min(window.__page || 1, pages);
+  const slice = rows.slice((window.__page - 1) * pageSize, window.__page * pageSize);
+  
+  const expEl = $("#explorer");
+  if (!expEl) return;
+  expEl.innerHTML = `
+    <div style="overflow-x:auto"><table><thead><tr><th class="num">Dòng</th><th>SKU</th><th class="num">Sao</th><th>Nội dung</th><th>Cảm xúc</th><th>Khía cạnh</th></tr></thead><tbody>
+    ${slice.map(r => `<tr><td class="num">${r.row}</td><td class="mono">${esc(r.sku)}</td><td class="num">${r.rating}</td><td class="wrap" style="max-width:420px">${esc(r.text)}</td><td>${pill(r.absa)}</td><td>${[...new Set(r.aspects.map(a => a.aspect))].map(a => `<span class="chip">${ASP[a]}</span>`).join("")}</td></tr>`).join("") || `<tr><td colspan="6" class="muted">Không có đánh giá khớp bộ lọc.</td></tr>`}
+    </tbody></table></div>
+    <div class="pg"><span>${rows.length} đánh giá · trang ${window.__page || 1}/${pages}</span>
+      <button class="btn" id="pprev">‹</button><button class="btn" id="pnext">›</button></div>`;
+  $("#pprev").onclick = () => { window.__page = Math.max(1, (window.__page || 1) - 1); renderExplorer(); };
+  $("#pnext").onclick = () => { window.__page = Math.min(pages, (window.__page || 1) + 1); renderExplorer(); };
+}
+
+function wireUnit() {
+  const readInputs = () => Object.fromEntries([...document.querySelectorAll(".u-in")].map(i => [i.dataset.k, Number(i.value)]));
+  const u = (x) => {
+    const r = x.return_rate, kept = 1 - r;
+    const discounts = x.selling_price * x.discount_rate, gad = x.selling_price - discounts, refunds = gad * r, netRev = gad - refunds;
+    const cogs = x.cogs * kept, platform = netRev * x.platform_fee_rate, ful = x.fulfillment_cost * kept;
+    const contrib = netRev - cogs - platform - x.ad_cost_per_order - ful;
+    const rb = { reverse_shipping: r * x.reverse_shipping_cost, forward_shipping_nonrecovered: r * x.forward_shipping_nonrecovered, packaging_write_off: r * x.packaging_write_off, defect_loss: r * x.defect_loss };
+    const rl = Object.values(rb).reduce((a, b) => a + b, 0);
+    const net = contrib - rl - x.other_opex;
+    const cap = netRev - cogs - platform - ful - rl - x.other_opex;
+    const perRet = x.reverse_shipping_cost + x.forward_shipping_nonrecovered + x.packaging_write_off + x.defect_loss;
+    const per = x.cogs * kept + x.ad_cost_per_order + x.fulfillment_cost * kept + r * perRet + x.other_opex;
+    const be = per / (((1 - x.discount_rate) * kept * (1 - x.platform_fee_rate)) || 1);
+    return { netRev, cogs, platform, ad: x.ad_cost_per_order, ful, contrib, rl, rb, net, margin: netRev ? net / netRev : 0, cap, roas: cap > 0 ? netRev / cap : null, be };
+  };
+  const show = () => {
+    const x = readInputs(), r = u(x);
+    const rows = [["Net Revenue", r.netRev], ["COGS (hàng giữ lại)", -r.cogs], ["Phí sàn", -r.platform], ["Quảng cáo", -r.ad], ["Fulfillment", -r.ful], ["Contribution", r.contrib], ["Return Loss", -r.rl], ["Net Profit", r.net]];
+    $("#u-out").innerHTML = `<table><tbody>${rows.map(([a, b]) => `<tr><td>${a}</td><td class="num ${b < 0 ? "neg" : ""}">${fmtVnd(b)}</td></tr>`).join("")}</tbody></table>
+      <div class="note">Biên ròng: <b>${fmtPct(r.margin * 100)}</b> · Giá hòa vốn: <b>${fmtVnd(r.be)}</b> · CAC tối đa/đơn: <b>${fmtVnd(r.cap)}</b> · ROAS hòa vốn: <b>${r.roas ? fmtNum(r.roas) : "—"}</b></div>`;
+  };
+  if ($("#u-calc")) $("#u-calc").onclick = show; show();
+  if ($("#w-run")) $("#w-run").onclick = () => {
+    const base = readInputs(), before = u(base);
+    const after = u({ ...base, selling_price: Number($("#w-price").value), ad_cost_per_order: Number($("#w-ads").value) });
+    const d = after.net - before.net;
+    $("#w-out").innerHTML = `<div class="grid" style="margin-top:12px">
+      <div class="card kpi"><div class="l">Net Profit trước</div><div class="v">${fmtVnd(before.net)}</div></div>
+      <div class="card kpi"><div class="l">Net Profit sau</div><div class="v">${fmtVnd(after.net)}</div></div>
+      <div class="card kpi"><div class="l">Chênh lệch</div><div class="v ${d >= 0 ? "pos" : "neg"}">${fmtVnd(d)}</div></div></div>`;
+  };
+}
+
+async function fetchTelemetry() {
+  try {
+    const data = await apiCall('/system/telemetry');
+    telemetryData = data;
+    if ($("#t-cpu")) $("#t-cpu").textContent = data.cpu + '%';
+    if ($("#t-ram")) $("#t-ram").textContent = data.ram + '%';
+    if ($("#t-disk")) $("#t-disk").textContent = data.disk + '%';
+    if ($("#t-gpu")) $("#t-gpu").textContent = data.gpu + '%';
+    if ($("#t-status")) $("#t-status").textContent = data.model_status || 'Ready';
+    if ($("#t-latency")) $("#t-latency").textContent = (data.latency_ms || 0) + ' ms';
+  } catch (err) {
+    console.warn("Không thể tải Telemetry từ API.");
+  }
+}
+
+async function uploadFile(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    toast("Đang tải file và chạy phân tích ABSA...");
+    const result = await apiCall('/datasets/upload', { method: 'POST', body: formData });
+    D = result;
+    toast("Tải lên và xử lý file thành công!");
+    go(current);
+  } catch (err) {
+    toast("Lỗi API upload: " + err.message + " (Đã quay về chế độ xem mẫu).", true);
+  }
+}
+
+function wirePage(p) {
+  if (telemetryTimer) { clearInterval(telemetryTimer); telemetryTimer = null; }
+  
+  if (p === "import") {
+    const dz = $("#dropzone"), fi = $("#file-input");
+    if (dz && fi) {
+      dz.onclick = () => fi.click();
+      fi.onchange = (e) => { if (e.target.files.length) uploadFile(e.target.files[0]); };
+      dz.ondragover = (e) => e.preventDefault();
+      dz.ondrop = (e) => { e.preventDefault(); if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]); };
+    }
+  }
+
+  if (p === "customers") {
+    ["#fsku","#fsent","#fq"].forEach(s => { if ($(s)) $(s).addEventListener("input", () => { window.__page = 1; renderExplorer(); }); });
+    if ($("#dl-reviews")) { $("#dl-reviews").href = "data:text/csv;base64," + (D.csv.reviews || ''); $("#dl-reviews").download = "nexus_reviews.csv"; }
+    window.__page = 1; renderExplorer();
+  }
+
+  if (p === "feedback") {
+    if ($("#dl-aspects")) { $("#dl-aspects").href = "data:text/csv;base64," + (D.csv.aspects || ''); $("#dl-aspects").download = "nexus_aspects.csv"; }
+  }
+
+  if (p === "unit") wireUnit();
+
+  if (p === "competitors") {
+    if ($("#btn-import-comp")) {
+      $("#btn-import-comp").onclick = async () => {
+        const fileInput = $("#comp-file-input");
+        if (!fileInput.files.length) return toast("Vui lòng chọn file CSV đối thủ!", true);
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        try {
+          toast("Đang nạp dữ liệu đối thủ...");
+          const res = await apiCall('/competitors/import', { method: 'POST', body: formData });
+          D.bench = res.bench || D.bench;
+          toast("Đã cập nhật Benchmark đối thủ!");
+          go("competitors");
+        } catch (err) {
+          toast("Lỗi khi nạp file đối thủ: " + err.message, true);
+        }
+      };
+    }
+  }
+
+  if (p === "system") {
+    fetchTelemetry();
+    telemetryTimer = setInterval(fetchTelemetry, 5000);
+    if ($("#btn-refresh-telemetry")) $("#btn-refresh-telemetry").onclick = fetchTelemetry;
+  }
+}
+
+let current = "import";
+function go(p) {
+  current = p;
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.id === p));
+  $("#title").textContent = NAV.find(n => n[0] === p)[1];
+  $("#content").innerHTML = PAGES[p]();
+  $("#src").textContent = "Nguồn: " + D.source.name;
+  wirePage(p);
+}
+
+// Global Initialization
+$("#nav").innerHTML = NAV.map(([id, l]) => `<button data-id="${id}">${l}</button>`).join("");
+$("#nav").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.id); });
+$("#theme").addEventListener("click", e => {
+  const dark = document.documentElement.dataset.theme !== "dark";
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  e.target.textContent = dark ? "Light" : "Dark";
+});
+document.documentElement.dataset.theme = "dark";
+$("#theme").textContent = "Light";
+
+// Run initial check and boot app
+initApiCheck();
+</script>
+</body>
+</html> , 

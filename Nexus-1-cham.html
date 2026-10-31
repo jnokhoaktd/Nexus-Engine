@@ -1,574 +1,519 @@
 ﻿<!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nexus Engine – E-Commerce Intelligence Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Nexus Engine - API Connected Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
-:root {
-  --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
-  --brand: #0d9488;
-  --brand-hover: #0f766e;
-  --brand-light: #f0fdf4;
-  --accent: #6366f1;
-  --pos-color: #10b981;
-  --pos-bg: #ecfdf5;
-  --neg-color: #f43f5e;
-  --neg-bg: #fff1f2;
-  --warn-color: #f59e0b;
-  --warn-bg: #fffbeb;
-  --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg-main); color: var(--text-main); font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; line-height: 1.5; font-size: 14px; -webkit-font-smoothing: antialiased; }
-
-.app-header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
-.logo-group { display: flex; align-items: center; gap: 12px; }
-.logo-badge { background: linear-gradient(135deg, var(--brand), #0284c7); color: #fff; font-weight: 800; padding: 6px 14px; border-radius: 10px; font-size: 16px; letter-spacing: -0.5px; box-shadow: 0 2px 8px rgba(13,148,136,0.3); }
-.logo-title { font-size: 18px; font-weight: 800; color: var(--text-main); letter-spacing: -0.3px; }
-.logo-sub { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-
-.status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: var(--pos-bg); color: var(--pos-color); font-size: 12px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2); }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pos-color); animation: pulse 2s infinite; }
-@keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-
-.container { max-width: 1280px; margin: 24px auto; padding: 0 24px; }
-.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s; }
-.card:hover { box-shadow: var(--shadow-md); }
-.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-.card-title { font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-
-.upload-wrapper { position: relative; }
-.drop-zone { border: 2px dashed var(--brand); border-radius: 14px; padding: 32px 20px; text-align: center; background: var(--brand-light); cursor: pointer; transition: all 0.2s ease; display: block; width: 100%; user-select: none; }
-.drop-zone:hover, .drop-zone.over { background: #ccfbf1; border-color: var(--brand-hover); transform: translateY(-1px); }
-.drop-icon { font-size: 36px; margin-bottom: 8px; color: var(--brand); }
-.drop-text { font-size: 15px; font-weight: 700; color: var(--text-main); }
-.drop-hint { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
-
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-
-label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
-input[type=text], select, textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 13px; color: var(--text-main); background: #fff; transition: all 0.15s; }
-input[type=text]:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15); }
-textarea { min-height: 80px; resize: vertical; margin-top: 10px; }
-
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--brand), #0f766e); color: #fff; font-weight: 700; padding: 11px 22px; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s; font-size: 13.5px; box-shadow: 0 2px 4px rgba(13,148,136,0.2); }
-.btn:hover { background: var(--brand-hover); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(13,148,136,0.3); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-.btn-sec { background: #fff; color: var(--text-main); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-.btn-sec:hover { background: var(--bg-main); border-color: #cbd5e1; }
-
-.nav-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--border); margin-bottom: 24px; }
-.tab-item { padding: 12px 20px; font-weight: 700; font-size: 13.5px; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; margin-bottom: -2px; }
-.tab-item:hover { color: var(--brand); }
-.tab-item.active { color: var(--brand); border-bottom-color: var(--brand); background: var(--bg-card); border-radius: 8px 8px 0 0; }
-
-.kpi-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
-.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--border); }
-.kpi-card.kpi-brand::before { background: var(--brand); }
-.kpi-card.kpi-pos::before { background: var(--pos-color); }
-.kpi-card.kpi-neg::before { background: var(--neg-color); }
-.kpi-card.kpi-accent::before { background: var(--accent); }
-
-.kpi-label { font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
-.kpi-value { font-size: 30px; font-weight: 800; color: var(--text-main); margin-top: 6px; letter-spacing: -0.5px; }
-.kpi-sub { font-size: 12px; margin-top: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
-.kpi-sub.pos { color: var(--pos-color); }
-.kpi-sub.neg { color: var(--neg-color); }
-
-.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 9999px; font-size: 11.5px; font-weight: 700; }
-.badge-pos { background: var(--pos-bg); color: var(--pos-color); border: 1px solid rgba(16, 185, 129, 0.25); }
-.badge-neg { background: var(--neg-bg); color: var(--neg-color); border: 1px solid rgba(244, 63, 94, 0.25); }
-.badge-warn { background: var(--warn-bg); color: var(--warn-color); border: 1px solid rgba(245, 158, 11, 0.25); }
-
-.table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
-table.data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-table.data-table th { background: #f1f5f9; color: var(--text-muted); font-weight: 700; padding: 12px 16px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-table.data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-main); }
-table.data-table tr:last-child td { border-bottom: none; }
-table.data-table tr:hover { background: #f8fafc; }
-
-.insight-card { background: linear-gradient(135deg, #f0fdf4, #e0f2fe); border: 1px solid #99f6e4; border-radius: 14px; padding: 20px; color: #0f766e; margin-bottom: 16px; }
-.insight-card h4 { font-size: 15px; font-weight: 800; color: #115e59; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.insight-card ul { padding-left: 20px; margin-top: 8px; }
-.insight-card li { margin-bottom: 6px; line-height: 1.6; }
-
-.chart-container { position: relative; height: 280px; width: 100%; }
+  :root { color-scheme: light dark; --bg:#f8fafc; --surface:#fff; --border:#e2e8f0; --text:#0f172a; --muted:#64748b; --hover:#f1f5f9; --primary:#6366f1; --pos:#10b981; --neu:#94a3b8; --neg:#ef4444; --warn:#f59e0b; }
+  :root[data-theme="dark"] { --bg:#0f172a; --surface:#1e293b; --border:#334155; --text:#f8fafc; --muted:#94a3b8; --hover:#273449; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: Inter, "Plus Jakarta Sans", system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: 13px; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  aside { width: 230px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+  .brand { padding: 16px 18px; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+  .brand span { color: var(--primary); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--neu); transition: background .3s; }
+  .status-dot.online { background: var(--pos); }
+  .status-dot.offline { background: var(--warn); }
+  nav { padding: 0 8px; overflow-y: auto; flex: 1; }
+  nav button { width: 100%; text-align: left; padding: 8px 10px; margin-bottom: 2px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; }
+  nav button:hover { background: var(--hover); }
+  nav button.active { background: rgba(99,102,241,.15); color: var(--primary); font-weight: 600; }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header { display: flex; align-items: center; gap: 12px; padding: 12px 22px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  .hright { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
+  .btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .btn.primary:hover { opacity: 0.9; }
+  main { padding: 20px; overflow: auto; flex: 1; }
+  .banner { border: 1px solid rgba(99,102,241,.4); background: rgba(99,102,241,.08); border-radius: 6px; padding: 10px 12px; font-size: 12px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; min-width: 0; }
+  .card h2 { font-size: 13px; margin: 0 0 2px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .card .sub { color: var(--muted); font-size: 11px; margin-bottom: 10px; }
+  .tag { border: 1px solid var(--border); color: var(--muted); border-radius: 4px; padding: 1px 6px; font-family: "JetBrains Mono", monospace; font-size: 10px; text-transform: uppercase; }
+  .tag.actual { border-color: rgba(16,185,129,.5); color: var(--pos); }
+  .tag.demo { border-color: rgba(245,158,11,.6); color: var(--warn); }
+  .tag.insuf { border-color: rgba(245,158,11,.6); color: var(--warn); }
+  .kpi .v { font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 600; margin-top: 4px; }
+  .kpi .l { color: var(--muted); font-size: 12px; }
+  .insuf-box { border: 1px dashed rgba(245,158,11,.6); border-radius: 6px; padding: 10px; font-size: 12px; }
+  .insuf-box b { color: var(--warn); font-family: "JetBrains Mono", monospace; font-size: 11px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; }
+  td.num, th.num { text-align: right; font-family: "JetBrains Mono", monospace; }
+  .bar-row { display: grid; grid-template-columns: 110px 1fr 60px; gap: 8px; align-items: center; margin: 6px 0; font-size: 12px; }
+  .bar-track { height: 14px; background: var(--hover); border-radius: 3px; overflow: hidden; display: flex; }
+  .bar-fill { height: 100%; }
+  .stack-row { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: center; margin: 6px 0; font-size: 12px; }
+  .legend { display: flex; gap: 12px; font-size: 11px; color: var(--muted); margin-bottom: 8px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+  .pareto { display: flex; align-items: flex-end; gap: 8px; height: 180px; padding-top: 16px; border-bottom: 1px solid var(--border); }
+  .pcol { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
+  .pcol .b { width: 70%; background: var(--neg); border-radius: 3px 3px 0 0; }
+  .pcol .c { font-size: 10px; color: var(--warn); font-family: "JetBrains Mono", monospace; margin-bottom: 2px; }
+  .pcol .n { font-size: 10px; color: var(--muted); text-align: center; margin-top: 4px; height: 36px; overflow: hidden; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
+  input, select { background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; font-size: 12px; }
+  .upload-box { border: 2px dashed var(--border); border-radius: 8px; padding: 26px; text-align: center; cursor: pointer; transition: border-color .2s; }
+  .upload-box:hover { border-color: var(--primary); background: var(--hover); }
+  .chip { display: inline-block; background: rgba(99,102,241,.15); color: var(--primary); padding: 1px 6px; border-radius: 4px; font-size: 11px; margin: 1px 2px 1px 0; }
+  .pill { color: #fff; padding: 1px 7px; border-radius: 4px; font-size: 11px; }
+  .pos { color: var(--pos); } .neg { color: var(--neg); } .neu { color: var(--muted); }
+  .muted { color: var(--muted); }
+  .note { font-size: 11px; color: var(--muted); margin-top: 8px; }
+  .label-row { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+  .wrap { white-space: normal; }
+  .pg { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-top: 8px; font-size: 12px; }
+  .toast { position: fixed; bottom: 16px; right: 16px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 10px 14px; border-radius: 6px; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; display: none; }
 </style>
 </head>
 <body>
-
-<header class="app-header">
-  <div class="logo-group">
-    <div class="logo-badge">NEXUS</div>
-    <div>
-      <div class="logo-title">E-Commerce Intelligence Dashboard</div>
-      <div class="logo-sub">Hệ thống Tình báo Phản hồi & Phân tích Cạnh tranh SaaS</div>
-    </div>
+<aside>
+  <div class="brand">
+    Nexus <span>Engine</span>
+    <div id="api-status" class="status-dot offline" title="API Status: Checking..."></div>
   </div>
-  <div class="status-pill" id="serverStatus">
-    <span class="status-dot"></span>
-    <span id="statusText">FastAPI Server Local Sẵn sàng</span>
-  </div>
-</header>
-
-<div class="container">
-  
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title">📌 1. Tải Dữ liệu Đánh giá / Comment Sản phẩm</div>
-      <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Hỗ trợ .csv, .xlsx, .docx, .txt (Tối đa 2.000 dòng)</span>
+  <nav id="nav"></nav>
+</aside>
+<div class="main">
+  <header>
+    <h1 id="title"></h1>
+    <div class="hright">
+      <span id="src"></span>
+      <button class="btn" id="theme">Light</button>
     </div>
-    
-    <div class="upload-wrapper">
-      <label for="fileInput" class="drop-zone" id="dropZone">
-        <div class="drop-icon">📂</div>
-        <div class="drop-text">Bấm vào đây để chọn file hoặc Kéo thả file dữ liệu vào đây</div>
-        <div class="drop-hint">Chấp nhận file Excel Shopee / TikTok Shop / Lazada hoặc file văn bản</div>
-      </label>
-      <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.docx,.txt" style="display: none;">
-    </div>
-    
-    <textarea id="pasteInput" placeholder="Hoặc dán trực tiếp danh sách nhận xét ở đây (mỗi dòng 1 nhận xét)..."></textarea>
-
-    <div id="columnSelects" class="grid-2" style="margin-top: 16px; display: none;">
-      <div>
-        <label for="colText">Cột Nội dung đánh giá (*):</label>
-        <select id="colText"></select>
-      </div>
-      <div>
-        <label for="colSku">Cột Mã SKU / Tên Sản phẩm (Tùy chọn):</label>
-        <select id="colSku"></select>
-      </div>
-    </div>
-    
-    <div style="margin-top: 18px; display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 12px 16px; border-radius: 12px;">
-      <label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-        <input type="checkbox" id="demoMode" checked style="width: auto;"> ⚡ <b>Chế độ Demo Tốc độ cao</b> (Phân tích từ khóa thông minh)
-      </label>
-      <button class="btn" id="btnRun" disabled>🚀 Chạy Phân tích BI Trọn gói</button>
-    </div>
-    <div id="fileStatus" style="font-size: 12.5px; color: var(--brand); font-weight: 700; margin-top: 10px;"></div>
-  </div>
-
-  <div id="outputSection" style="display: none;">
-    
-    <div class="nav-tabs">
-      <div class="tab-item active" onclick="switchTab(event, 'tabOverview')">📊 Tổng quan CSAT & Sentiment</div>
-      <div class="tab-item" onclick="switchTab(event, 'tabSku')">📦 Phân tích SKU & Top Sản phẩm</div>
-      <div class="tab-item" onclick="switchTab(event, 'tabGap')">💡 Đối thủ & Market Gap</div>
-      <div class="tab-item" onclick="switchTab(event, 'tabDetail')">💬 Trích xuất & Lọc Phản hồi</div>
-    </div>
-
-    <div id="tabOverview">
-      <div class="grid-4" style="margin-bottom: 24px;">
-        <div class="kpi-card kpi-brand">
-          <div class="kpi-label">Tổng số Đánh giá</div>
-          <div class="kpi-value" id="kpiTotal">0</div>
-          <div class="kpi-sub" style="color: var(--text-muted);">Mẫu bình luận được quét</div>
-        </div>
-        <div class="kpi-card kpi-accent">
-          <div class="kpi-label">Chỉ số CSAT Score</div>
-          <div class="kpi-value" id="kpiCsat" style="color: var(--accent);">0.0 / 5.0</div>
-          <div class="kpi-sub pos" id="kpiCsatSub">Điểm hài lòng trung bình</div>
-        </div>
-        <div class="kpi-card kpi-pos">
-          <div class="kpi-label">Tỷ lệ Hài lòng (%)</div>
-          <div class="kpi-value" id="kpiPos" style="color: var(--pos-color);">0%</div>
-          <div class="kpi-sub pos">Phản hồi 4-5 sao</div>
-        </div>
-        <div class="kpi-card kpi-neg">
-          <div class="kpi-label">Tỷ lệ Đòi Trả Hàng</div>
-          <div class="kpi-value" id="kpiReturn" style="color: var(--neg-color);">0%</div>
-          <div class="kpi-sub neg">Yêu cầu hoàn tiền / đổi trả</div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-title">📈 Phân bổ Cảm xúc (Sentiment Share)</div>
-          <div class="chart-container">
-            <canvas id="sentimentChart"></canvas>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">⚠️ Phân bổ Nhóm Vấn đề / Phàn nàn (%)</div>
-          <div class="chart-container">
-            <canvas id="issueChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tabSku" style="display: none;">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">📦 Xếp hạng Chất lượng theo Mã SKU Sản phẩm</div>
-          <span style="font-size: 12px; color: var(--text-muted);">Tự động phân loại SKU Ngôi sao & SKU Cảnh báo</span>
-        </div>
-        <div class="table-wrapper">
-          <table class="data-table" id="skuTable">
-            <thead>
-              <tr>
-                <th>Mã SKU / Sản phẩm</th>
-                <th>Tổng đánh giá</th>
-                <th>Tỷ lệ Hài lòng</th>
-                <th>Tỷ lệ Tiêu cực</th>
-                <th>Xếp hạng & Cảnh báo</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div id="tabGap" style="display: none;">
-      <div class="card">
-        <div class="card-title">💡 Báo cáo Tình báo Kinh doanh & Khoảng trống Thị trường (Market Gap)</div>
-        <div id="marketGapBox"></div>
-      </div>
-    </div>
-
-    <div id="tabDetail" style="display: none;">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">💬 Trích xuất Phản hồi Chi tiết & Lọc Tìm kiếm</div>
-          <button class="btn btn-sec" onclick="window.print()" style="padding: 6px 14px; font-size: 12px;">🖨️ In Báo cáo PDF</button>
-        </div>
-
-        <div class="grid-3" style="margin-bottom: 16px;">
-          <div>
-            <label for="filterSentiment">Lọc theo Cảm xúc:</label>
-            <select id="filterSentiment" onchange="filterDetails()">
-              <option value="ALL">Tất cả cảm xúc</option>
-              <option value="pos">Hài lòng (Positive)</option>
-              <option value="neg">Tiêu cực (Negative)</option>
-              <option value="neu">Bình thường (Neutral)</option>
-            </select>
-          </div>
-          <div>
-            <label for="filterIssue">Lọc theo Nhóm vấn đề:</label>
-            <select id="filterIssue" onchange="filterDetails()">
-              <option value="ALL">Tất cả nhóm vấn đề</option>
-              <option value="quality">Chất lượng sản phẩm</option>
-              <option value="sizing_fit">Kích cỡ / Size</option>
-              <option value="shipping">Giao hàng & Đóng gói</option>
-              <option value="price_value">Giá cả / Đáng tiền</option>
-              <option value="instructions">Hướng dẫn & Hỗ trợ</option>
-            </select>
-          </div>
-          <div>
-            <label for="searchKeyword">Tìm từ khóa:</label>
-            <input type="text" id="searchKeyword" placeholder="Nhập từ khóa (ví dụ: mỏng, rộng, vỡ)..." oninput="filterDetails()">
-          </div>
-        </div>
-
-        <div class="table-wrapper">
-          <table class="data-table" id="detailTable">
-            <thead>
-              <tr>
-                <th style="width: 15%;">SKU</th>
-                <th style="width: 15%;">Cảm xúc</th>
-                <th style="width: 20%;">Nhóm vấn đề</th>
-                <th style="width: 50%;">Nội dung phản hồi</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
+  </header>
+  <main id="content"></main>
 </div>
+<div id="toast" class="toast"></div>
 
 <script>
-"use strict";
+// ==========================================
+// CONFIGURATION & CLEAN INITIAL STATE
+// ==========================================
+let API_BASE_URL = localStorage.getItem('NEXUS_API_URL') || (
+  window.location.protocol.startsWith('http') ? '/api/v1' : 'http://127.0.0.1:8000/api/v1'
+);
+let isApiConnected = false;
+let telemetryTimer = null;
 
-var state = { table: null, lines: [], skus: [], results: [] };
-var sentimentChartInst = null;
-var issueChartInst = null;
-
-var ISSUES = {
-  quality: "Chất lượng sản phẩm",
-  sizing_fit: "Kích cỡ / Size",
-  shipping: "Giao hàng & Đóng gói",
-  price_value: "Giá cả / Đáng tiền",
-  instructions: "Hướng dẫn & Hỗ trợ",
-  no_issue: "Không phàn nàn"
+// BỘ DỮ LIỆU KHỞI TẠO TRỐNG (ĐÃ XÓA SẠCH DỮ LIỆU MẪU HARDCODE)
+let D = {
+  "source": { "name": "Chưa có file dữ liệu", "uploaded_at": "N/A" },
+  "dq": {
+    "file_encoding": "utf-8",
+    "columns_detected": {},
+    "total_rows": 0,
+    "valid_rows": 0,
+    "rejected_rows": 0,
+    "issues": [],
+    "missing_by_column": {},
+    "has_timestamp": false,
+    "warnings": ["Chưa nạp bộ dữ liệu nào. Vui lòng kéo thả file Excel/CSV vào hệ thống."]
+  },
+  "dist": {
+    "data_type": "actual",
+    "total": 0,
+    "by_rating_bucket": [
+      { "sentiment": "positive", "count": 0, "pct": 0 },
+      { "sentiment": "neutral", "count": 0, "pct": 0 },
+      { "sentiment": "negative", "count": 0, "pct": 0 }
+    ],
+    "by_absa": []
+  },
+  "hist": [
+    { "rating": 1, "count": 0 }, { "rating": 2, "count": 0 }, { "rating": 3, "count": 0 }, { "rating": 4, "count": 0 }, { "rating": 5, "count": 0 }
+  ],
+  "rva": [],
+  "sku": [],
+  "aspects": [
+    { "aspect": "product_quality", "label": "Chất lượng sản phẩm", "positive": 0, "neutral": 0, "negative": 0 },
+    { "aspect": "sizing_fit", "label": "Size & form", "positive": 0, "neutral": 0, "negative": 0 },
+    { "aspect": "shipping_packaging", "label": "Giao hàng & đóng gói", "positive": 0, "neutral": 0, "negative": 0 },
+    { "aspect": "pricing_value", "label": "Giá & giá trị", "positive": 0, "neutral": 0, "negative": 0 },
+    { "aspect": "service_communication", "label": "Dịch vụ & hỗ trợ", "positive": 0, "neutral": 0, "negative": 0 }
+  ],
+  "matrix": [],
+  "pareto": { "data_type": "actual", "total_negative_clauses": 0, "items": [] },
+  "keywords": [],
+  "trend": { "status": "insufficient_data", "reason": "Chưa có dữ liệu đánh giá." },
+  "drift": { "status": "insufficient_data", "reason": "Chưa có dữ liệu đánh giá." },
+  "anomaly": { "status": "insufficient_data", "reason": "Chưa có dữ liệu đánh giá." },
+  "impact": { "status": "insufficient_data", "reason": "Chưa có dữ liệu đánh giá." },
+  "bench": { "data_type": "actual", "profiles": { "own": { "review_count": 0, "avg_rating": 0, "positive_pct": 0, "negative_pct": 0, "total_negative_clauses": 0 } }, "warnings": [] },
+  "gaps": { "status": "no_data", "reason": "Vui lòng nạp file để bắt đầu phân tích.", "warnings": [], "items": [] },
+  "explorer": [],
+  "csv": { "reviews": "", "aspects": "", "sku_summary": "", "root_causes": "" }
 };
 
-function $(id) { return document.getElementById(id); }
+let telemetryData = null;
 
-function switchTab(e, tabId) {
-  ['tabOverview', 'tabSku', 'tabGap', 'tabDetail'].forEach(t => $(t).style.display = 'none');
-  $(tabId).style.display = 'block';
-  document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-  e.currentTarget.classList.add('active');
+// Helpers
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtVnd = (n) => n == null ? "—" : Math.round(n).toLocaleString("vi-VN") + "đ";
+const fmtPct = (n, d = 1) => n == null ? "—" : n.toFixed(d).replace(".", ",") + "%";
+const fmtNum = (n, d = 2) => n == null ? "—" : n.toFixed(d).replace(".", ",");
+
+const ASP = { product_quality: "Chất lượng", sizing_fit: "Size & form", shipping_packaging: "Giao hàng & đóng gói", pricing_value: "Giá & giá trị", service_communication: "Dịch vụ & hỗ trợ" };
+const SENT = { positive: "Tích cực", neutral: "Trung lập", negative: "Tiêu cực" };
+const COL = { positive: "#10b981", neutral: "#94a3b8", negative: "#ef4444" };
+
+function toast(msg, isError = false) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.style.borderColor = isError ? "var(--neg)" : "var(--primary)";
+  t.style.display = "block";
+  setTimeout(() => { t.style.display = "none"; }, 4000);
 }
 
-async function handleFile(file) {
-  if (!file) return;
-  $("fileStatus").textContent = "⏳ Đang đọc dữ liệu từ file " + file.name + "...";
-  state.table = null;
-  
+function updateApiStatus(connected) {
+  isApiConnected = connected;
+  const dot = $("#api-status");
+  dot.className = "status-dot " + (connected ? "online" : "offline");
+  dot.title = connected ? "API Online: Connected to " + API_BASE_URL : "API Offline: Local Client Mode";
+}
+
+async function apiCall(endpoint, options = {}) {
   try {
-    var ext = file.name.split('.').pop().toLowerCase();
-    if (ext === 'docx') {
-      var r = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
-      $("pasteInput").value = r.value || "";
-    } else if (ext === 'txt') {
-      $("pasteInput").value = await file.text();
-    } else {
-      var wb = (ext === 'csv') ? XLSX.read(await file.text(), { type: 'string' }) : XLSX.read(await file.arrayBuffer(), { type: 'array' });
-      var ws = wb.Sheets[wb.SheetNames[0]];
-      var data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
-      if (!data.length) throw new Error("File rỗng.");
-      
-      var header = data[0].map((h, i) => String(h || ("Cột " + (i + 1))));
-      state.table = data.slice(1);
-      
-      var selTxt = $("colText"), selSku = $("colSku");
-      selTxt.innerHTML = ""; 
-      selSku.innerHTML = "<option value='-1'>-- Không chọn (Mặc định) --</option>";
-      
-      header.forEach((h, i) => {
-        selTxt.appendChild(new Option(h, i));
-        selSku.appendChild(new Option(h, i));
-      });
-      
-      header.forEach((h, i) => {
-        var lh = h.toLowerCase();
-        if (/bình luận|nội dung|comment|review|phản hồi|đánh giá/i.test(lh)) selTxt.value = i;
-        if (/sku|mã|sản phẩm|product/i.test(lh)) selSku.value = i;
-      });
-      
-      $("columnSelects").style.display = "grid";
-      $("pasteInput").value = "";
+    const res = await fetch(API_BASE_URL + endpoint, options);
+    if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+    updateApiStatus(true);
+    return await res.json();
+  } catch (err) {
+    updateApiStatus(false);
+    throw err;
+  }
+}
+
+async function initApiCheck() {
+  try {
+    const activeData = await apiCall('/datasets/active');
+    if (activeData && activeData.source && activeData.source.name !== "Chưa có file dữ liệu") {
+      D = activeData;
+      toast("Đã đồng bộ dữ liệu mới nhất từ Nexus Engine Backend.");
     }
-    $("fileStatus").textContent = "✅ Đã đọc xong file " + file.name + " (" + (state.table ? state.table.length : 0) + " dòng). Bấm 'Chạy Phân tích BI' bên dưới.";
-  } catch (e) {
-    $("fileStatus").textContent = "❌ Lỗi đọc file: " + e.message;
-  }
-  updateReadyState();
-}
-
-function updateReadyState() {
-  var count = getParsedLines().length;
-  $("btnRun").disabled = count === 0;
-  if (count > 0 && !state.table) {
-    $("fileStatus").textContent = "✅ Đã nhận " + count + " dòng văn bản. Bấm 'Chạy Phân tích BI' để bắt đầu.";
+  } catch (err) {
+    console.warn("Backend API chưa kết nối, ứng dụng sẵn sàng nhận file Excel/CSV từ giao diện.", err);
+  } finally {
+    go(current);
   }
 }
 
-function getParsedLines() {
-  var lines = [], skus = [];
-  if (state.table) {
-    var cTxt = parseInt($("colText").value, 10) || 0;
-    var cSku = parseInt($("colSku").value, 10);
-    state.table.forEach(r => {
-      var txt = String(r[cTxt] || "").trim();
-      var sku = (cSku >= 0 && r[cSku] != null) ? String(r[cSku]).trim() : "Tất cả sản phẩm";
-      if (txt.length >= 2) { lines.push(txt); skus.push(sku || "Tất cả sản phẩm"); }
-    });
-  } else {
-    $("pasteInput").value.split(/\r?\n/).forEach(l => {
-      var txt = l.trim();
-      if (txt.length >= 2) { lines.push(txt); skus.push("Tất cả sản phẩm"); }
-    });
+// Xử lý nạp File Excel (.xlsx, .xls) và CSV Client-Side
+async function uploadFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['csv', 'xlsx', 'xls'].includes(ext)) {
+    return toast("Vui lòng chọn file định dạng .xlsx, .xls hoặc .csv!", true);
   }
-  state.lines = lines.slice(0, 2000);
-  state.skus = skus.slice(0, 2000);
-  return state.lines;
+
+  if (isApiConnected) {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      toast(`Đang truyền file ${file.name} tới Nexus Engine Backend...`);
+      const result = await apiCall('/datasets/upload', { method: 'POST', body: formData });
+      D = result;
+      toast("Tải lên và xử lý phân tích file thành công!");
+      go(current);
+      return;
+    } catch (err) {
+      toast("Lỗi API Upload. Chuyển sang chế độ phân tích Local Client...", true);
+    }
+  }
+  parseFileClientSide(file);
 }
 
-function analyzeRuleBased(text, sku) {
-  var t = text.toLowerCase();
-  var isNeg = /tệ|dở|kém|chậm|hỏng|vỡ|lừa|thất vọng|không như|trả hàng|hoàn tiền|rách|mỏng|lỗi|chật|rộng|bung|hôi|rè|tụt/.test(t);
-  var isPos = /tốt|đẹp|ưng|hài lòng|nhanh|chất lượng|thích|tuyệt|ok|xịn|đáng tiền|vừa|êm|chuẩn|sắc nét/.test(t);
-  
-  var issue = "no_issue";
-  if (isNeg) {
-    if (/giao|ship|vận chuyển|đóng gói|hộp|chậm/.test(t)) issue = "shipping";
-    else if (/size|rộng|chật|kích cỡ|form|ngắn|dài/.test(t)) issue = "sizing_fit";
-    else if (/giá|đắt|đáng tiền/.test(t)) issue = "price_value";
-    else if (/hướng dẫn|lắp|cách dùng|kết nối|tiếng việt/.test(t)) issue = "instructions";
-    else issue = "quality";
-  }
-  
-  return {
-    text: text, sku: sku,
-    cam: isNeg ? 'neg' : (isPos ? 'pos' : 'neu'),
-    issue: issue,
-    isReturn: /trả hàng|hoàn tiền|đổi trả|trả lại/.test(t)
+function parseFileClientSide(file) {
+  toast(`Đang đọc dữ liệu từ file ${file.name}...`);
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+      if (!rows.length) return toast("File rỗng!", true);
+
+      let pos = 0, neu = 0, neg = 0;
+      const histMap = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      const skuMap = {};
+
+      const explorer = rows.map((r, i) => {
+        const sku = String(r["Mã_SKU"] || r["SKU"] || r["Tên sản phẩm"] || "Tất cả sản phẩm").trim();
+        const text = String(r["Nội dung đánh giá"] || r["Review"] || r["Comment"] || r["Đánh giá"] || "").trim();
+        const rating = parseInt(r["Số_sao"] || r["Rating"] || 5) || 5;
+
+        if (histMap[rating] !== undefined) histMap[rating]++;
+        if (rating >= 4) pos++; else if (rating === 3) neu++; else neg++;
+
+        if (!skuMap[sku]) skuMap[sku] = { sku, product_name: sku, review_count: 0, total_rating: 0, pos: 0, neg: 0 };
+        skuMap[sku].review_count++;
+        skuMap[sku].total_rating += rating;
+        if (rating >= 4) skuMap[sku].pos++;
+        if (rating <= 2) skuMap[sku].neg++;
+
+        const absa = rating >= 4 ? "positive" : rating === 3 ? "neutral" : "negative";
+        return { row: i + 2, sku, rating, text, absa, aspects: [{ aspect: "product_quality", sentiment: absa }] };
+      });
+
+      const total = rows.length;
+      const skuList = Object.values(skuMap).map(s => ({
+        sku: s.sku,
+        product_name: s.product_name,
+        review_count: s.review_count,
+        avg_rating: s.review_count ? s.total_rating / s.review_count : 0,
+        positive_pct: s.review_count ? (s.pos / s.review_count) * 100 : 0,
+        negative_pct: s.review_count ? (s.neg / s.review_count) * 100 : 0,
+        return_intent_pct: 0,
+        top_complaint: s.neg > 0 ? "Theo dõi thêm phàn nàn" : "Không có"
+      }));
+
+      D.source = { name: file.name, uploaded_at: new Date().toLocaleTimeString("vi-VN") };
+      D.dq.total_rows = total;
+      D.dq.valid_rows = total;
+      D.dq.warnings = [];
+      D.dist.total = total;
+      D.dist.by_rating_bucket = [
+        { sentiment: "positive", count: pos, pct: total ? (pos / total) * 100 : 0 },
+        { sentiment: "neutral", count: neu, pct: total ? (neu / total) * 100 : 0 },
+        { sentiment: "negative", count: neg, pct: total ? (neg / total) * 100 : 0 }
+      ];
+      D.hist = [1, 2, 3, 4, 5].map(r => ({ rating: r, count: histMap[r] }));
+      D.sku = skuList;
+      D.explorer = explorer;
+
+      toast(`Phân tích thành công ${total} mẫu đánh giá từ file ${file.name}!`);
+      go(current);
+    } catch (err) {
+      toast("Lỗi đọc file: " + err.message, true);
+    }
   };
+  reader.readAsArrayBuffer(file);
 }
 
-function renderDashboard(results) {
-  state.results = results;
-  var total = results.length;
-  var pos = 0, neg = 0, neu = 0, returns = 0;
-  var issueCounts = { quality: 0, sizing_fit: 0, shipping: 0, price_value: 0, instructions: 0 };
-  var skuMap = {};
+// Render UI Helpers
+const insuf = (reason) => `<div class="insuf-box"><b>INSUFFICIENT DATA</b><div class="muted" style="margin-top:4px">${esc(reason)}</div></div>`;
+const tag = (t) => `<span class="tag ${t === 'actual' ? 'actual' : 'demo'}">${esc(t)}</span>`;
+const pill = (s) => `<span class="pill" style="background:${COL[s]}">${SENT[s]}</span>`;
 
-  results.forEach(r => {
-    if (r.cam === 'pos') pos++;
-    else if (r.cam === 'neg') neg++;
-    else neu++;
-    if (r.isReturn) returns++;
+function bars(items, color = "#6366f1", max = null, unit = "%") {
+  const m = max ?? Math.max(...items.map(i => i.value), 1);
+  return items.map(i => `<div class="bar-row"><span class="muted">${esc(i.label)}</span><div class="bar-track"><div class="bar-fill" style="width:${(i.value / m * 100).toFixed(1)}%;background:${i.color || color}"></div></div><span class="mono" style="text-align:right">${unit === "%" ? fmtPct(i.value) : i.value}</span></div>`).join("");
+}
 
-    if (r.issue !== 'no_issue' && issueCounts[r.issue] !== undefined) {
-      issueCounts[r.issue]++;
-    }
+function stacked(items) {
+  return items.map(i => {
+    const t = (i.positive + i.neutral + i.negative) || 1;
+    const seg = (k) => `<div style="width:${(i[k] / t * 100).toFixed(1)}%;background:${COL[k]}" title="${SENT[k]}: ${i[k]}"></div>`;
+    return `<div class="stack-row"><span class="muted">${esc(i.label)}</span><div class="bar-track">${seg("positive")}${seg("neutral")}${seg("negative")}</div></div>`;
+  }).join("");
+}
 
-    if (!skuMap[r.sku]) skuMap[r.sku] = { total: 0, pos: 0, neg: 0 };
-    skuMap[r.sku].total++;
-    if (r.cam === 'pos') skuMap[r.sku].pos++;
-    if (r.cam === 'neg') skuMap[r.sku].neg++;
-  });
+const legend = () => `<div class="legend"><span><i style="background:${COL.positive}"></i>Tích cực</span><span><i style="background:${COL.neutral}"></i>Trung lập</span><span><i style="background:${COL.negative}"></i>Tiêu cực</span></div>`;
 
-  var csat = total > 0 ? (((pos * 5 + neu * 3 + neg * 1) / (total * 5)) * 5).toFixed(1) : "0.0";
-  $("kpiTotal").textContent = total;
-  $("kpiCsat").textContent = csat + " / 5.0";
-  $("kpiPos").textContent = (pos / total * 100).toFixed(1) + "%";
-  $("kpiReturn").textContent = (returns / total * 100).toFixed(1) + "%";
-
-  if (sentimentChartInst) sentimentChartInst.destroy();
-  var ctx1 = $("sentimentChart").getContext('2d');
-  sentimentChartInst = new Chart(ctx1, {
-    type: 'doughnut',
-    data: {
-      labels: ['Hài lòng (Positive)', 'Tiêu cực (Negative)', 'Bình thường (Neutral)'],
-      datasets: [{
-        data: [pos, neg, neu],
-        backgroundColor: ['#10b981', '#f43f5e', '#cbd5e1'],
-        borderWidth: 2,
-        borderColor: '#ffffff'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom' } }
-    }
-  });
-
-  if (issueChartInst) issueChartInst.destroy();
-  var ctx2 = $("issueChart").getContext('2d');
-  issueChartInst = new Chart(ctx2, {
-    type: 'bar',
-    data: {
-      labels: Object.keys(issueCounts).map(k => ISSUES[k]),
-      datasets: [{
-        label: 'Số lượng phàn nàn',
-        data: Object.values(issueCounts),
-        backgroundColor: '#0d9488',
-        borderRadius: 8
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-    }
-  });
-
-  var skuTbody = $("skuTable").querySelector("tbody");
-  skuTbody.innerHTML = "";
-  Object.keys(skuMap).forEach(sku => {
-    var d = skuMap[sku];
-    var posPct = (d.pos / d.total * 100).toFixed(1);
-    var negPct = (d.neg / d.total * 100).toFixed(1);
-    var statusBadge = negPct > 20 ? '<span class="badge badge-neg">⚠️ Cảnh báo Trả hàng cao</span>' : (posPct >= 70 ? '<span class="badge badge-pos">⭐ Sản phẩm Ngôi sao</span>' : '<span class="badge badge-warn">Ổn định</span>');
-
-    skuTbody.innerHTML += `
-      <tr>
-        <td><b>${sku}</b></td>
-        <td><b>${d.total}</b> đánh giá</td>
-        <td><b style="color:var(--pos-color);">${posPct}%</b></td>
-        <td><b style="color:var(--neg-color);">${negPct}%</b></td>
-        <td>${statusBadge}</td>
-      </tr>
-    `;
-  });
-
-  var gapBox = $("marketGapBox");
-  gapBox.innerHTML = `
-    <div class="insight-card">
-      <h4>📌 Phân tích Chiến lược & Hành động Đề xuất cho Shop:</h4>
-      <ul>
-        <li><b>Vấn đề Kích cỡ & Form dáng:</b> Chiếm <b>${((issueCounts.sizing_fit || 0) / total * 100).toFixed(1)}%</b> tổng phàn nàn. Đề xuất: Đăng video hướng dẫn đo bảng size thực tế lên trang sản phẩm để giảm 30% tỷ lệ trả hàng.</li>
-        <li><b>Rủi ro Đổi trả / Hoàn tiền:</b> Đạt mức <b>${(returns / total * 100).toFixed(1)}%</b>. Cần bổ sung Tem kiểm định QC và thẻ thư cảm ơn kèm mã QR hỗ trợ đổi trả 1-1 trước khi khiếu nại Shopee.</li>
-        <li><b>Đối thủ & Dịch vụ:</b> Ghi nhận khách phàn nàn về tốc độ đóng gói và lỗi thiếu phụ kiện. Nếu shop bạn bổ sung quà tặng kèm và đóng hàng chống sốc 3 lớp, bạn sẽ chiếm ưu thế vượt trội so với các shop cùng ngành.</li>
-      </ul>
+// Pages View Definitions
+const PAGES = {
+  import() {
+    const dq = D.dq;
+    return `
+    <div class="banner">
+      <span>Trạng thái kết nối Engine: <b>${isApiConnected ? 'FastAPI Connected' : 'Local Fallback Mode'}</b></span>
+      <span class="mono">POST ${API_BASE_URL}/datasets/upload</span>
     </div>
-  `;
 
-  filterDetails();
+    <div class="card" style="margin-bottom:14px">
+      <h2>Tải lên file đánh giá (.xlsx, .xls, .csv)</h2>
+      <div class="sub">Hệ thống tự động phân tích cảm xúc, lọc theo SKU và trích xuất từ khóa.</div>
+      <div class="upload-box" id="dropzone">
+        <input type="file" id="file-input" accept=".csv, .xlsx, .xls" style="display:none" />
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px">Kéo thả file Excel / CSV vào đây hoặc nhấp để chọn file</div>
+        <div class="muted">Hỗ trợ file xuất đánh giá từ Shopee, TikTok Shop, Lazada...</div>
+      </div>
+    </div>
 
-  $("outputSection").style.display = "block";
-  $("outputSection").scrollIntoView({ behavior: 'smooth' });
-}
+    <div class="grid">
+      <div class="card kpi"><div class="l">Tên File</div><div class="v" style="font-size:14px">${esc(D.source.name)}</div></div>
+      <div class="card kpi"><div class="l">Dòng đọc được</div><div class="v">${dq.total_rows}</div></div>
+      <div class="card kpi"><div class="l">Dòng hợp lệ</div><div class="v pos">${dq.valid_rows}</div></div>
+      <div class="card kpi"><div class="l">Dòng bị loại</div><div class="v neg">${dq.rejected_rows || 0}</div></div>
+    </div>`;
+  },
 
-function filterDetails() {
-  if (!state.results || !state.results.length) return;
-  var sFilter = $("filterSentiment").value;
-  var iFilter = $("filterIssue").value;
-  var kw = $("searchKeyword").value.toLowerCase().trim();
+  executive() {
+    const pos = D.dist.by_rating_bucket.find(x => x.sentiment === "positive");
+    const neg = D.dist.by_rating_bucket.find(x => x.sentiment === "negative");
+    const avg = D.sku.length ? (D.sku.reduce((s, x) => s + x.avg_rating * x.review_count, 0) / (D.sku.reduce((s, x) => s + x.review_count, 0) || 1)) : 0;
+    return `
+    <div class="grid">
+      <div class="card kpi"><h2>Số đánh giá ${tag(D.dist.data_type)}</h2><div class="v">${D.dist.total}</div><div class="l">${D.sku.length} SKU</div></div>
+      <div class="card kpi"><h2>Điểm trung bình ${tag(D.dist.data_type)}</h2><div class="v">${fmtNum(avg)}</div><div class="l">Trung bình số sao</div></div>
+      <div class="card kpi"><h2>Tích cực (4–5★) ${tag(D.dist.data_type)}</h2><div class="v pos">${fmtPct(pos ? pos.pct : 0)}</div><div class="l">${pos ? pos.count : 0} đánh giá</div></div>
+      <div class="card kpi"><h2>Tiêu cực (1–2★) ${tag(D.dist.data_type)}</h2><div class="v neg">${fmtPct(neg ? neg.pct : 0)}</div><div class="l">${neg ? neg.count : 0} đánh giá</div></div>
+    </div>`;
+  },
 
-  var detailTbody = $("detailTable").querySelector("tbody");
-  detailTbody.innerHTML = "";
+  customers() {
+    const rows = D.sku.length ? D.sku.map(s => `<tr><td>${esc(s.sku)}</td><td>${esc(s.product_name)}</td><td class="num">${s.review_count}</td><td class="num">${fmtNum(s.avg_rating)}</td><td class="num pos">${fmtPct(s.positive_pct)}</td><td class="num neg">${fmtPct(s.negative_pct)}</td><td class="num">${fmtPct(s.return_intent_pct)}</td><td>${esc(s.top_complaint ?? "—")}</td></tr>`).join("") : `<tr><td colspan="8" class="muted">Chưa có dữ liệu SKU. Vui lòng nạp file tại trang Import Data.</td></tr>`;
+    return `
+    <div class="grid">
+      <div class="card"><h2>Phân bố cảm xúc ${tag(D.dist.data_type)}</h2>${bars(D.dist.by_rating_bucket.map(x => ({ label: SENT[x.sentiment], value: x.pct, color: COL[x.sentiment] })))}</div>
+      <div class="card"><h2>Phân bố số sao ${tag(D.dist.data_type)}</h2>${bars(D.hist.map(h => ({ label: h.rating + "★", value: h.count })), "#6366f1", null, "n")}</div>
+    </div>
+    <div class="card"><h2>Thống kê theo SKU ${tag(D.dist.data_type)}</h2>
+      <div style="overflow-x:auto"><table><thead><tr><th>SKU</th><th>Sản phẩm</th><th class="num">Số ĐG</th><th class="num">Điểm TB</th><th class="num">% tích cực</th><th class="num">% tiêu cực</th><th class="num">Nhắc hoàn/đổi</th><th>Phàn nàn chính</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+    <div class="card" style="margin-top:14px"><h2>Explorer đánh giá</h2>
+      <div class="controls">
+        <select id="fsku"><option value="">Tất cả SKU</option>${D.sku.map(s => `<option>${esc(s.sku)}</option>`).join("")}</select>
+        <select id="fsent"><option value="">Mọi cảm xúc</option><option value="positive">Tích cực</option><option value="neutral">Trung lập</option><option value="negative">Tiêu cực</option></select>
+        <input id="fq" placeholder="Tìm trong nội dung…" style="width:240px" />
+      </div>
+      <div id="explorer"></div>
+    </div>`;
+  },
 
-  state.results.forEach(r => {
-    if (sFilter !== 'ALL' && r.cam !== sFilter) return;
-    if (iFilter !== 'ALL' && r.issue !== iFilter) return;
-    if (kw.length > 0 && r.text.toLowerCase().indexOf(kw) === -1) return;
+  feedback() {
+    const asp = D.aspects.map(a => ({ label: ASP[a.aspect] || a.aspect, positive: a.positive, neutral: a.neutral, negative: a.negative }));
+    return `
+    <div class="banner">Mô hình ABSA: Phân tích từ khóa và mệnh đề cảm xúc theo nhóm khía cạnh.</div>
+    <div class="grid">
+      <div class="card"><h2>Cảm xúc theo khía cạnh ${tag("actual")}</h2>${legend()}${stacked(asp)}</div>
+      <div class="card"><h2>Từ khóa tiêu cực ${tag("actual")}</h2>${bars((D.keywords || []).map(k => ({ label: k.keyword, value: k.count })), "#6366f1", null, "n")}</div>
+    </div>`;
+  },
 
-    var badgeClass = r.cam === 'pos' ? 'badge-pos' : (r.cam === 'neg' ? 'badge-neg' : 'badge-warn');
-    var camText = r.cam === 'pos' ? 'Hài lòng' : (r.cam === 'neg' ? 'Tiêu cực' : 'Bình thường');
-    detailTbody.innerHTML += `
-      <tr>
-        <td><b>${r.sku}</b></td>
-        <td><span class="badge ${badgeClass}">${camText}</span></td>
-        <td><b>${ISSUES[r.issue] || r.issue}</b></td>
-        <td>${r.text}</td>
-      </tr>
-    `;
-  });
-}
+  unit() {
+    const DEF = { selling_price: 200000, cogs: 80000, discount_rate: 0.1, return_rate: 0.1, platform_fee_rate: 0.06, ad_cost_per_order: 15000, fulfillment_cost: 20000, reverse_shipping_cost: 18000, forward_shipping_nonrecovered: 5000, packaging_write_off: 2000, defect_loss: 10000, other_opex: 3000 };
+    const F = [["selling_price","Giá bán (VNĐ)",1000],["cogs","Giá vốn (VNĐ)",1000],["discount_rate","Chiết khấu (0–1)",0.01],["return_rate","Tỷ lệ hoàn (0–1)",0.01],["platform_fee_rate","Phí sàn (0–1)",0.01],["ad_cost_per_order","Quảng cáo / đơn",1000]];
+    return `
+    <div class="grid" style="grid-template-columns:320px 1fr">
+      <div class="card"><h2>Đầu vào SKU <span class="tag demo">SIMULATED</span></h2>
+        ${F.map(([k, l, s]) => `<div class="label-row"><span class="muted">${l}</span><input class="u-in" data-k="${k}" type="number" step="${s}" value="${DEF[k]}" style="width:120px;text-align:right" /></div>`).join("")}
+        <div class="controls" style="margin-top:10px"><button class="btn primary" id="u-calc">Tính Toán</button></div></div>
+      <div class="card"><h2>Phân rã đơn hàng</h2><div id="u-out"></div></div>
+    </div>`;
+  },
 
-var dz = $("dropZone");
-["dragenter", "dragover"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("over"); }));
-["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("over"); }));
-dz.addEventListener("drop", e => { var f = e.dataTransfer.files[0]; if (f) handleFile(f); });
-
-$("fileInput").addEventListener("change", e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
-$("pasteInput").addEventListener("input", updateReadyState);
-$("colText").addEventListener("change", updateReadyState);
-$("colSku").addEventListener("change", updateReadyState);
-
-$("btnRun").onclick = () => {
-  var lines = getParsedLines(), skus = state.skus;
-  var results = lines.map((line, idx) => analyzeRuleBased(line, skus[idx]));
-  renderDashboard(results);
+  predictive() { return `<div class="card"><h2>Dự báo tỷ lệ hoàn & Doanh thu</h2>${insuf("Chưa nạp chuỗi thời gian ngày đánh giá.")}</div>`; },
+  competitors() { return `<div class="card"><h2>Nạp dữ liệu đối thủ (CSV/Excel)</h2><input type="file" id="comp-file-input" accept=".csv, .xlsx" /><button class="btn primary" id="btn-import-comp">Tải Lên</button></div>`; },
+  opportunities() { return `<div class="card"><h2>Phân tích Market Gap</h2>${insuf("Chưa có dữ liệu đối thủ để so sánh.")}</div>`; },
+  reports() { return `<div class="card"><h2>Xuất Báo Cáo CSV / Excel</h2><p>Tải xuống tập dữ liệu sau khi phân tích.</p></div>`; },
+  system() {
+    return `
+    <div class="banner"><span>Telemetry Engine API: <code>GET ${API_BASE_URL}/system/telemetry</code></span><button class="btn" id="btn-refresh-telemetry">Cập nhật</button></div>
+    <div class="grid">
+      <div class="card kpi"><div class="l">CPU Usage</div><div class="v" id="t-cpu">${telemetryData ? telemetryData.cpu + '%' : '—'}</div></div>
+      <div class="card kpi"><div class="l">RAM Usage</div><div class="v" id="t-ram">${telemetryData ? telemetryData.ram + '%' : '—'}</div></div>
+      <div class="card kpi"><div class="l">GPU / VRAM</div><div class="v" id="t-gpu">${telemetryData ? telemetryData.gpu + '%' : '—'}</div></div>
+      <div class="card kpi"><div class="l">Trạng thái Model</div><div class="v pos" id="t-status">${telemetryData ? telemetryData.model_status : 'Ready'}</div></div>
+    </div>`;
+  },
+  settings() {
+    return `
+    <div class="card"><h2>Cấu hình Nexus Backend Local</h2>
+      <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+        <label>FastAPI URL:</label><input id="api-url-input" type="text" value="${API_BASE_URL}" style="width:280px" />
+        <button class="btn primary" id="btn-save-api">Lưu & Kết Nối Lại</button>
+      </div>
+    </div>`;
+  }
 };
+
+const NAV = [
+  ["import","Import Data"],["executive","Executive Overview"],["customers","Customer Intelligence"],["feedback","Feedback & ABSA"],
+  ["unit","Unit Economics"],["predictive","Predictive Analytics"],["competitors","Competitor Intelligence"],["opportunities","Market Opportunities"],
+  ["reports","Report Center"],["system","System Monitoring"],["settings","Settings"]
+];
+
+function renderExplorer() {
+  const sku = $("#fsku") ? $("#fsku").value : "", sent = $("#fsent") ? $("#fsent").value : "", q = $("#fq") ? $("#fq").value.trim().toLowerCase() : "";
+  const rows = (D.explorer || []).filter(r => (!sku || r.sku === sku) && (!sent || r.absa === sent) && (!q || r.text.toLowerCase().includes(q)));
+  const pageSize = 8;
+  const pages = Math.max(1, Math.ceil(rows.length / pageSize));
+  window.__page = Math.min(window.__page || 1, pages);
+  const slice = rows.slice((window.__page - 1) * pageSize, window.__page * pageSize);
+
+  const expEl = $("#explorer");
+  if (!expEl) return;
+  expEl.innerHTML = `
+    <div style="overflow-x:auto"><table><thead><tr><th class="num">Dòng</th><th>SKU</th><th class="num">Sao</th><th>Nội dung</th><th>Cảm xúc</th></tr></thead><tbody>
+    ${slice.map(r => `<tr><td class="num">${r.row}</td><td class="mono">${esc(r.sku)}</td><td class="num">${r.rating}</td><td class="wrap" style="max-width:420px">${esc(r.text)}</td><td>${pill(r.absa)}</td></tr>`).join("") || `<tr><td colspan="5" class="muted">Chưa có dữ liệu đánh giá nào.</td></tr>`}
+    </tbody></table></div>
+    <div class="pg"><span>Trang ${window.__page || 1}/${pages} (${rows.length} đánh giá)</span>
+      <button class="btn" id="pprev">‹</button><button class="btn" id="pnext">›</button></div>`;
+  $("#pprev").onclick = () => { window.__page = Math.max(1, (window.__page || 1) - 1); renderExplorer(); };
+  $("#pnext").onclick = () => { window.__page = Math.min(pages, (window.__page || 1) + 1); renderExplorer(); };
+}
+
+async function fetchTelemetry() {
+  try {
+    const data = await apiCall('/system/telemetry');
+    telemetryData = data;
+    if ($("#t-cpu")) $("#t-cpu").textContent = data.cpu + '%';
+    if ($("#t-ram")) $("#t-ram").textContent = data.ram + '%';
+    if ($("#t-gpu")) $("#t-gpu").textContent = data.gpu + '%';
+    if ($("#t-status")) $("#t-status").textContent = data.model_status || 'Ready';
+  } catch (err) { console.warn("Lỗi fetch telemetry."); }
+}
+
+function wirePage(p) {
+  if (telemetryTimer) { clearInterval(telemetryTimer); telemetryTimer = null; }
+  if (p === "import") {
+    const dz = $("#dropzone"), fi = $("#file-input");
+    if (dz && fi) {
+      dz.onclick = () => fi.click();
+      fi.onchange = (e) => { if (e.target.files.length) uploadFile(e.target.files[0]); };
+      dz.ondragover = (e) => e.preventDefault();
+      dz.ondrop = (e) => { e.preventDefault(); if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]); };
+    }
+  }
+  if (p === "customers") {
+    ["#fsku","#fsent","#fq"].forEach(s => { if ($(s)) $(s).addEventListener("input", () => { window.__page = 1; renderExplorer(); }); });
+    window.__page = 1; renderExplorer();
+  }
+  if (p === "system") {
+    fetchTelemetry();
+    telemetryTimer = setInterval(fetchTelemetry, 5000);
+    if ($("#btn-refresh-telemetry")) $("#btn-refresh-telemetry").onclick = fetchTelemetry;
+  }
+  if (p === "settings") {
+    if ($("#btn-save-api")) {
+      $("#btn-save-api").onclick = () => {
+        const u = $("#api-url-input").value.trim();
+        if (u) { API_BASE_URL = u; localStorage.setItem('NEXUS_API_URL', u); toast("Đã lưu API URL!"); initApiCheck(); }
+      };
+    }
+  }
+}
+
+let current = "import";
+function go(p) {
+  current = p;
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.id === p));
+  $("#title").textContent = NAV.find(n => n[0] === p)[1];
+  $("#content").innerHTML = PAGES[p]();
+  $("#src").textContent = "Nguồn: " + D.source.name;
+  wirePage(p);
+}
+
+$("#nav").innerHTML = NAV.map(([id, l]) => `<button data-id="${id}">${l}</button>`).join("");
+$("#nav").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.id); });
+$("#theme").addEventListener("click", e => {
+  const dark = document.documentElement.dataset.theme !== "dark";
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  e.target.textContent = dark ? "Light" : "Dark";
+});
+document.documentElement.dataset.theme = "dark";
+$("#theme").textContent = "Light";
+
+initApiCheck();
 </script>
 </body>
 </html>
